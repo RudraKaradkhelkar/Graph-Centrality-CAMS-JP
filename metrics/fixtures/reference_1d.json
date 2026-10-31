@@ -1,0 +1,4065 @@
+{
+ "note": "Made-up sample network. Expected values come from the V3 reference _derive(), which divides edge importance by 3.",
+ "assets": [
+  {
+   "id": "CC-001",
+   "importance": 3
+  },
+  {
+   "id": "CC-002",
+   "importance": 3
+  },
+  {
+   "id": "GEN-001",
+   "importance": 3
+  },
+  {
+   "id": "GEN-002",
+   "importance": 2
+  },
+  {
+   "id": "GEN-003",
+   "importance": 3
+  },
+  {
+   "id": "GEN-004",
+   "importance": 3
+  },
+  {
+   "id": "GEN-005",
+   "importance": 2
+  },
+  {
+   "id": "GEN-006",
+   "importance": 3
+  },
+  {
+   "id": "GEN-007",
+   "importance": 3
+  },
+  {
+   "id": "GEN-008",
+   "importance": 2
+  },
+  {
+   "id": "TSS-001",
+   "importance": 3
+  },
+  {
+   "id": "TSS-002",
+   "importance": 2
+  },
+  {
+   "id": "TSS-003",
+   "importance": 3
+  },
+  {
+   "id": "TSS-004",
+   "importance": 3
+  },
+  {
+   "id": "TSS-005",
+   "importance": 3
+  },
+  {
+   "id": "TSS-006",
+   "importance": 3
+  },
+  {
+   "id": "TSS-007",
+   "importance": 3
+  },
+  {
+   "id": "TSS-008",
+   "importance": 3
+  },
+  {
+   "id": "TSS-009",
+   "importance": 3
+  },
+  {
+   "id": "TSS-010",
+   "importance": 3
+  },
+  {
+   "id": "TSS-011",
+   "importance": 2
+  },
+  {
+   "id": "TSS-012",
+   "importance": 3
+  },
+  {
+   "id": "TSS-013",
+   "importance": 3
+  },
+  {
+   "id": "TSS-014",
+   "importance": 2
+  },
+  {
+   "id": "TSS-015",
+   "importance": 3
+  },
+  {
+   "id": "TSS-016",
+   "importance": 3
+  },
+  {
+   "id": "DSS-001",
+   "importance": 2
+  },
+  {
+   "id": "DSS-002",
+   "importance": 3
+  },
+  {
+   "id": "DSS-003",
+   "importance": 2
+  },
+  {
+   "id": "DSS-004",
+   "importance": 2
+  },
+  {
+   "id": "DSS-005",
+   "importance": 2
+  },
+  {
+   "id": "DSS-006",
+   "importance": 2
+  },
+  {
+   "id": "DSS-007",
+   "importance": 1
+  },
+  {
+   "id": "DSS-008",
+   "importance": 3
+  },
+  {
+   "id": "DSS-009",
+   "importance": 2
+  },
+  {
+   "id": "DSS-010",
+   "importance": 2
+  },
+  {
+   "id": "DSS-011",
+   "importance": 1
+  },
+  {
+   "id": "DSS-012",
+   "importance": 2
+  },
+  {
+   "id": "DSS-013",
+   "importance": 2
+  },
+  {
+   "id": "DSS-014",
+   "importance": 2
+  },
+  {
+   "id": "DSS-015",
+   "importance": 1
+  },
+  {
+   "id": "DSS-016",
+   "importance": 2
+  },
+  {
+   "id": "DSS-017",
+   "importance": 2
+  },
+  {
+   "id": "DSS-018",
+   "importance": 2
+  },
+  {
+   "id": "DSS-019",
+   "importance": 2
+  },
+  {
+   "id": "DSS-020",
+   "importance": 3
+  },
+  {
+   "id": "DSS-021",
+   "importance": 3
+  },
+  {
+   "id": "DSS-022",
+   "importance": 1
+  },
+  {
+   "id": "DSS-023",
+   "importance": 3
+  },
+  {
+   "id": "DSS-024",
+   "importance": 3
+  },
+  {
+   "id": "DSS-025",
+   "importance": 1
+  },
+  {
+   "id": "DSS-026",
+   "importance": 1
+  },
+  {
+   "id": "DSS-027",
+   "importance": 2
+  },
+  {
+   "id": "DSS-028",
+   "importance": 2
+  },
+  {
+   "id": "DSS-029",
+   "importance": 2
+  },
+  {
+   "id": "DSS-030",
+   "importance": 2
+  },
+  {
+   "id": "DSS-031",
+   "importance": 1
+  },
+  {
+   "id": "DSS-032",
+   "importance": 3
+  },
+  {
+   "id": "DSS-033",
+   "importance": 1
+  },
+  {
+   "id": "DSS-034",
+   "importance": 3
+  },
+  {
+   "id": "RTU-001",
+   "importance": 1
+  },
+  {
+   "id": "RTU-002",
+   "importance": 2
+  },
+  {
+   "id": "RTU-003",
+   "importance": 1
+  },
+  {
+   "id": "RTU-004",
+   "importance": 1
+  },
+  {
+   "id": "RTU-005",
+   "importance": 2
+  },
+  {
+   "id": "RTU-006",
+   "importance": 1
+  },
+  {
+   "id": "RTU-007",
+   "importance": 1
+  },
+  {
+   "id": "RTU-008",
+   "importance": 1
+  },
+  {
+   "id": "RTU-009",
+   "importance": 1
+  },
+  {
+   "id": "RTU-010",
+   "importance": 1
+  },
+  {
+   "id": "RTU-011",
+   "importance": 1
+  },
+  {
+   "id": "RTU-012",
+   "importance": 1
+  },
+  {
+   "id": "RTU-013",
+   "importance": 2
+  },
+  {
+   "id": "RTU-014",
+   "importance": 1
+  },
+  {
+   "id": "RTU-015",
+   "importance": 2
+  },
+  {
+   "id": "RTU-016",
+   "importance": 2
+  },
+  {
+   "id": "RTU-017",
+   "importance": 1
+  },
+  {
+   "id": "RTU-018",
+   "importance": 1
+  },
+  {
+   "id": "RTU-019",
+   "importance": 2
+  },
+  {
+   "id": "RTU-020",
+   "importance": 1
+  },
+  {
+   "id": "RTU-021",
+   "importance": 2
+  },
+  {
+   "id": "RTU-022",
+   "importance": 1
+  },
+  {
+   "id": "RTU-023",
+   "importance": 2
+  },
+  {
+   "id": "RTU-024",
+   "importance": 1
+  },
+  {
+   "id": "RTU-025",
+   "importance": 1
+  },
+  {
+   "id": "RTU-026",
+   "importance": 1
+  },
+  {
+   "id": "RTU-027",
+   "importance": 1
+  },
+  {
+   "id": "RTU-028",
+   "importance": 1
+  },
+  {
+   "id": "RTU-029",
+   "importance": 2
+  },
+  {
+   "id": "RTU-030",
+   "importance": 2
+  },
+  {
+   "id": "RTU-031",
+   "importance": 1
+  },
+  {
+   "id": "RTU-032",
+   "importance": 1
+  },
+  {
+   "id": "RTU-033",
+   "importance": 2
+  },
+  {
+   "id": "RTU-034",
+   "importance": 2
+  },
+  {
+   "id": "RTU-035",
+   "importance": 1
+  },
+  {
+   "id": "RTU-036",
+   "importance": 2
+  },
+  {
+   "id": "RTU-037",
+   "importance": 2
+  },
+  {
+   "id": "RTU-038",
+   "importance": 2
+  },
+  {
+   "id": "COM-001",
+   "importance": 1
+  },
+  {
+   "id": "COM-002",
+   "importance": 3
+  },
+  {
+   "id": "COM-003",
+   "importance": 1
+  },
+  {
+   "id": "COM-004",
+   "importance": 3
+  },
+  {
+   "id": "COM-005",
+   "importance": 2
+  },
+  {
+   "id": "COM-006",
+   "importance": 1
+  },
+  {
+   "id": "COM-007",
+   "importance": 3
+  },
+  {
+   "id": "COM-008",
+   "importance": 2
+  },
+  {
+   "id": "COM-009",
+   "importance": 2
+  },
+  {
+   "id": "COM-010",
+   "importance": 1
+  },
+  {
+   "id": "COM-011",
+   "importance": 2
+  },
+  {
+   "id": "COM-012",
+   "importance": 2
+  },
+  {
+   "id": "COM-013",
+   "importance": 3
+  },
+  {
+   "id": "COM-014",
+   "importance": 2
+  },
+  {
+   "id": "COM-015",
+   "importance": 2
+  },
+  {
+   "id": "COM-016",
+   "importance": 1
+  },
+  {
+   "id": "COM-017",
+   "importance": 1
+  },
+  {
+   "id": "COM-018",
+   "importance": 1
+  },
+  {
+   "id": "COM-019",
+   "importance": 2
+  },
+  {
+   "id": "COM-020",
+   "importance": 2
+  },
+  {
+   "id": "COM-021",
+   "importance": 1
+  },
+  {
+   "id": "COM-022",
+   "importance": 1
+  }
+ ],
+ "links": [
+  {
+   "source": "CC-001",
+   "target": "CC-002",
+   "type": "Control",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "CC-001",
+   "target": "COM-006",
+   "type": "Network",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "CC-001",
+   "target": "COM-011",
+   "type": "Network",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "CC-001",
+   "target": "COM-022",
+   "type": "Network",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "CC-001",
+   "target": "COM-015",
+   "type": "Network",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "CC-001",
+   "target": "TSS-016",
+   "type": "Control",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "CC-001",
+   "target": "TSS-015",
+   "type": "Control",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "CC-001",
+   "target": "TSS-004",
+   "type": "Control",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "CC-002",
+   "target": "COM-011",
+   "type": "Network",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "CC-002",
+   "target": "COM-013",
+   "type": "Network",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "CC-002",
+   "target": "COM-022",
+   "type": "Network",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "CC-002",
+   "target": "COM-009",
+   "type": "Network",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "CC-002",
+   "target": "TSS-007",
+   "type": "Control",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "CC-002",
+   "target": "TSS-011",
+   "type": "Control",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "CC-002",
+   "target": "TSS-016",
+   "type": "Control",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "GEN-001",
+   "target": "TSS-009",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "GEN-002",
+   "target": "TSS-003",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 2,
+   "target_importance": 3
+  },
+  {
+   "source": "GEN-002",
+   "target": "TSS-005",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 2,
+   "target_importance": 3
+  },
+  {
+   "source": "GEN-003",
+   "target": "TSS-001",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "GEN-003",
+   "target": "TSS-007",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "GEN-004",
+   "target": "TSS-005",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "GEN-005",
+   "target": "TSS-004",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 2,
+   "target_importance": 3
+  },
+  {
+   "source": "GEN-006",
+   "target": "TSS-002",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "GEN-007",
+   "target": "TSS-016",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "GEN-007",
+   "target": "TSS-003",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "GEN-008",
+   "target": "TSS-015",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 2,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-001",
+   "target": "TSS-002",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-001",
+   "target": "TSS-004",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-001",
+   "target": "DSS-010",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-001",
+   "target": "DSS-011",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "TSS-001",
+   "target": "DSS-019",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-001",
+   "target": "DSS-020",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-001",
+   "target": "DSS-025",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "TSS-001",
+   "target": "DSS-027",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-002",
+   "target": "TSS-003",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-002",
+   "target": "TSS-008",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 2,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-002",
+   "target": "DSS-016",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-002",
+   "target": "DSS-034",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-003",
+   "target": "TSS-004",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-003",
+   "target": "TSS-001",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-003",
+   "target": "TSS-010",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-003",
+   "target": "DSS-008",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-003",
+   "target": "DSS-014",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-004",
+   "target": "TSS-005",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-004",
+   "target": "DSS-019",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-004",
+   "target": "DSS-021",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-004",
+   "target": "DSS-022",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "TSS-005",
+   "target": "TSS-006",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-005",
+   "target": "DSS-007",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "TSS-005",
+   "target": "DSS-030",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-005",
+   "target": "DSS-031",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "TSS-006",
+   "target": "TSS-007",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-006",
+   "target": "DSS-003",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-006",
+   "target": "DSS-005",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-006",
+   "target": "DSS-006",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-006",
+   "target": "DSS-018",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-006",
+   "target": "DSS-023",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-006",
+   "target": "DSS-029",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-007",
+   "target": "TSS-008",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-007",
+   "target": "TSS-015",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-007",
+   "target": "DSS-015",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "TSS-007",
+   "target": "DSS-027",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-008",
+   "target": "TSS-009",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-008",
+   "target": "DSS-001",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-008",
+   "target": "DSS-010",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-008",
+   "target": "DSS-014",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-009",
+   "target": "TSS-010",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-009",
+   "target": "DSS-017",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-009",
+   "target": "DSS-034",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-010",
+   "target": "TSS-011",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-010",
+   "target": "TSS-007",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-010",
+   "target": "DSS-004",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-010",
+   "target": "DSS-007",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "TSS-010",
+   "target": "DSS-012",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-010",
+   "target": "DSS-023",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-010",
+   "target": "DSS-026",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "TSS-010",
+   "target": "DSS-033",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "TSS-011",
+   "target": "TSS-012",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-011",
+   "target": "DSS-002",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 2,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-011",
+   "target": "DSS-008",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-011",
+   "target": "DSS-028",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 2,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-012",
+   "target": "TSS-013",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-012",
+   "target": "DSS-015",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "TSS-013",
+   "target": "TSS-014",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-013",
+   "target": "TSS-007",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-013",
+   "target": "DSS-009",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-013",
+   "target": "DSS-013",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-014",
+   "target": "TSS-015",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 2,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-014",
+   "target": "DSS-028",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 2,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-014",
+   "target": "DSS-032",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-015",
+   "target": "TSS-016",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-015",
+   "target": "DSS-024",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-016",
+   "target": "TSS-001",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "TSS-016",
+   "target": "DSS-004",
+   "type": "Power",
+   "importance": 3,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-016",
+   "target": "DSS-005",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-016",
+   "target": "DSS-012",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "TSS-016",
+   "target": "DSS-031",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-002",
+   "target": "DSS-031",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-002",
+   "target": "RTU-030",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "DSS-003",
+   "target": "DSS-002",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 3
+  },
+  {
+   "source": "DSS-003",
+   "target": "RTU-018",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-003",
+   "target": "RTU-028",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-005",
+   "target": "DSS-031",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-005",
+   "target": "DSS-020",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 3
+  },
+  {
+   "source": "DSS-005",
+   "target": "DSS-029",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 2
+  },
+  {
+   "source": "DSS-007",
+   "target": "RTU-033",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 1,
+   "target_importance": 2
+  },
+  {
+   "source": "DSS-008",
+   "target": "RTU-038",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "DSS-010",
+   "target": "RTU-006",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-011",
+   "target": "RTU-015",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 1,
+   "target_importance": 2
+  },
+  {
+   "source": "DSS-011",
+   "target": "RTU-023",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 1,
+   "target_importance": 2
+  },
+  {
+   "source": "DSS-012",
+   "target": "RTU-010",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-013",
+   "target": "RTU-026",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-013",
+   "target": "RTU-032",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-013",
+   "target": "RTU-035",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-016",
+   "target": "RTU-013",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 2
+  },
+  {
+   "source": "DSS-016",
+   "target": "RTU-025",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-017",
+   "target": "RTU-016",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 2
+  },
+  {
+   "source": "DSS-017",
+   "target": "RTU-031",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-018",
+   "target": "RTU-014",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-018",
+   "target": "RTU-017",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-018",
+   "target": "RTU-036",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 2
+  },
+  {
+   "source": "DSS-019",
+   "target": "RTU-019",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 2
+  },
+  {
+   "source": "DSS-021",
+   "target": "DSS-009",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "DSS-021",
+   "target": "RTU-007",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-022",
+   "target": "RTU-003",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 1,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-022",
+   "target": "RTU-034",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 1,
+   "target_importance": 2
+  },
+  {
+   "source": "DSS-023",
+   "target": "DSS-020",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 3,
+   "target_importance": 3
+  },
+  {
+   "source": "DSS-023",
+   "target": "RTU-002",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "DSS-023",
+   "target": "RTU-022",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-023",
+   "target": "RTU-024",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-024",
+   "target": "DSS-003",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "DSS-024",
+   "target": "RTU-029",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "DSS-025",
+   "target": "RTU-011",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 1,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-026",
+   "target": "RTU-004",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 1,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-028",
+   "target": "RTU-027",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-029",
+   "target": "RTU-009",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-029",
+   "target": "RTU-012",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-029",
+   "target": "RTU-021",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 2
+  },
+  {
+   "source": "DSS-030",
+   "target": "RTU-001",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-030",
+   "target": "RTU-008",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "DSS-031",
+   "target": "RTU-005",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 1,
+   "target_importance": 2
+  },
+  {
+   "source": "DSS-031",
+   "target": "RTU-037",
+   "type": "Power",
+   "importance": 2,
+   "source_importance": 1,
+   "target_importance": 2
+  },
+  {
+   "source": "DSS-034",
+   "target": "RTU-020",
+   "type": "Power",
+   "importance": 1,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-001",
+   "target": "COM-002",
+   "type": "Network",
+   "importance": 2,
+   "source_importance": 1,
+   "target_importance": 3
+  },
+  {
+   "source": "COM-001",
+   "target": "COM-012",
+   "type": "Network",
+   "importance": 1,
+   "source_importance": 1,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-002",
+   "target": "COM-003",
+   "type": "Network",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-002",
+   "target": "RTU-011",
+   "type": "Control",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-002",
+   "target": "RTU-012",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-003",
+   "target": "COM-004",
+   "type": "Network",
+   "importance": 2,
+   "source_importance": 1,
+   "target_importance": 3
+  },
+  {
+   "source": "COM-004",
+   "target": "COM-005",
+   "type": "Network",
+   "importance": 1,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-004",
+   "target": "RTU-003",
+   "type": "Control",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-004",
+   "target": "RTU-004",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-004",
+   "target": "RTU-005",
+   "type": "Control",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-004",
+   "target": "RTU-007",
+   "type": "Control",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-004",
+   "target": "RTU-008",
+   "type": "Control",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-004",
+   "target": "RTU-015",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-004",
+   "target": "RTU-036",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-004",
+   "target": "RTU-038",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-005",
+   "target": "COM-006",
+   "type": "Network",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-005",
+   "target": "RTU-027",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-005",
+   "target": "RTU-030",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-006",
+   "target": "COM-007",
+   "type": "Network",
+   "importance": 1,
+   "source_importance": 1,
+   "target_importance": 3
+  },
+  {
+   "source": "COM-006",
+   "target": "RTU-025",
+   "type": "Control",
+   "importance": 2,
+   "source_importance": 1,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-007",
+   "target": "COM-008",
+   "type": "Network",
+   "importance": 1,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-007",
+   "target": "COM-017",
+   "type": "Network",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-007",
+   "target": "RTU-009",
+   "type": "Control",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-007",
+   "target": "RTU-031",
+   "type": "Control",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-008",
+   "target": "COM-009",
+   "type": "Network",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-008",
+   "target": "RTU-019",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-009",
+   "target": "COM-010",
+   "type": "Network",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-009",
+   "target": "RTU-035",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-010",
+   "target": "COM-011",
+   "type": "Network",
+   "importance": 1,
+   "source_importance": 1,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-010",
+   "target": "COM-005",
+   "type": "Network",
+   "importance": 1,
+   "source_importance": 1,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-011",
+   "target": "COM-012",
+   "type": "Network",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-011",
+   "target": "RTU-016",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-012",
+   "target": "COM-013",
+   "type": "Network",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 3
+  },
+  {
+   "source": "COM-012",
+   "target": "RTU-020",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-012",
+   "target": "RTU-024",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-012",
+   "target": "RTU-028",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-012",
+   "target": "RTU-032",
+   "type": "Control",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-012",
+   "target": "RTU-033",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-012",
+   "target": "RTU-034",
+   "type": "Control",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-013",
+   "target": "COM-014",
+   "type": "Network",
+   "importance": 1,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-013",
+   "target": "RTU-021",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-013",
+   "target": "RTU-029",
+   "type": "Control",
+   "importance": 2,
+   "source_importance": 3,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-014",
+   "target": "COM-015",
+   "type": "Network",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-014",
+   "target": "RTU-022",
+   "type": "Control",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-015",
+   "target": "COM-016",
+   "type": "Network",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-015",
+   "target": "RTU-002",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-016",
+   "target": "COM-017",
+   "type": "Network",
+   "importance": 1,
+   "source_importance": 1,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-016",
+   "target": "RTU-037",
+   "type": "Control",
+   "importance": 2,
+   "source_importance": 1,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-017",
+   "target": "COM-018",
+   "type": "Network",
+   "importance": 2,
+   "source_importance": 1,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-017",
+   "target": "RTU-001",
+   "type": "Control",
+   "importance": 2,
+   "source_importance": 1,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-017",
+   "target": "RTU-014",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 1,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-017",
+   "target": "RTU-018",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 1,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-017",
+   "target": "RTU-026",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 1,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-018",
+   "target": "COM-019",
+   "type": "Network",
+   "importance": 2,
+   "source_importance": 1,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-018",
+   "target": "RTU-023",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 1,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-019",
+   "target": "COM-020",
+   "type": "Network",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-019",
+   "target": "RTU-010",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-020",
+   "target": "COM-021",
+   "type": "Network",
+   "importance": 2,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-020",
+   "target": "RTU-006",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-020",
+   "target": "RTU-017",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 2,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-021",
+   "target": "COM-022",
+   "type": "Network",
+   "importance": 2,
+   "source_importance": 1,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-022",
+   "target": "COM-001",
+   "type": "Network",
+   "importance": 1,
+   "source_importance": 1,
+   "target_importance": 1
+  },
+  {
+   "source": "COM-022",
+   "target": "COM-020",
+   "type": "Network",
+   "importance": 1,
+   "source_importance": 1,
+   "target_importance": 2
+  },
+  {
+   "source": "COM-022",
+   "target": "RTU-013",
+   "type": "Control",
+   "importance": 1,
+   "source_importance": 1,
+   "target_importance": 2
+  }
+ ],
+ "expected": [
+  {
+   "id": "CC-001",
+   "1U": 0.067226891,
+   "1U_rank": 2,
+   "1W": 0.067226891,
+   "1W_rank": 1,
+   "1UB": 0.260504202,
+   "1UB_rank": 1,
+   "1WB": 0.201680672,
+   "1WB_rank": 1,
+   "out": 8,
+   "in": 0,
+   "hop1": 8,
+   "hop2": 23,
+   "high": 11
+  },
+  {
+   "id": "CC-002",
+   "1U": 0.058823529,
+   "1U_rank": 5,
+   "1W": 0.058823529,
+   "1W_rank": 2,
+   "1UB": 0.25210084,
+   "1UB_rank": 2,
+   "1WB": 0.179271709,
+   "1WB_rank": 2,
+   "out": 7,
+   "in": 1,
+   "hop1": 7,
+   "hop2": 23,
+   "high": 9
+  },
+  {
+   "id": "GEN-001",
+   "1U": 0.008403361,
+   "1U_rank": 68,
+   "1W": 0.008403361,
+   "1W_rank": 52,
+   "1UB": 0.033613445,
+   "1UB_rank": 52,
+   "1WB": 0.025210084,
+   "1WB_rank": 32,
+   "out": 1,
+   "in": 0,
+   "hop1": 1,
+   "hop2": 3,
+   "high": 3
+  },
+  {
+   "id": "GEN-002",
+   "1U": 0.016806723,
+   "1U_rank": 52,
+   "1W": 0.016806723,
+   "1W_rank": 20,
+   "1UB": 0.092436975,
+   "1UB_rank": 17,
+   "1WB": 0.078431373,
+   "1WB_rank": 9,
+   "out": 2,
+   "in": 0,
+   "hop1": 2,
+   "hop2": 9,
+   "high": 7
+  },
+  {
+   "id": "GEN-003",
+   "1U": 0.016806723,
+   "1U_rank": 53,
+   "1W": 0.016806723,
+   "1W_rank": 21,
+   "1UB": 0.109243697,
+   "1UB_rank": 11,
+   "1WB": 0.084033613,
+   "1WB_rank": 8,
+   "out": 2,
+   "in": 0,
+   "hop1": 2,
+   "hop2": 11,
+   "high": 6
+  },
+  {
+   "id": "GEN-004",
+   "1U": 0.008403361,
+   "1U_rank": 69,
+   "1W": 0.008403361,
+   "1W_rank": 53,
+   "1UB": 0.042016807,
+   "1UB_rank": 39,
+   "1WB": 0.036414566,
+   "1WB_rank": 22,
+   "out": 1,
+   "in": 0,
+   "hop1": 1,
+   "hop2": 4,
+   "high": 2
+  },
+  {
+   "id": "GEN-005",
+   "1U": 0.008403361,
+   "1U_rank": 70,
+   "1W": 0.008403361,
+   "1W_rank": 54,
+   "1UB": 0.042016807,
+   "1UB_rank": 40,
+   "1WB": 0.036414566,
+   "1WB_rank": 23,
+   "out": 1,
+   "in": 0,
+   "hop1": 1,
+   "hop2": 4,
+   "high": 3
+  },
+  {
+   "id": "GEN-006",
+   "1U": 0.008403361,
+   "1U_rank": 71,
+   "1W": 0.008403361,
+   "1W_rank": 55,
+   "1UB": 0.042016807,
+   "1UB_rank": 41,
+   "1WB": 0.033613445,
+   "1WB_rank": 27,
+   "out": 1,
+   "in": 0,
+   "hop1": 1,
+   "hop2": 4,
+   "high": 3
+  },
+  {
+   "id": "GEN-007",
+   "1U": 0.016806723,
+   "1U_rank": 54,
+   "1W": 0.016806723,
+   "1W_rank": 22,
+   "1UB": 0.092436975,
+   "1UB_rank": 18,
+   "1WB": 0.075630252,
+   "1WB_rank": 11,
+   "out": 2,
+   "in": 0,
+   "hop1": 2,
+   "hop2": 9,
+   "high": 6
+  },
+  {
+   "id": "GEN-008",
+   "1U": 0.008403361,
+   "1U_rank": 72,
+   "1W": 0.008403361,
+   "1W_rank": 56,
+   "1UB": 0.025210084,
+   "1UB_rank": 56,
+   "1WB": 0.025210084,
+   "1WB_rank": 33,
+   "out": 1,
+   "in": 0,
+   "hop1": 1,
+   "hop2": 2,
+   "high": 3
+  },
+  {
+   "id": "TSS-001",
+   "1U": 0.067226891,
+   "1U_rank": 3,
+   "1W": 0.047619048,
+   "1W_rank": 4,
+   "1UB": 0.168067227,
+   "1UB_rank": 6,
+   "1WB": 0.090569561,
+   "1WB_rank": 7,
+   "out": 8,
+   "in": 3,
+   "hop1": 8,
+   "hop2": 12,
+   "high": 7
+  },
+  {
+   "id": "TSS-002",
+   "1U": 0.033613445,
+   "1U_rank": 13,
+   "1W": 0.025210084,
+   "1W_rank": 14,
+   "1UB": 0.12605042,
+   "1UB_rank": 9,
+   "1WB": 0.071895425,
+   "1WB_rank": 13,
+   "out": 4,
+   "in": 2,
+   "hop1": 4,
+   "hop2": 11,
+   "high": 8
+  },
+  {
+   "id": "TSS-003",
+   "1U": 0.042016807,
+   "1U_rank": 9,
+   "1W": 0.033613445,
+   "1W_rank": 7,
+   "1UB": 0.201680672,
+   "1UB_rank": 4,
+   "1WB": 0.140989729,
+   "1WB_rank": 3,
+   "out": 5,
+   "in": 3,
+   "hop1": 5,
+   "hop2": 19,
+   "high": 9
+  },
+  {
+   "id": "TSS-004",
+   "1U": 0.033613445,
+   "1U_rank": 14,
+   "1W": 0.028011204,
+   "1W_rank": 11,
+   "1UB": 0.109243697,
+   "1UB_rank": 12,
+   "1WB": 0.069094304,
+   "1WB_rank": 14,
+   "out": 4,
+   "in": 4,
+   "hop1": 4,
+   "hop2": 9,
+   "high": 3
+  },
+  {
+   "id": "TSS-005",
+   "1U": 0.033613445,
+   "1U_rank": 15,
+   "1W": 0.028011204,
+   "1W_rank": 12,
+   "1UB": 0.134453782,
+   "1UB_rank": 8,
+   "1WB": 0.092436975,
+   "1WB_rank": 6,
+   "out": 4,
+   "in": 3,
+   "hop1": 4,
+   "hop2": 12,
+   "high": 3
+  },
+  {
+   "id": "TSS-006",
+   "1U": 0.058823529,
+   "1U_rank": 7,
+   "1W": 0.047619048,
+   "1W_rank": 5,
+   "1UB": 0.210084034,
+   "1UB_rank": 3,
+   "1WB": 0.112044818,
+   "1WB_rank": 5,
+   "out": 7,
+   "in": 1,
+   "hop1": 7,
+   "hop2": 18,
+   "high": 6
+  },
+  {
+   "id": "TSS-007",
+   "1U": 0.033613445,
+   "1U_rank": 16,
+   "1W": 0.025210084,
+   "1W_rank": 15,
+   "1UB": 0.084033613,
+   "1UB_rank": 21,
+   "1WB": 0.051353875,
+   "1WB_rank": 18,
+   "out": 4,
+   "in": 5,
+   "hop1": 4,
+   "hop2": 6,
+   "high": 5
+  },
+  {
+   "id": "TSS-008",
+   "1U": 0.033613445,
+   "1U_rank": 17,
+   "1W": 0.022408964,
+   "1W_rank": 16,
+   "1UB": 0.067226891,
+   "1UB_rank": 27,
+   "1WB": 0.035480859,
+   "1WB_rank": 26,
+   "out": 4,
+   "in": 2,
+   "hop1": 4,
+   "hop2": 4,
+   "high": 3
+  },
+  {
+   "id": "TSS-009",
+   "1U": 0.025210084,
+   "1U_rank": 30,
+   "1W": 0.016806723,
+   "1W_rank": 23,
+   "1UB": 0.117647059,
+   "1UB_rank": 10,
+   "1WB": 0.057889823,
+   "1WB_rank": 15,
+   "out": 3,
+   "in": 2,
+   "hop1": 3,
+   "hop2": 11,
+   "high": 4
+  },
+  {
+   "id": "TSS-010",
+   "1U": 0.067226891,
+   "1U_rank": 4,
+   "1W": 0.053221289,
+   "1W_rank": 3,
+   "1UB": 0.193277311,
+   "1UB_rank": 5,
+   "1WB": 0.116713352,
+   "1WB_rank": 4,
+   "out": 8,
+   "in": 2,
+   "hop1": 8,
+   "hop2": 15,
+   "high": 8
+  },
+  {
+   "id": "TSS-011",
+   "1U": 0.033613445,
+   "1U_rank": 18,
+   "1W": 0.028011204,
+   "1W_rank": 13,
+   "1UB": 0.084033613,
+   "1UB_rank": 22,
+   "1WB": 0.053221289,
+   "1WB_rank": 17,
+   "out": 4,
+   "in": 2,
+   "hop1": 4,
+   "hop2": 6,
+   "high": 4
+  },
+  {
+   "id": "TSS-012",
+   "1U": 0.016806723,
+   "1U_rank": 55,
+   "1W": 0.014005602,
+   "1W_rank": 28,
+   "1UB": 0.050420168,
+   "1UB_rank": 32,
+   "1WB": 0.044817927,
+   "1WB_rank": 19,
+   "out": 2,
+   "in": 1,
+   "hop1": 2,
+   "hop2": 4,
+   "high": 2
+  },
+  {
+   "id": "TSS-013",
+   "1U": 0.033613445,
+   "1U_rank": 19,
+   "1W": 0.030812325,
+   "1W_rank": 8,
+   "1UB": 0.109243697,
+   "1UB_rank": 13,
+   "1WB": 0.076563959,
+   "1WB_rank": 10,
+   "out": 4,
+   "in": 1,
+   "hop1": 4,
+   "hop2": 9,
+   "high": 4
+  },
+  {
+   "id": "TSS-014",
+   "1U": 0.025210084,
+   "1U_rank": 31,
+   "1W": 0.022408964,
+   "1W_rank": 17,
+   "1UB": 0.050420168,
+   "1UB_rank": 33,
+   "1WB": 0.044817927,
+   "1WB_rank": 20,
+   "out": 3,
+   "in": 1,
+   "hop1": 3,
+   "hop2": 3,
+   "high": 4
+  },
+  {
+   "id": "TSS-015",
+   "1U": 0.016806723,
+   "1U_rank": 56,
+   "1W": 0.016806723,
+   "1W_rank": 24,
+   "1UB": 0.075630252,
+   "1UB_rank": 24,
+   "1WB": 0.056022409,
+   "1WB_rank": 16,
+   "out": 2,
+   "in": 4,
+   "hop1": 2,
+   "hop2": 7,
+   "high": 3
+  },
+  {
+   "id": "TSS-016",
+   "1U": 0.042016807,
+   "1U_rank": 10,
+   "1W": 0.030812325,
+   "1W_rank": 9,
+   "1UB": 0.142857143,
+   "1UB_rank": 7,
+   "1WB": 0.073762838,
+   "1WB_rank": 12,
+   "out": 5,
+   "in": 4,
+   "hop1": 5,
+   "hop2": 12,
+   "high": 3
+  },
+  {
+   "id": "DSS-001",
+   "1U": 0,
+   "1U_rank": 73,
+   "1W": 0,
+   "1W_rank": 73,
+   "1UB": 0,
+   "1UB_rank": 73,
+   "1WB": 0,
+   "1WB_rank": 73,
+   "out": 0,
+   "in": 1,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-002",
+   "1U": 0.016806723,
+   "1U_rank": 43,
+   "1W": 0.008403361,
+   "1W_rank": 46,
+   "1UB": 0.033613445,
+   "1UB_rank": 50,
+   "1WB": 0.011204482,
+   "1WB_rank": 52,
+   "out": 2,
+   "in": 2,
+   "hop1": 2,
+   "hop2": 2,
+   "high": 0
+  },
+  {
+   "id": "DSS-003",
+   "1U": 0.025210084,
+   "1U_rank": 25,
+   "1W": 0.014005602,
+   "1W_rank": 26,
+   "1UB": 0.042016807,
+   "1UB_rank": 37,
+   "1WB": 0.019607843,
+   "1WB_rank": 35,
+   "out": 3,
+   "in": 2,
+   "hop1": 3,
+   "hop2": 2,
+   "high": 1
+  },
+  {
+   "id": "DSS-004",
+   "1U": 0,
+   "1U_rank": 74,
+   "1W": 0,
+   "1W_rank": 74,
+   "1UB": 0,
+   "1UB_rank": 74,
+   "1WB": 0,
+   "1WB_rank": 74,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-005",
+   "1U": 0.025210084,
+   "1U_rank": 26,
+   "1W": 0.011204482,
+   "1W_rank": 33,
+   "1UB": 0.067226891,
+   "1UB_rank": 26,
+   "1WB": 0.021475257,
+   "1WB_rank": 34,
+   "out": 3,
+   "in": 2,
+   "hop1": 3,
+   "hop2": 5,
+   "high": 1
+  },
+  {
+   "id": "DSS-006",
+   "1U": 0,
+   "1U_rank": 75,
+   "1W": 0,
+   "1W_rank": 75,
+   "1UB": 0,
+   "1UB_rank": 75,
+   "1WB": 0,
+   "1WB_rank": 75,
+   "out": 0,
+   "in": 1,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-007",
+   "1U": 0.008403361,
+   "1U_rank": 59,
+   "1W": 0.005602241,
+   "1W_rank": 61,
+   "1UB": 0.008403361,
+   "1UB_rank": 64,
+   "1WB": 0.005602241,
+   "1WB_rank": 61,
+   "out": 1,
+   "in": 2,
+   "hop1": 1,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-008",
+   "1U": 0.008403361,
+   "1U_rank": 60,
+   "1W": 0.00280112,
+   "1W_rank": 67,
+   "1UB": 0.008403361,
+   "1UB_rank": 65,
+   "1WB": 0.00280112,
+   "1WB_rank": 67,
+   "out": 1,
+   "in": 2,
+   "hop1": 1,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-009",
+   "1U": 0,
+   "1U_rank": 76,
+   "1W": 0,
+   "1W_rank": 76,
+   "1UB": 0,
+   "1UB_rank": 76,
+   "1WB": 0,
+   "1WB_rank": 76,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-010",
+   "1U": 0.008403361,
+   "1U_rank": 61,
+   "1W": 0.00280112,
+   "1W_rank": 68,
+   "1UB": 0.008403361,
+   "1UB_rank": 66,
+   "1WB": 0.00280112,
+   "1WB_rank": 68,
+   "out": 1,
+   "in": 2,
+   "hop1": 1,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-011",
+   "1U": 0.016806723,
+   "1U_rank": 44,
+   "1W": 0.008403361,
+   "1W_rank": 47,
+   "1UB": 0.016806723,
+   "1UB_rank": 57,
+   "1WB": 0.008403361,
+   "1WB_rank": 57,
+   "out": 2,
+   "in": 1,
+   "hop1": 2,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-012",
+   "1U": 0.008403361,
+   "1U_rank": 62,
+   "1W": 0.00280112,
+   "1W_rank": 69,
+   "1UB": 0.008403361,
+   "1UB_rank": 67,
+   "1WB": 0.00280112,
+   "1WB_rank": 69,
+   "out": 1,
+   "in": 2,
+   "hop1": 1,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-013",
+   "1U": 0.025210084,
+   "1U_rank": 27,
+   "1W": 0.011204482,
+   "1W_rank": 34,
+   "1UB": 0.025210084,
+   "1UB_rank": 53,
+   "1WB": 0.011204482,
+   "1WB_rank": 53,
+   "out": 3,
+   "in": 1,
+   "hop1": 3,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-014",
+   "1U": 0,
+   "1U_rank": 77,
+   "1W": 0,
+   "1W_rank": 77,
+   "1UB": 0,
+   "1UB_rank": 77,
+   "1WB": 0,
+   "1WB_rank": 77,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-015",
+   "1U": 0,
+   "1U_rank": 78,
+   "1W": 0,
+   "1W_rank": 78,
+   "1UB": 0,
+   "1UB_rank": 78,
+   "1WB": 0,
+   "1WB_rank": 78,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-016",
+   "1U": 0.016806723,
+   "1U_rank": 45,
+   "1W": 0.005602241,
+   "1W_rank": 62,
+   "1UB": 0.016806723,
+   "1UB_rank": 58,
+   "1WB": 0.005602241,
+   "1WB_rank": 62,
+   "out": 2,
+   "in": 1,
+   "hop1": 2,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-017",
+   "1U": 0.016806723,
+   "1U_rank": 46,
+   "1W": 0.005602241,
+   "1W_rank": 63,
+   "1UB": 0.016806723,
+   "1UB_rank": 59,
+   "1WB": 0.005602241,
+   "1WB_rank": 63,
+   "out": 2,
+   "in": 1,
+   "hop1": 2,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-018",
+   "1U": 0.025210084,
+   "1U_rank": 28,
+   "1W": 0.014005602,
+   "1W_rank": 27,
+   "1UB": 0.025210084,
+   "1UB_rank": 54,
+   "1WB": 0.014005602,
+   "1WB_rank": 47,
+   "out": 3,
+   "in": 1,
+   "hop1": 3,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-019",
+   "1U": 0.008403361,
+   "1U_rank": 63,
+   "1W": 0.00280112,
+   "1W_rank": 70,
+   "1UB": 0.008403361,
+   "1UB_rank": 68,
+   "1WB": 0.00280112,
+   "1WB_rank": 70,
+   "out": 1,
+   "in": 2,
+   "hop1": 1,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-020",
+   "1U": 0,
+   "1U_rank": 79,
+   "1W": 0,
+   "1W_rank": 79,
+   "1UB": 0,
+   "1UB_rank": 79,
+   "1WB": 0,
+   "1WB_rank": 79,
+   "out": 0,
+   "in": 3,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-021",
+   "1U": 0.016806723,
+   "1U_rank": 47,
+   "1W": 0.008403361,
+   "1W_rank": 48,
+   "1UB": 0.016806723,
+   "1UB_rank": 60,
+   "1WB": 0.008403361,
+   "1WB_rank": 58,
+   "out": 2,
+   "in": 1,
+   "hop1": 2,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-022",
+   "1U": 0.016806723,
+   "1U_rank": 48,
+   "1W": 0.005602241,
+   "1W_rank": 64,
+   "1UB": 0.016806723,
+   "1UB_rank": 61,
+   "1WB": 0.005602241,
+   "1WB_rank": 64,
+   "out": 2,
+   "in": 1,
+   "hop1": 2,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-023",
+   "1U": 0.033613445,
+   "1U_rank": 12,
+   "1W": 0.011204482,
+   "1W_rank": 35,
+   "1UB": 0.033613445,
+   "1UB_rank": 51,
+   "1WB": 0.011204482,
+   "1WB_rank": 54,
+   "out": 4,
+   "in": 2,
+   "hop1": 4,
+   "hop2": 0,
+   "high": 1
+  },
+  {
+   "id": "DSS-024",
+   "1U": 0.016806723,
+   "1U_rank": 49,
+   "1W": 0.008403361,
+   "1W_rank": 49,
+   "1UB": 0.042016807,
+   "1UB_rank": 38,
+   "1WB": 0.01774043,
+   "1WB_rank": 37,
+   "out": 2,
+   "in": 1,
+   "hop1": 2,
+   "hop2": 3,
+   "high": 1
+  },
+  {
+   "id": "DSS-025",
+   "1U": 0.008403361,
+   "1U_rank": 64,
+   "1W": 0.00280112,
+   "1W_rank": 71,
+   "1UB": 0.008403361,
+   "1UB_rank": 69,
+   "1WB": 0.00280112,
+   "1WB_rank": 71,
+   "out": 1,
+   "in": 1,
+   "hop1": 1,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-026",
+   "1U": 0.008403361,
+   "1U_rank": 65,
+   "1W": 0.005602241,
+   "1W_rank": 65,
+   "1UB": 0.008403361,
+   "1UB_rank": 70,
+   "1WB": 0.005602241,
+   "1WB_rank": 65,
+   "out": 1,
+   "in": 1,
+   "hop1": 1,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-027",
+   "1U": 0,
+   "1U_rank": 80,
+   "1W": 0,
+   "1W_rank": 80,
+   "1UB": 0,
+   "1UB_rank": 80,
+   "1WB": 0,
+   "1WB_rank": 80,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-028",
+   "1U": 0.008403361,
+   "1U_rank": 66,
+   "1W": 0.005602241,
+   "1W_rank": 66,
+   "1UB": 0.008403361,
+   "1UB_rank": 71,
+   "1WB": 0.005602241,
+   "1WB_rank": 66,
+   "out": 1,
+   "in": 2,
+   "hop1": 1,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-029",
+   "1U": 0.025210084,
+   "1U_rank": 29,
+   "1W": 0.011204482,
+   "1W_rank": 36,
+   "1UB": 0.025210084,
+   "1UB_rank": 55,
+   "1WB": 0.011204482,
+   "1WB_rank": 55,
+   "out": 3,
+   "in": 2,
+   "hop1": 3,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-030",
+   "1U": 0.016806723,
+   "1U_rank": 50,
+   "1W": 0.008403361,
+   "1W_rank": 50,
+   "1UB": 0.016806723,
+   "1UB_rank": 62,
+   "1WB": 0.008403361,
+   "1WB_rank": 59,
+   "out": 2,
+   "in": 1,
+   "hop1": 2,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-031",
+   "1U": 0.016806723,
+   "1U_rank": 51,
+   "1W": 0.008403361,
+   "1W_rank": 51,
+   "1UB": 0.016806723,
+   "1UB_rank": 63,
+   "1WB": 0.008403361,
+   "1WB_rank": 60,
+   "out": 2,
+   "in": 4,
+   "hop1": 2,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-032",
+   "1U": 0,
+   "1U_rank": 81,
+   "1W": 0,
+   "1W_rank": 81,
+   "1UB": 0,
+   "1UB_rank": 81,
+   "1WB": 0,
+   "1WB_rank": 81,
+   "out": 0,
+   "in": 1,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-033",
+   "1U": 0,
+   "1U_rank": 82,
+   "1W": 0,
+   "1W_rank": 82,
+   "1UB": 0,
+   "1UB_rank": 82,
+   "1WB": 0,
+   "1WB_rank": 82,
+   "out": 0,
+   "in": 1,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "DSS-034",
+   "1U": 0.008403361,
+   "1U_rank": 67,
+   "1W": 0.00280112,
+   "1W_rank": 72,
+   "1UB": 0.008403361,
+   "1UB_rank": 72,
+   "1WB": 0.00280112,
+   "1WB_rank": 72,
+   "out": 1,
+   "in": 2,
+   "hop1": 1,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-001",
+   "1U": 0,
+   "1U_rank": 83,
+   "1W": 0,
+   "1W_rank": 83,
+   "1UB": 0,
+   "1UB_rank": 83,
+   "1WB": 0,
+   "1WB_rank": 83,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-002",
+   "1U": 0,
+   "1U_rank": 84,
+   "1W": 0,
+   "1W_rank": 84,
+   "1UB": 0,
+   "1UB_rank": 84,
+   "1WB": 0,
+   "1WB_rank": 84,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-003",
+   "1U": 0,
+   "1U_rank": 85,
+   "1W": 0,
+   "1W_rank": 85,
+   "1UB": 0,
+   "1UB_rank": 85,
+   "1WB": 0,
+   "1WB_rank": 85,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-004",
+   "1U": 0,
+   "1U_rank": 86,
+   "1W": 0,
+   "1W_rank": 86,
+   "1UB": 0,
+   "1UB_rank": 86,
+   "1WB": 0,
+   "1WB_rank": 86,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-005",
+   "1U": 0,
+   "1U_rank": 87,
+   "1W": 0,
+   "1W_rank": 87,
+   "1UB": 0,
+   "1UB_rank": 87,
+   "1WB": 0,
+   "1WB_rank": 87,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-006",
+   "1U": 0,
+   "1U_rank": 88,
+   "1W": 0,
+   "1W_rank": 88,
+   "1UB": 0,
+   "1UB_rank": 88,
+   "1WB": 0,
+   "1WB_rank": 88,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-007",
+   "1U": 0,
+   "1U_rank": 89,
+   "1W": 0,
+   "1W_rank": 89,
+   "1UB": 0,
+   "1UB_rank": 89,
+   "1WB": 0,
+   "1WB_rank": 89,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-008",
+   "1U": 0,
+   "1U_rank": 90,
+   "1W": 0,
+   "1W_rank": 90,
+   "1UB": 0,
+   "1UB_rank": 90,
+   "1WB": 0,
+   "1WB_rank": 90,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-009",
+   "1U": 0,
+   "1U_rank": 91,
+   "1W": 0,
+   "1W_rank": 91,
+   "1UB": 0,
+   "1UB_rank": 91,
+   "1WB": 0,
+   "1WB_rank": 91,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-010",
+   "1U": 0,
+   "1U_rank": 92,
+   "1W": 0,
+   "1W_rank": 92,
+   "1UB": 0,
+   "1UB_rank": 92,
+   "1WB": 0,
+   "1WB_rank": 92,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-011",
+   "1U": 0,
+   "1U_rank": 93,
+   "1W": 0,
+   "1W_rank": 93,
+   "1UB": 0,
+   "1UB_rank": 93,
+   "1WB": 0,
+   "1WB_rank": 93,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-012",
+   "1U": 0,
+   "1U_rank": 94,
+   "1W": 0,
+   "1W_rank": 94,
+   "1UB": 0,
+   "1UB_rank": 94,
+   "1WB": 0,
+   "1WB_rank": 94,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-013",
+   "1U": 0,
+   "1U_rank": 95,
+   "1W": 0,
+   "1W_rank": 95,
+   "1UB": 0,
+   "1UB_rank": 95,
+   "1WB": 0,
+   "1WB_rank": 95,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-014",
+   "1U": 0,
+   "1U_rank": 96,
+   "1W": 0,
+   "1W_rank": 96,
+   "1UB": 0,
+   "1UB_rank": 96,
+   "1WB": 0,
+   "1WB_rank": 96,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-015",
+   "1U": 0,
+   "1U_rank": 97,
+   "1W": 0,
+   "1W_rank": 97,
+   "1UB": 0,
+   "1UB_rank": 97,
+   "1WB": 0,
+   "1WB_rank": 97,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-016",
+   "1U": 0,
+   "1U_rank": 98,
+   "1W": 0,
+   "1W_rank": 98,
+   "1UB": 0,
+   "1UB_rank": 98,
+   "1WB": 0,
+   "1WB_rank": 98,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-017",
+   "1U": 0,
+   "1U_rank": 99,
+   "1W": 0,
+   "1W_rank": 99,
+   "1UB": 0,
+   "1UB_rank": 99,
+   "1WB": 0,
+   "1WB_rank": 99,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-018",
+   "1U": 0,
+   "1U_rank": 100,
+   "1W": 0,
+   "1W_rank": 100,
+   "1UB": 0,
+   "1UB_rank": 100,
+   "1WB": 0,
+   "1WB_rank": 100,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-019",
+   "1U": 0,
+   "1U_rank": 101,
+   "1W": 0,
+   "1W_rank": 101,
+   "1UB": 0,
+   "1UB_rank": 101,
+   "1WB": 0,
+   "1WB_rank": 101,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-020",
+   "1U": 0,
+   "1U_rank": 102,
+   "1W": 0,
+   "1W_rank": 102,
+   "1UB": 0,
+   "1UB_rank": 102,
+   "1WB": 0,
+   "1WB_rank": 102,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-021",
+   "1U": 0,
+   "1U_rank": 103,
+   "1W": 0,
+   "1W_rank": 103,
+   "1UB": 0,
+   "1UB_rank": 103,
+   "1WB": 0,
+   "1WB_rank": 103,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-022",
+   "1U": 0,
+   "1U_rank": 104,
+   "1W": 0,
+   "1W_rank": 104,
+   "1UB": 0,
+   "1UB_rank": 104,
+   "1WB": 0,
+   "1WB_rank": 104,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-023",
+   "1U": 0,
+   "1U_rank": 105,
+   "1W": 0,
+   "1W_rank": 105,
+   "1UB": 0,
+   "1UB_rank": 105,
+   "1WB": 0,
+   "1WB_rank": 105,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-024",
+   "1U": 0,
+   "1U_rank": 106,
+   "1W": 0,
+   "1W_rank": 106,
+   "1UB": 0,
+   "1UB_rank": 106,
+   "1WB": 0,
+   "1WB_rank": 106,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-025",
+   "1U": 0,
+   "1U_rank": 107,
+   "1W": 0,
+   "1W_rank": 107,
+   "1UB": 0,
+   "1UB_rank": 107,
+   "1WB": 0,
+   "1WB_rank": 107,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-026",
+   "1U": 0,
+   "1U_rank": 108,
+   "1W": 0,
+   "1W_rank": 108,
+   "1UB": 0,
+   "1UB_rank": 108,
+   "1WB": 0,
+   "1WB_rank": 108,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-027",
+   "1U": 0,
+   "1U_rank": 109,
+   "1W": 0,
+   "1W_rank": 109,
+   "1UB": 0,
+   "1UB_rank": 109,
+   "1WB": 0,
+   "1WB_rank": 109,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-028",
+   "1U": 0,
+   "1U_rank": 110,
+   "1W": 0,
+   "1W_rank": 110,
+   "1UB": 0,
+   "1UB_rank": 110,
+   "1WB": 0,
+   "1WB_rank": 110,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-029",
+   "1U": 0,
+   "1U_rank": 111,
+   "1W": 0,
+   "1W_rank": 111,
+   "1UB": 0,
+   "1UB_rank": 111,
+   "1WB": 0,
+   "1WB_rank": 111,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-030",
+   "1U": 0,
+   "1U_rank": 112,
+   "1W": 0,
+   "1W_rank": 112,
+   "1UB": 0,
+   "1UB_rank": 112,
+   "1WB": 0,
+   "1WB_rank": 112,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-031",
+   "1U": 0,
+   "1U_rank": 113,
+   "1W": 0,
+   "1W_rank": 113,
+   "1UB": 0,
+   "1UB_rank": 113,
+   "1WB": 0,
+   "1WB_rank": 113,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-032",
+   "1U": 0,
+   "1U_rank": 114,
+   "1W": 0,
+   "1W_rank": 114,
+   "1UB": 0,
+   "1UB_rank": 114,
+   "1WB": 0,
+   "1WB_rank": 114,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-033",
+   "1U": 0,
+   "1U_rank": 115,
+   "1W": 0,
+   "1W_rank": 115,
+   "1UB": 0,
+   "1UB_rank": 115,
+   "1WB": 0,
+   "1WB_rank": 115,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-034",
+   "1U": 0,
+   "1U_rank": 116,
+   "1W": 0,
+   "1W_rank": 116,
+   "1UB": 0,
+   "1UB_rank": 116,
+   "1WB": 0,
+   "1WB_rank": 116,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-035",
+   "1U": 0,
+   "1U_rank": 117,
+   "1W": 0,
+   "1W_rank": 117,
+   "1UB": 0,
+   "1UB_rank": 117,
+   "1WB": 0,
+   "1WB_rank": 117,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-036",
+   "1U": 0,
+   "1U_rank": 118,
+   "1W": 0,
+   "1W_rank": 118,
+   "1UB": 0,
+   "1UB_rank": 118,
+   "1WB": 0,
+   "1WB_rank": 118,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-037",
+   "1U": 0,
+   "1U_rank": 119,
+   "1W": 0,
+   "1W_rank": 119,
+   "1UB": 0,
+   "1UB_rank": 119,
+   "1WB": 0,
+   "1WB_rank": 119,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "RTU-038",
+   "1U": 0,
+   "1U_rank": 120,
+   "1W": 0,
+   "1W_rank": 120,
+   "1UB": 0,
+   "1UB_rank": 120,
+   "1WB": 0,
+   "1WB_rank": 120,
+   "out": 0,
+   "in": 2,
+   "hop1": 0,
+   "hop2": 0,
+   "high": 0
+  },
+  {
+   "id": "COM-001",
+   "1U": 0.016806723,
+   "1U_rank": 32,
+   "1W": 0.008403361,
+   "1W_rank": 37,
+   "1UB": 0.100840336,
+   "1UB_rank": 14,
+   "1WB": 0.027077498,
+   "1WB_rank": 29,
+   "out": 2,
+   "in": 1,
+   "hop1": 2,
+   "hop2": 10,
+   "high": 2
+  },
+  {
+   "id": "COM-002",
+   "1U": 0.025210084,
+   "1U_rank": 20,
+   "1W": 0.014005602,
+   "1W_rank": 25,
+   "1UB": 0.033613445,
+   "1UB_rank": 42,
+   "1WB": 0.01774043,
+   "1WB_rank": 36,
+   "out": 3,
+   "in": 1,
+   "hop1": 3,
+   "hop2": 1,
+   "high": 1
+  },
+  {
+   "id": "COM-003",
+   "1U": 0.008403361,
+   "1U_rank": 57,
+   "1W": 0.005602241,
+   "1W_rank": 57,
+   "1UB": 0.084033613,
+   "1UB_rank": 19,
+   "1WB": 0.029878618,
+   "1WB_rank": 28,
+   "out": 1,
+   "in": 1,
+   "hop1": 1,
+   "hop2": 9,
+   "high": 1
+  },
+  {
+   "id": "COM-004",
+   "1U": 0.075630252,
+   "1U_rank": 1,
+   "1W": 0.036414566,
+   "1W_rank": 6,
+   "1UB": 0.100840336,
+   "1UB_rank": 15,
+   "1WB": 0.040149393,
+   "1WB_rank": 21,
+   "out": 9,
+   "in": 1,
+   "hop1": 9,
+   "hop2": 3,
+   "high": 0
+  },
+  {
+   "id": "COM-005",
+   "1U": 0.025210084,
+   "1U_rank": 21,
+   "1W": 0.011204482,
+   "1W_rank": 29,
+   "1UB": 0.042016807,
+   "1UB_rank": 34,
+   "1WB": 0.016806723,
+   "1WB_rank": 38,
+   "out": 3,
+   "in": 2,
+   "hop1": 3,
+   "hop2": 2,
+   "high": 1
+  },
+  {
+   "id": "COM-006",
+   "1U": 0.016806723,
+   "1U_rank": 33,
+   "1W": 0.008403361,
+   "1W_rank": 38,
+   "1UB": 0.050420168,
+   "1UB_rank": 31,
+   "1WB": 0.014939309,
+   "1WB_rank": 40,
+   "out": 2,
+   "in": 2,
+   "hop1": 2,
+   "hop2": 4,
+   "high": 1
+  },
+  {
+   "id": "COM-007",
+   "1U": 0.033613445,
+   "1U_rank": 11,
+   "1W": 0.019607843,
+   "1W_rank": 18,
+   "1UB": 0.092436975,
+   "1UB_rank": 16,
+   "1WB": 0.035480859,
+   "1WB_rank": 24,
+   "out": 4,
+   "in": 1,
+   "hop1": 4,
+   "hop2": 7,
+   "high": 0
+  },
+  {
+   "id": "COM-008",
+   "1U": 0.016806723,
+   "1U_rank": 34,
+   "1W": 0.008403361,
+   "1W_rank": 39,
+   "1UB": 0.033613445,
+   "1UB_rank": 43,
+   "1WB": 0.014005602,
+   "1WB_rank": 45,
+   "out": 2,
+   "in": 1,
+   "hop1": 2,
+   "hop2": 2,
+   "high": 0
+  },
+  {
+   "id": "COM-009",
+   "1U": 0.016806723,
+   "1U_rank": 35,
+   "1W": 0.008403361,
+   "1W_rank": 40,
+   "1UB": 0.033613445,
+   "1UB_rank": 44,
+   "1WB": 0.012138189,
+   "1WB_rank": 48,
+   "out": 2,
+   "in": 2,
+   "hop1": 2,
+   "hop2": 2,
+   "high": 0
+  },
+  {
+   "id": "COM-010",
+   "1U": 0.016806723,
+   "1U_rank": 36,
+   "1W": 0.005602241,
+   "1W_rank": 58,
+   "1UB": 0.058823529,
+   "1UB_rank": 28,
+   "1WB": 0.012138189,
+   "1WB_rank": 49,
+   "out": 2,
+   "in": 1,
+   "hop1": 2,
+   "hop2": 5,
+   "high": 0
+  },
+  {
+   "id": "COM-011",
+   "1U": 0.016806723,
+   "1U_rank": 37,
+   "1W": 0.008403361,
+   "1W_rank": 41,
+   "1UB": 0.075630252,
+   "1UB_rank": 23,
+   "1WB": 0.027077498,
+   "1WB_rank": 30,
+   "out": 2,
+   "in": 3,
+   "hop1": 2,
+   "hop2": 7,
+   "high": 1
+  },
+  {
+   "id": "COM-012",
+   "1U": 0.058823529,
+   "1U_rank": 6,
+   "1W": 0.028011204,
+   "1W_rank": 10,
+   "1UB": 0.084033613,
+   "1UB_rank": 20,
+   "1WB": 0.035480859,
+   "1WB_rank": 25,
+   "out": 7,
+   "in": 2,
+   "hop1": 7,
+   "hop2": 3,
+   "high": 1
+  },
+  {
+   "id": "COM-013",
+   "1U": 0.025210084,
+   "1U_rank": 22,
+   "1W": 0.011204482,
+   "1W_rank": 30,
+   "1UB": 0.042016807,
+   "1UB_rank": 35,
+   "1WB": 0.014939309,
+   "1WB_rank": 41,
+   "out": 3,
+   "in": 2,
+   "hop1": 3,
+   "hop2": 2,
+   "high": 0
+  },
+  {
+   "id": "COM-014",
+   "1U": 0.016806723,
+   "1U_rank": 38,
+   "1W": 0.011204482,
+   "1W_rank": 31,
+   "1UB": 0.033613445,
+   "1UB_rank": 45,
+   "1WB": 0.016806723,
+   "1WB_rank": 39,
+   "out": 2,
+   "in": 1,
+   "hop1": 2,
+   "hop2": 2,
+   "high": 0
+  },
+  {
+   "id": "COM-015",
+   "1U": 0.016806723,
+   "1U_rank": 39,
+   "1W": 0.008403361,
+   "1W_rank": 42,
+   "1UB": 0.033613445,
+   "1UB_rank": 46,
+   "1WB": 0.014005602,
+   "1WB_rank": 46,
+   "out": 2,
+   "in": 2,
+   "hop1": 2,
+   "hop2": 2,
+   "high": 0
+  },
+  {
+   "id": "COM-016",
+   "1U": 0.016806723,
+   "1U_rank": 40,
+   "1W": 0.008403361,
+   "1W_rank": 43,
+   "1UB": 0.058823529,
+   "1UB_rank": 29,
+   "1WB": 0.014939309,
+   "1WB_rank": 42,
+   "out": 2,
+   "in": 1,
+   "hop1": 2,
+   "hop2": 5,
+   "high": 0
+  },
+  {
+   "id": "COM-017",
+   "1U": 0.042016807,
+   "1U_rank": 8,
+   "1W": 0.019607843,
+   "1W_rank": 19,
+   "1UB": 0.058823529,
+   "1UB_rank": 30,
+   "1WB": 0.025210084,
+   "1WB_rank": 31,
+   "out": 5,
+   "in": 2,
+   "hop1": 5,
+   "hop2": 2,
+   "high": 0
+  },
+  {
+   "id": "COM-018",
+   "1U": 0.016806723,
+   "1U_rank": 41,
+   "1W": 0.008403361,
+   "1W_rank": 44,
+   "1UB": 0.033613445,
+   "1UB_rank": 47,
+   "1WB": 0.012138189,
+   "1WB_rank": 50,
+   "out": 2,
+   "in": 1,
+   "hop1": 2,
+   "hop2": 2,
+   "high": 0
+  },
+  {
+   "id": "COM-019",
+   "1U": 0.016806723,
+   "1U_rank": 42,
+   "1W": 0.005602241,
+   "1W_rank": 59,
+   "1UB": 0.042016807,
+   "1UB_rank": 36,
+   "1WB": 0.009337068,
+   "1WB_rank": 56,
+   "out": 2,
+   "in": 1,
+   "hop1": 2,
+   "hop2": 3,
+   "high": 0
+  },
+  {
+   "id": "COM-020",
+   "1U": 0.025210084,
+   "1U_rank": 23,
+   "1W": 0.011204482,
+   "1W_rank": 32,
+   "1UB": 0.033613445,
+   "1UB_rank": 48,
+   "1WB": 0.014939309,
+   "1WB_rank": 43,
+   "out": 3,
+   "in": 2,
+   "hop1": 3,
+   "hop2": 1,
+   "high": 0
+  },
+  {
+   "id": "COM-021",
+   "1U": 0.008403361,
+   "1U_rank": 58,
+   "1W": 0.005602241,
+   "1W_rank": 60,
+   "1UB": 0.033613445,
+   "1UB_rank": 49,
+   "1WB": 0.011204482,
+   "1WB_rank": 51,
+   "out": 1,
+   "in": 1,
+   "hop1": 1,
+   "hop2": 3,
+   "high": 0
+  },
+  {
+   "id": "COM-022",
+   "1U": 0.025210084,
+   "1U_rank": 24,
+   "1W": 0.008403361,
+   "1W_rank": 45,
+   "1UB": 0.067226891,
+   "1UB_rank": 25,
+   "1WB": 0.014939309,
+   "1WB_rank": 44,
+   "out": 3,
+   "in": 3,
+   "hop1": 3,
+   "hop2": 5,
+   "high": 1
+  }
+ ]
+}

@@ -1,0 +1,4 @@
+networkx==3.6.1
+pytest
+# Local tests only (private/test_golden.py reads the partner workbook); never used by the app.
+openpyxl==3.1.5

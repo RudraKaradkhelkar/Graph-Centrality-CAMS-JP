@@ -1,0 +1,59 @@
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--text);
+  font-family: 'Segoe UI Variable', 'Segoe UI', -apple-system, 'SF Pro Text', sans-serif;
+  /* Tabular numerals for every number. */
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--link); text-decoration: underline; text-underline-offset: 2px; }
+a:hover { color: var(--link-hover); }
+
+/* Every control: hover, focus-visible and disabled states. Inline styles set the resting look; these rules add
+   the states without fighting them (hover darkens/lightens the whole control slightly). */
+button:not(:disabled), select:not(:disabled), summary, label:has(input[type="checkbox"]) { cursor: pointer; }
+button:not(:disabled):hover, select:not(:disabled):hover, input[type="number"]:not(:disabled):hover,
+input[type="text"]:not(:disabled):hover, input[type="search"]:not(:disabled):hover { filter: var(--hover-filter); }
+button:focus-visible, select:focus-visible, input:focus-visible, a:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+button:disabled, input:disabled, select:disabled { cursor: not-allowed; opacity: 0.45; }
+input[type="checkbox"] { accent-color: var(--check); }
+/* Tables: row hover only, no zebra stripes. */
+tbody tr:hover > td { background: var(--row-hover); }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* 3D graph viewport (virtual space 1400 x 1200). The graph drawing itself is not restyled. */
+.graph-viewport {
+  position: relative; width: 100%; aspect-ratio: 1400 / 1200; background: var(--graph-bg);
+  border-bottom: 1px solid var(--border); overflow: hidden; user-select: none; -webkit-user-select: none;
+}
+.graph-viewport:fullscreen { aspect-ratio: auto; }
+/* Overlays adapt to the graph's own width (it narrows beside the affected-assets panel). */
+.graph-viewport { container-type: inline-size; }
+@container (max-width: 1200px) {
+  .gv-tools { flex-direction: column; align-items: flex-end; }
+  .gv-narrow-hide { display: none; }
+}
+.graph-layer { position: absolute; inset: 0; pointer-events: none; }
+.graph-nodes { pointer-events: auto; }
+.graph-nodes button:hover { filter: none; }
+.graph-cone-label {
+  display: inline-block; padding: 2px 8px; border-radius: 9px; background: var(--orange-soft-bg);
+  border: 1px solid var(--cone-label-border); font-size: 11px; font-weight: 600; color: var(--orange-text); white-space: nowrap;
+}
+.graph-tip {
+  padding: 8px 12px; background: var(--popover-bg); border: 1px solid var(--popover-border); border-radius: 6px;
+  box-shadow: var(--popover-shadow); white-space: nowrap;
+}
+.graph-tip-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.graph-tip-line { margin-top: 2px; font-size: 12px; color: var(--text-3); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}

@@ -1,0 +1,27 @@
+# Sensitive: never commit (public repo)
+private/
+data/
+# ...but not the app's source folder of the same name (parsing code, no data)
+!src/data/
+snapshots/
+PLAYBOOK.md
+# Internal decision log (kept locally, never published)
+DECISIONS.md
+*.xlsx
+*.xls
+*.csv
+*.pdf
+*.pptx
+!public/sample/*
+
+# Build and tooling
+node_modules/
+dist/
+__pycache__/
+.pytest_cache/
+.DS_Store
+
+# Approved designs: local spec only (Phase 0 decision Q2)
+reference/
+.venv/
+*.tsbuildinfo

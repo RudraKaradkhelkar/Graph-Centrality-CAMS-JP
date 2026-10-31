@@ -1,0 +1,32 @@
+{
+  "name": "carma",
+  "private": true,
+  "version": "0.1.0",
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run --passWithNoTests",
+    "test:py": "node scripts/pytest.mjs",
+    "sample": "node scripts/build-sample.mjs",
+    "snapshots": "node scripts/snapshots.mjs"
+  },
+  "dependencies": {
+    "@fluentui/react-icons": "2.0.345",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@types/node": "26.6.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "typescript": "7.0.2",
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
+  }
+}
