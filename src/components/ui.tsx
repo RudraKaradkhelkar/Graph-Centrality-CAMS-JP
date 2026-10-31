@@ -63,6 +63,16 @@ export function LevelChip({ lv, alt = false }: { lv: number | string; alt?: bool
   );
 }
 
+/** App header on every page: the name and what it stands for. */
+export function AppBar() {
+  return (
+    <header style={css('height: 48px; padding: 0 24px; display: flex; align-items: baseline; gap: 12px; background: var(--surface); border-bottom: 1px solid var(--border); box-sizing: border-box')}>
+      <span style={css('line-height: 48px; font-size: 16px; font-weight: 600; letter-spacing: 0.04em; color: var(--text-strong)')}>CARMA</span>
+      <span style={css('font-size: 13px; color: var(--text-3)')}>Critical Asset Risk Management Analytics</span>
+    </header>
+  );
+}
+
 export function ThemeButton() {
   const { theme, toggleTheme } = useApp();
   const dark = theme === 'dark';

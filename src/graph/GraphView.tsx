@@ -1,7 +1,7 @@
 // 3D network view. The ported scene maths (scene.ts) produces style strings; this component writes them to
 // pooled DOM elements in requestAnimationFrame, so dragging and tweening never re-render React.
 // Overlays (legend, selected asset bar, view controls) are rendered by the caller through `overlay`.
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { GraphTheme } from './graph-theme';
 import { DEFAULT_PITCH, DEFAULT_YAW } from './layout';
 import { buildScene, H, W, type GatherCache, type Scene, type SceneData } from './scene';
@@ -32,8 +32,16 @@ export interface TipContent {
 interface Props {
   data: SceneData;
   fitZ: number;
-  /** Zoom the view opens (and Reset view returns) at. The reference uses 1 (100%). */
-  startZoom?: number;
+  /** Fit zoom from the height alone (layout fitH): lets Fit to screen follow a shorter viewport. */
+  fitH?: number;
+  /** Zoom the view opens (and Reset view returns) at. The reference uses 1 (100%); 'fit' = Fit to screen. */
+  startZoom?: number | 'fit';
+  /** Height in px; the drawing stays centred and the empty space above and below is trimmed. Default: 1400:1200. */
+  height?: number;
+  /** Start rotating on mount (Present mode). */
+  autoRotate?: boolean;
+  /** Auto-rotate speed in degrees per second. */
+  rotateSpeed?: number;
   theme: GraphTheme;
   sel: number;
   from: number;
@@ -62,6 +70,8 @@ export interface Cam { yaw: number; pitch: number; z: number; px: number; py: nu
 /** One camera shared by several graph views; each view redraws when another one moves it. */
 export class CameraLink {
   readonly ref: { current: Cam };
+  /** Auto-rotate clock shared by the linked views, so they turn together and any of them can stop it. */
+  readonly auto: { current: number | null } = { current: null };
   private subs = new Set<() => void>();
   constructor(start: Partial<Cam> = {}) {
     this.ref = { current: { yaw: DEFAULT_YAW, pitch: DEFAULT_PITCH, z: 1, px: 0, py: 0, ...start } };
@@ -77,6 +87,8 @@ export class CameraLink {
 type Pooled = HTMLElement & { _s?: string; _t?: string };
 
 const MORPH_MS = 700;
+/** The Play button's speed (the reference's 0.5 degrees per 33 ms). */
+const AUTO_SPEED = 0.5 / 33 * 1000;
 
 function setStyle(el: Pooled, s: string) {
   if (el._s !== s) { el.style.cssText = s; el._s = s; }
@@ -98,7 +110,7 @@ export function GraphView(props: Props) {
     elabels: useRef<HTMLDivElement>(null), nodes: useRef<HTMLDivElement>(null), names: useRef<HTMLDivElement>(null),
     coneLabels: useRef<HTMLDivElement>(null), tip: useRef<HTMLDivElement>(null),
   };
-  const ownCam = useRef<Cam>({ yaw: DEFAULT_YAW, pitch: DEFAULT_PITCH, z: props.startZoom ?? 1, px: 0, py: 0 });
+  const ownCam = useRef<Cam>({ yaw: DEFAULT_YAW, pitch: DEFAULT_PITCH, z: props.startZoom === 'fit' ? props.fitZ : props.startZoom ?? 1, px: 0, py: 0 });
   const cam = props.link ? props.link.ref : ownCam;
   const propsRef = useRef(props);
   propsRef.current = props;
@@ -106,7 +118,12 @@ export function GraphView(props: Props) {
   const drag = useRef<null | { mode: 'pan' | 'rot'; x: number; y: number; k: number } & Cam>(null);
   const moved = useRef(false);
   const tween = useRef<null | { from: Cam; to: Partial<Cam>; t0: number; dur: number }>(null);
-  const auto = useRef<number | null>(null);
+  const ownAuto = useRef<number | null>(null);
+  const auto = props.link ? props.link.auto : ownAuto;
+  // Virtual height of the viewport (its width is always W), measured from the element.
+  const vh = useRef(H);
+  // While true the zoom follows the viewport's shape (opened at, or last set to, Fit to screen).
+  const autoFit = useRef(props.startZoom === 'fit');
   const morph = useRef<{ from: number[]; to: number[]; m0: number } | null>(null);
   const frame = useRef(0);
   const frameKey = useRef('');
@@ -133,7 +150,7 @@ export function GraphView(props: Props) {
       if (k >= 1) tween.current = null; else again = true;
     }
     if (auto.current != null) {
-      c.yaw += 0.5 * (now - auto.current) / 33;
+      c.yaw += (p.rotateSpeed ?? AUTO_SPEED) * (now - auto.current) / 1000;
       auto.current = now;
       again = true;
     }
@@ -143,16 +160,17 @@ export function GraphView(props: Props) {
     const sc = buildScene(p.data, {
       view: p.view, z: c.z, px: c.px, py: c.py, yaw: c.yaw, pitch: c.pitch, weighted: p.weighted, showLevels: p.showLevels,
       sizeByScore: p.sizeByScore, gatherCone: p.gatherCone, sel: p.sel, from: p.from, to: p.to, labelStyle: p.labelStyle,
-      hover: drag.current ? null : hover.current, gFrom: m.from, gTo: m.to, mt,
+      hover: drag.current ? null : hover.current, gFrom: m.from, gTo: m.to, mt, vh: vh.current,
     }, p.theme, cache);
     apply(sc, p);
     if (pendingFrame.current && mt >= 1 && sc.focus) {
       // Fit the blast cones in view (leaving room for the overlays), keeping the current rotation.
       pendingFrame.current = false;
       const [x0, y0, x1, y1] = sc.focus, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
-      const f = Math.min(W * 0.8 / Math.max(1, x1 - x0), H * 0.66 / Math.max(1, y1 - y0));
+      const f = Math.min(W * 0.8 / Math.max(1, x1 - x0), vh.current * 0.66 / Math.max(1, y1 - y0));
       const zt = zoomTarget(cx, cy, c.z * f);
-      startTween({ z: zt.z, px: zt.px! + (W / 2 - cx), py: zt.py! + (H / 2 + 20 - cy) }, 500);
+      autoFit.current = false;
+      startTween({ z: zt.z, px: zt.px! + (W / 2 - cx), py: zt.py! + (vh.current / 2 + 20 - cy) }, 500);
       again = true;
     }
     setInfo((old) => {
@@ -215,18 +233,40 @@ export function GraphView(props: Props) {
 
   useEffect(schedule);
   useEffect(() => () => { cancelAnimationFrame(frame.current); frame.current = 0; }, []);
+  useEffect(() => { if (props.autoRotate) { auto.current = performance.now(); schedule(); } }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // Follow the element's shape: the drawing stays centred, and a fitted view re-fits.
+  useLayoutEffect(() => {
+    const vp = vpRef.current!;
+    const measure = () => {
+      const r = vp.getBoundingClientRect();
+      if (!r.width) return;
+      vh.current = W * r.height / r.width;
+      if (autoFit.current && !props.link) { const z = fitAt(); Object.assign(cam.current, { z, py: fitPy(z) }); }
+      schedule();
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(vp);
+    return () => ro.disconnect();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => props.link?.subscribe(onLink), [props.link, onLink]);
 
   const pt = (e: { clientX: number; clientY: number }) => {
     const r = vpRef.current!.getBoundingClientRect();
-    return { x: (e.clientX - r.left) / r.width * W, y: (e.clientY - r.top) / r.height * H, k: W / r.width };
+    return { x: (e.clientX - r.left) / r.width * W, y: (e.clientY - r.top) / r.height * vh.current, k: W / r.width };
   };
+  const fitAt = () => {
+    const p = propsRef.current;
+    return p.fitH ? Math.min(p.fitZ, p.fitH * (vh.current - 220) / 980) : p.fitZ;
+  };
+  // Vertical pan that keeps the network centred at zoom z (the layout centres it at zoom 1).
+  const fitPy = (z: number) => -(propsRef.current.data.CY - H / 2) * (1 - z);
   const zoomTarget = (x: number, y: number, nz: number): Partial<Cam> => {
-    const v = cam.current, t = Math.max(0.2, Math.min(12, nz)), CX = propsRef.current.data.CX, CY = propsRef.current.data.CY;
+    const v = cam.current, t = Math.max(0.2, Math.min(12, nz)), CX = propsRef.current.data.CX, CY = propsRef.current.data.CY + (vh.current - H) / 2;
     return { z: t, px: x - CX - (x - CX - v.px) * t / v.z, py: y - CY - (y - CY - v.py) * t / v.z };
   };
   const startTween = (to: Partial<Cam>, dur = 300) => { tween.current = { from: { ...cam.current }, to, t0: performance.now(), dur }; schedule(); };
-  const stopAuto = () => { auto.current = null; schedule(); };
+  const stopAuto = () => { auto.current = null; autoFit.current = false; schedule(); };
   const isUI = (e: { target: EventTarget | null }) => !!(e.target as HTMLElement)?.closest?.('[data-ui]');
 
   useEffect(() => {
@@ -236,6 +276,7 @@ export function GraphView(props: Props) {
       e.preventDefault();
       const p = pt(e);
       tween.current = null;
+      autoFit.current = false;
       Object.assign(cam.current, zoomTarget(p.x, p.y, cam.current.z * Math.exp(-e.deltaY * 0.0022)));
       schedule();
     };
@@ -244,10 +285,16 @@ export function GraphView(props: Props) {
   }, []);
 
   const controls: GraphControls = {
-    zoomIn: () => startTween(zoomTarget(700, 600, cam.current.z * 1.5)),
-    zoomOut: () => startTween(zoomTarget(700, 600, cam.current.z / 1.5)),
-    resetView: () => { auto.current = null; startTween({ yaw: DEFAULT_YAW, pitch: DEFAULT_PITCH, z: propsRef.current.startZoom ?? 1, px: 0, py: 0 }, 450); },
-    fitView: () => startTween({ z: propsRef.current.fitZ, px: 0, py: 0 }),
+    zoomIn: () => { autoFit.current = false; startTween(zoomTarget(W / 2, vh.current / 2, cam.current.z * 1.5)); },
+    zoomOut: () => { autoFit.current = false; startTween(zoomTarget(W / 2, vh.current / 2, cam.current.z / 1.5)); },
+    resetView: () => {
+      const s = propsRef.current.startZoom;
+      auto.current = null;
+      autoFit.current = s === 'fit';
+      const z = s === 'fit' ? fitAt() : s ?? 1;
+      startTween({ yaw: DEFAULT_YAW, pitch: DEFAULT_PITCH, z, px: 0, py: s === 'fit' ? fitPy(z) : 0 }, 450);
+    },
+    fitView: () => { const z = fitAt(); autoFit.current = true; startTween({ z, px: 0, py: fitPy(z) }); },
     rotL: () => { auto.current = null; startTween({ yaw: cam.current.yaw - 30 }); },
     rotR: () => { auto.current = null; startTween({ yaw: cam.current.yaw + 30 }); },
     toggleAuto: () => { auto.current = auto.current == null ? performance.now() : null; schedule(); },
@@ -267,7 +314,7 @@ export function GraphView(props: Props) {
       ref={vpRef}
       className="graph-viewport"
       aria-label="3D network view. Hover a sphere for its name, click to select, drag to rotate, Shift and drag to pan, Ctrl and scroll to zoom."
-      style={{ cursor: dragging ? 'grabbing' : 'grab' }}
+      style={{ cursor: dragging ? 'grabbing' : 'grab', ...(props.height ? { height: props.height, aspectRatio: 'auto' } : null) }}
       onMouseDown={(e) => {
         moved.current = false;
         if ((e.button !== 0 && e.button !== 2) || isUI(e)) return;
@@ -288,7 +335,7 @@ export function GraphView(props: Props) {
       }}
       onMouseUp={() => { if (drag.current) { drag.current = null; setDragging(false); } }}
       onMouseLeave={() => { if (drag.current) { drag.current = null; setDragging(false); } }}
-      onDoubleClick={(e) => { if (isUI(e)) return; const p = pt(e); startTween(zoomTarget(p.x, p.y, cam.current.z * 1.8)); }}
+      onDoubleClick={(e) => { if (isUI(e)) return; const p = pt(e); autoFit.current = false; startTween(zoomTarget(p.x, p.y, cam.current.z * 1.8)); }}
       onContextMenu={(e) => { if (!isUI(e)) e.preventDefault(); }}
     >
       <div ref={L.grid} aria-hidden="true" className="graph-layer" />

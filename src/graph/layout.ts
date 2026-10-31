@@ -15,6 +15,8 @@ export interface Layout {
   CX: number;
   CY: number;
   fitZ: number;
+  /** Fit zoom from the height alone (frame 1400 x 1200); a shorter viewport fits by min(fitZ, fitH * (h - 220) / 980). */
+  fitH: number;
   floor: number;
   gx: [number, number];
   gz: [number, number];
@@ -101,7 +103,7 @@ export function layout(input: LayoutInput): Layout {
   const fit = () => {
     let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
     P.map(pj).forEach((q) => { x0 = Math.min(x0, q[0]); x1 = Math.max(x1, q[0]); y0 = Math.min(y0, q[1]); y1 = Math.max(y1, q[1]); });
-    return { k: Math.min(1240 / ((x1 - x0) * K), 980 / ((y1 - y0) * K)), cx: (x0 + x1) / 2, cy: (y0 + y1) / 2 };
+    return { k: Math.min(1240 / ((x1 - x0) * K), 980 / ((y1 - y0) * K)), kh: 980 / ((y1 - y0) * K), cx: (x0 + x1) / 2, cy: (y0 + y1) / 2 };
   };
   const square = (A: number) => {
     // Square floor: x and z get the same half-width A around the footprint's centre.
@@ -118,7 +120,7 @@ export function layout(input: LayoutInput): Layout {
   const gh = Math.ceil(Math.max(-mn[0], mx[0], -mn[2], mx[2]) * 2) / 2 + 0.5;
   return {
     pos: P.map((q) => [r3(q[0]), r3(q[1]), r3(q[2])]),
-    CX: 700 - f2.cx * K, CY: 600 + f2.cy * K, fitZ: r3(f2.k * 0.95), floor: r3(mn[1] - 0.18),
+    CX: 700 - f2.cx * K, CY: 600 + f2.cy * K, fitZ: r3(f2.k * 0.95), fitH: r3(f2.kh * 0.95), floor: r3(mn[1] - 0.18),
     gx: [-gh, gh], gz: [-gh, gh],
   };
 }

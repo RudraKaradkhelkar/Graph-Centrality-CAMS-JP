@@ -2,7 +2,7 @@
 import { useRef, useState } from 'react';
 import { navigate } from '../App';
 import { css } from '../components/css';
-import { Icon, LevelChip, LV, Segmented, ThemeButton } from '../components/ui';
+import { AppBar, Icon, LevelChip, LV, Segmented, ThemeButton } from '../components/ui';
 import { downloadTemplate, loadSample } from '../data/dataset';
 import { fromTables, hasErrors, parseTwoFiles, readFile, shortName, type Issue, type ParseResult, type SourceFile, type Table } from '../data/parse';
 import { LANES, type Lane } from '../graph/seed';
@@ -139,6 +139,7 @@ export function UploadPage() {
 
   return (
     <div style={css('min-height: 100vh; background: var(--page); color: var(--text)')}>
+      <AppBar />
       <main style={css('max-width: 1200px; margin: 0 auto; padding: 40px 32px 64px; box-sizing: border-box')}>
         <div style={css('display: flex; align-items: center; justify-content: space-between; gap: 12px')}>
           <nav aria-label="Breadcrumb" style={css('display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-3)')}>

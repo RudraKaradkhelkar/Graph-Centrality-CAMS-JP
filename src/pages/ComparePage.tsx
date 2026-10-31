@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import type { ReadyVariant } from '../analysis-types';
 import { navigate } from '../App';
 import { css } from '../components/css';
-import { ExitPresent, GraphButtons, GraphCaption, GraphLegend, PresentButton } from '../components/GraphChrome';
-import { BandChip, Icon, LV, LV_FULL, ThemeButton } from '../components/ui';
+import { ExitPresent, GraphButtons, GraphCaption, GraphLegend, PresentButton, RotateButton } from '../components/GraphChrome';
+import { AppBar, BandChip, Icon, LV, LV_FULL, ThemeButton } from '../components/ui';
 import { DARK, LIGHT } from '../graph/graph-theme';
 import { CameraLink, GraphView } from '../graph/GraphView';
 import { DEFAULT_PITCH, DEFAULT_YAW } from '../graph/layout';
@@ -32,8 +32,10 @@ export function ComparePage() {
   const link = useMemo(() => new CameraLink({ z: geo.fitZ }), [geo]);
   const [sel, setSel] = useState<number | null>(null);
   // Entering or leaving Present mode starts from the fitted, centred view.
+  // Leaving it stops the slow rotation Present mode starts (the graphs share one rotation clock).
   useEffect(() => {
     Object.assign(link.ref.current, { yaw: DEFAULT_YAW, pitch: DEFAULT_PITCH, z: geo.fitZ, px: 0, py: 0 });
+    if (!app.present) link.auto.current = null;
   }, [app.present, link, geo.fitZ]);
   const [all, setAll] = useState(false);
   const blastTargets = sel != null ? [sel] : [];
@@ -75,7 +77,7 @@ export function ComparePage() {
     const sub = `${V.kind === 'scalar' ? 'Ranked by score' : 'Ranked by Pareto front, then node importance'} · ranks ${V.k_from}–${V.k_to} highlighted${sel != null ? ` · blast radius of ${labels[sel]} (${affected} ${affected === 1 ? 'asset' : 'assets'})` : ''}`;
     return (
       <GraphView
-        data={data} fitZ={geo.fitZ} startZoom={geo.fitZ} link={link} theme={T} sel={sel ?? -1} from={V.k_from} to={V.k_to}
+        data={data} fitZ={geo.fitZ} fitH={geo.fitH} startZoom="fit" link={link} autoRotate={present} rotateSpeed={present ? 6 : undefined} theme={T} sel={sel ?? -1} from={V.k_from} to={V.k_to}
         weighted showLevels sizeByScore gatherCone blastTargets={blastTargets} view="3d" labelStyle="inside"
         frameKey={lead && sel != null ? `${sel}-${present}` : ''}
         ariaLabel={(i) => `${labels[i]}, ${names[i]}, ${V.kind === 'scalar' ? `rank ${V.rank[i]}` : `order ${pos[i]}, front ${V.front![i]}`}`}
@@ -84,11 +86,12 @@ export function ComparePage() {
           line: `${V.kind === 'scalar' ? `Rank ${V.rank[i]}` : `Order ${pos[i]} · Front ${V.front![i]}`} · Centrality ${V.band[i]} · Importance ${LV_FULL[result.importance[i]]}`,
         })}
         onSelect={(k) => setSel(k)}
-        overlay={(_, c) => (
+        overlay={(info, c) => (
           <>
             <GraphCaption title={title} sub={sub} big={present} />
             <GraphLegend T={T} from={V.k_from} to={V.k_to} levels blast={sel != null} />
             {!present && <GraphButtons c={c} />}
+            {present && lead && <RotateButton info={info} c={c} />}
           </>
         )}
       />
@@ -127,6 +130,7 @@ export function ComparePage() {
 
   return (
     <div style={css('min-height: 100vh; background: var(--page); color: var(--text)')}>
+      <AppBar />
       <div style={css('background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px')}>
         <div style={css('min-width: 0')}>
           <nav aria-label="Breadcrumb" style={css('display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-3)')}>

@@ -58,6 +58,8 @@ export interface SceneState {
   gFrom: number[];
   gTo: number[];
   mt: number;
+  /** Virtual height of the viewport (width is always W). The drawing stays centred; default H. */
+  vh?: number;
 }
 
 export interface Scene {
@@ -98,7 +100,7 @@ const LV = ['', 'L', 'M', 'H'];
 const CONE_TILT = 35 * Math.PI / 180;
 
 export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: GatherCache): Scene {
-  const CX = D.CX, CY = D.CY, FLOOR = D.FLOOR;
+  const VH = st.vh ?? H, CX = D.CX, CY = D.CY + (VH - H) / 2, FLOOR = D.FLOOR;
   const flat = st.view === 'flat', zoom = st.z, weighted = st.weighted && st.showLevels, sel = st.sel;
   const yaw = st.yaw * Math.PI / 180, pit = (flat ? -90 : st.pitch) * Math.PI / 180;
   const cyw = Math.cos(yaw), syw = Math.sin(yaw), cp = Math.cos(pit), sp = Math.sin(pit);
@@ -111,7 +113,7 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
   const pc = (v: number, t: number) => (v / t * 100).toFixed(3) + '%';
   const seg = (a: { x: number; y: number }, b: { x: number; y: number }, w: number, bg: string, extra?: string) => {
     const dx = b.x - a.x, dy = b.y - a.y;
-    return 'position: absolute; left: ' + pc(a.x, W) + '; top: ' + pc(a.y, H) + '; width: ' + pc(Math.sqrt(dx * dx + dy * dy), W) + '; height: ' + w + 'px; margin-top: -' + (w / 2) + 'px; background: ' + bg + '; transform-origin: 0 50%; transform: rotate(' + (Math.atan2(dy, dx) * 180 / Math.PI).toFixed(2) + 'deg)' + (extra || '');
+    return 'position: absolute; left: ' + pc(a.x, W) + '; top: ' + pc(a.y, VH) + '; width: ' + pc(Math.sqrt(dx * dx + dy * dy), W) + '; height: ' + w + 'px; margin-top: -' + (w / 2) + 'px; background: ' + bg + '; transform-origin: 0 50%; transform: rotate(' + (Math.atan2(dy, dx) * 180 / Math.PI).toFixed(2) + 'deg)' + (extra || '');
   };
   const N = D.N, E = D.E;
   let i: number, j: number;
@@ -250,11 +252,11 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
     });
     if (weighted && (focus < 0.5 || isH1 || isH2)) {
       const mx = (P[a].x + P[b].x) / 2, my = (P[a].y + P[b].y) / 2, ex = P[b].x - P[a].x, ey = P[b].y - P[a].y;
-      if (Math.sqrt(ex * ex + ey * ey) > P[a].r + P[b].r + 22 && mx > 0 && mx < W && my > 0 && my < H) {
+      if (Math.sqrt(ex * ex + ey * ey) > P[a].r + P[b].r + 22 && mx > 0 && mx < W && my > 0 && my < VH) {
         const bx = [mx - 9, my - 9, mx + 9, my + 9];
         if (!hit(bx)) {
           placed.push(bx);
-          elabels.push({ t: LV[lv], s: 'position: absolute; left: ' + pc(mx, W) + '; top: ' + pc(my, H) + '; width: 15px; height: 15px; margin: -7.5px 0 0 -7.5px; border-radius: 50%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; line-height: 1; background: ' + T.lblBg + '; border: 1px solid ' + (isH1 || isH2 ? T.lblHop : T.lblBorder) + '; color: ' + T.lblText + '; opacity: ' + Math.max(op, 0.75).toFixed(2) });
+          elabels.push({ t: LV[lv], s: 'position: absolute; left: ' + pc(mx, W) + '; top: ' + pc(my, VH) + '; width: 15px; height: 15px; margin: -7.5px 0 0 -7.5px; border-radius: 50%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; line-height: 1; background: ' + T.lblBg + '; border: 1px solid ' + (isH1 || isH2 ? T.lblHop : T.lblBorder) + '; color: ' + T.lblText + '; opacity: ' + Math.max(op, 0.75).toFixed(2) });
         }
       }
     }
@@ -281,7 +283,7 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
     }
     return {
       k, lab, ls,
-      s: 'position: absolute; left: ' + pc(q.x, W) + '; top: ' + pc(q.y, H) + '; width: ' + (2 * q.r).toFixed(1) + 'px; height: ' + (2 * q.r).toFixed(1) + 'px; margin: -' + q.r.toFixed(1) + 'px 0 0 -' + q.r.toFixed(1) + 'px; padding: 0; border: 0; border-radius: 50%; background: radial-gradient(circle at 34% 30%, ' + c[0] + ' 0%, ' + c[1] + ' 46%, ' + c[2] + ' 100%); box-shadow: ' + sh + '; opacity: ' + op.toFixed(2) + '; display: flex; align-items: center; justify-content: center; cursor: pointer',
+      s: 'position: absolute; left: ' + pc(q.x, W) + '; top: ' + pc(q.y, VH) + '; width: ' + (2 * q.r).toFixed(1) + 'px; height: ' + (2 * q.r).toFixed(1) + 'px; margin: -' + q.r.toFixed(1) + 'px 0 0 -' + q.r.toFixed(1) + 'px; padding: 0; border: 0; border-radius: 50%; background: radial-gradient(circle at 34% 30%, ' + c[0] + ' 0%, ' + c[1] + ' 46%, ' + c[2] + ' 100%); box-shadow: ' + sh + '; opacity: ' + op.toFixed(2) + '; display: flex; align-items: center; justify-content: center; cursor: pointer',
     };
   });
 
@@ -299,7 +301,7 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
     const q = P[k], n = N[k], isSel = k === sel;
     if (!isSel && n.pos > tierN) return;
     if (blastOn && !inBlast(k) && focus > 0.5) return;
-    if (q.x < -40 || q.x > W + 40 || q.y < -20 || q.y > H + 20) return;
+    if (q.x < -40 || q.x > W + 40 || q.y < -20 || q.y > VH + 20) return;
     const nm = D.NM[k], lw = Math.max(6.6 * n.id.length, showNm ? 5.9 * nm.length : 0) + 6, lh = showNm ? 30 : 16;
     const Rb = [q.x + q.r + 5, q.y - lh / 2, q.x + q.r + 5 + lw, q.y + lh / 2], Lb = [q.x - q.r - 5 - lw, q.y - lh / 2, q.x - q.r - 5, q.y + lh / 2];
     let left = false;
@@ -308,7 +310,7 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
     const lead = isSel || n.pos <= 10;
     names.push({
       id: n.id, nm,
-      s: 'position: absolute; left: ' + pc(left ? q.x - q.r - 5 : q.x + q.r + 5, W) + '; top: ' + pc(q.y, H) + '; transform: translate(' + (left ? '-100%' : '0') + ', -50%); white-space: nowrap; line-height: 1.25; text-align: ' + (left ? 'right' : 'left') + '; text-shadow: 0 0 2px ' + T.nameHalo + ', 0 0 4px ' + T.nameHalo + ', 0 0 8px ' + T.nameHalo,
+      s: 'position: absolute; left: ' + pc(left ? q.x - q.r - 5 : q.x + q.r + 5, W) + '; top: ' + pc(q.y, VH) + '; transform: translate(' + (left ? '-100%' : '0') + ', -50%); white-space: nowrap; line-height: 1.25; text-align: ' + (left ? 'right' : 'left') + '; text-shadow: 0 0 2px ' + T.nameHalo + ', 0 0 4px ' + T.nameHalo + ', 0 0 8px ' + T.nameHalo,
       is: 'display: block; font-size: ' + (lead ? '11.5px; font-weight: 600; color: ' + T.nameTop : '10.5px; font-weight: 500; color: ' + T.nameRest),
       ns: showNm ? 'display: block; font-size: 10.5px; font-weight: 400; color: ' + T.nameRest : 'display: none',
     });
@@ -334,7 +336,7 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
       return res;
     };
     const axis = (t: number) => proj(S0[0] + d0[0] * t, S0[1] + d0[1] * t, S0[2] + d0[2] * t);
-    const poly = (pts: P2[]) => 'polygon(' + pts.map((q) => pc(q.x, W) + ' ' + pc(q.y, H)).join(', ') + ')';
+    const poly = (pts: P2[]) => 'polygon(' + pts.map((q) => pc(q.x, W) + ' ' + pc(q.y, VH)).join(', ') + ')';
     const Lend = G0.Lend;
     const apex = proj(S0[0], S0[1], S0[2]), R = G0.L.map((t) => ring(t, 48)), rend = ring(Lend, 48);
     rend.forEach((q) => grow(q.x, q.y));
@@ -347,7 +349,7 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
     // Shade along the cone's axis: strongest at the asset, fading to nothing past the last ring.
     const cEnd = axis(Lend);
     const gx = cEnd.x - apex.x, gy = cEnd.y - apex.y, ga = Math.atan2(gx, -gy), sa = Math.sin(ga), ca = Math.cos(ga);
-    const glen = Math.abs(W * sa) + Math.abs(H * ca), sX = W / 2 - sa * glen / 2, sY = H / 2 + ca * glen / 2;
+    const glen = Math.abs(W * sa) + Math.abs(VH * ca), sX = W / 2 - sa * glen / 2, sY = VH / 2 + ca * glen / 2;
     const at2 = (q: { x: number; y: number }) => (((q.x - sX) * sa - (q.y - sY) * ca) / glen * 100).toFixed(2) + '%';
     const CA = T.coneA, col = (al: number) => 'rgba(' + T.cone + ', ' + al + ')';
     const stops = [col(CA[0]) + ' ' + at2(apex), col(CA[1]) + ' ' + at2(axis(G0.L[0]))];
@@ -355,7 +357,7 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
     else stops.push(col(CA[2]) + ' ' + at2(cEnd));
     stops.push(col(0) + ' ' + at2(cEnd));
     cone.op = (fromG.get(tx) === G0 ? 1 : e).toFixed(2); // fade in new (or turned) cones
-    cone.fill = 'position: absolute; inset: 0; clip-path: polygon(' + hull.map((q) => pc(q[0], W) + ' ' + pc(q[1], H)).join(', ') + '); background: linear-gradient(' + (ga * 180 / Math.PI).toFixed(2) + 'deg, ' + stops.join(', ') + ')';
+    cone.fill = 'position: absolute; inset: 0; clip-path: polygon(' + hull.map((q) => pc(q[0], W) + ' ' + pc(q[1], VH)).join(', ') + '); background: linear-gradient(' + (ga * 180 / Math.PI).toFixed(2) + 'deg, ' + stops.join(', ') + ')';
     for (let h = nr - 1; h >= 0; h--) cone.discs.push('position: absolute; inset: 0; clip-path: ' + poly(R[h]) + '; background: ' + col(h === 0 ? CA[3] : +(CA[4] * Math.pow(0.8, h - 1)).toFixed(3)));
     for (j = 0; j < 48; j += 2) {
       for (let h = 0; h < nr; h++) {
@@ -372,7 +374,7 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
     const topOf = (pts: P2[]) => { let tq = pts[0]; pts.forEach((q) => { if (q.y < tq.y) tq = q; }); return tq; };
     for (let h = 0; h < nr; h++) {
       const t = topOf(R[h]), c = G0.rings[h].length;
-      cone.labels.push({ t: (h + 1) + (h === 0 ? ' hop · ' : ' hops · ') + c + (c === 1 ? ' asset' : ' assets'), s: 'position: absolute; left: ' + pc(t.x, W) + '; top: ' + pc(t.y, H) + '; transform: translate(-50%, -135%); opacity: ' + cone.op });
+      cone.labels.push({ t: (h + 1) + (h === 0 ? ' hop · ' : ' hops · ') + c + (c === 1 ? ' asset' : ' assets'), s: 'position: absolute; left: ' + pc(t.x, W) + '; top: ' + pc(t.y, VH) + '; transform: translate(-50%, -135%); opacity: ' + cone.op });
     }
     cones.push(cone);
   }
@@ -380,7 +382,7 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
   let tip: Scene['tip'] = null;
   if (st.hover != null && st.hover >= 0) {
     const hq = P[st.hover];
-    tip = { k: st.hover, s: 'position: absolute; left: ' + pc(hq.x + hq.r + 10, W) + '; top: ' + pc(hq.y, H) + '; transform: translateY(-50%); pointer-events: none' };
+    tip = { k: st.hover, s: 'position: absolute; left: ' + pc(hq.x + hq.r + 10, W) + '; top: ' + pc(hq.y, VH) + '; transform: translateY(-50%); pointer-events: none' };
   }
 
   const axisDir = (x: number, y: number, z: number) => {

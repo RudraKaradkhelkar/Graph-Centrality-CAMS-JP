@@ -1,11 +1,11 @@
 // Analysis dashboard (port of V3-Dashboard). Every number comes from the analyze() result.
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { ChartOptions, Dimension, Distribution, ReadyVariant, Scope, VariantKey } from '../analysis-types';
 import { navigate } from '../App';
 import { css } from '../components/css';
 import { DistributionChart } from '../components/DistributionChart';
-import { ExitPresent, GraphCaption, GraphLegend, PresentButton } from '../components/GraphChrome';
-import { BandChip, Icon, LevelChip, LV, LV_FULL, Segmented, ThemeButton } from '../components/ui';
+import { ExitPresent, GraphCaption, GraphLegend, PresentButton, RotateButton } from '../components/GraphChrome';
+import { AppBar, BandChip, Icon, LevelChip, LV, LV_FULL, Segmented, ThemeButton } from '../components/ui';
 import { shortName } from '../data/dataset';
 import { DARK, LIGHT } from '../graph/graph-theme';
 import { GraphView, type CameraInfo, type GraphControls } from '../graph/GraphView';
@@ -18,6 +18,9 @@ const OVERLAY = 'pointer-events: auto; background: var(--overlay-94); box-shadow
 const NAV_BTN = 'width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); color: var(--text); cursor: pointer';
 const TOOL_BTN = 'width: 32px; height: 28px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 6px; background: transparent; color: var(--text-2); cursor: pointer';
 const CHECK = 'width: 16px; height: 16px; margin: 0; accent-color: var(--check)';
+// Graph height: dragged by the handle under it, remembered in this browser; opens filling the window.
+const GRAPH_MIN = 400;
+const GRAPH_H_KEY = 'carma-graph-height';
 
 function fmtTuple(t: [number, number]) {
   return `${t[0].toFixed(2)}, ${t[1].toFixed(2)}`;
@@ -59,6 +62,27 @@ export function DashboardPage() {
   const [gatherCone, setGatherCone] = useState(true);
   const [depth, setDepth] = useState(result.options.depth);
   const [spread, setSpread] = useState(result.options.blast_direction);
+  const graphWrap = useRef<HTMLDivElement>(null);
+  const [graphBox, setGraphBox] = useState({ w: 0, top: 0 });
+  const [savedH, setSavedH] = useState<number | null>(() => {
+    try { const v = Number(localStorage.getItem(GRAPH_H_KEY)); return v > 0 ? v : null; } catch { return null; }
+  });
+  const resizeFrom = useRef<{ y: number; h: number } | null>(null);
+  useLayoutEffect(() => {
+    const el = graphWrap.current;
+    if (!el) return;
+    const measure = () => { const r = el.getBoundingClientRect(); setGraphBox({ w: r.width, top: r.top + scrollY }); };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [app.present]);
+  useEffect(() => {
+    try { if (savedH == null) localStorage.removeItem(GRAPH_H_KEY); else localStorage.setItem(GRAPH_H_KEY, String(savedH)); } catch { /* storage unavailable */ }
+  }, [savedH]);
+  const graphMax = Math.max(GRAPH_MIN, graphBox.w * 1200 / 1400);
+  const clampH = (h: number) => Math.round(Math.min(graphMax, Math.max(GRAPH_MIN, h)));
+  const graphH = graphBox.w ? clampH(savedH ?? innerHeight - graphBox.top - 13) : undefined; // 13 = the handle
   const allTypes = useMemo(() => Object.keys(result.edge_types), [result.edge_types]);
   const [types, setTypes] = useState<string[] | null>(result.options.edge_types);
 
@@ -438,15 +462,16 @@ export function DashboardPage() {
         <ExitPresent />
         <div style={{ width: `min(calc(100vw - ${panel ? 380 : 0}px), calc(100vh * 1400 / 1200))` }}>
           <GraphView
-            data={sceneData} fitZ={geo.fitZ} startZoom={geo.fitZ} theme={T} sel={s} from={from} to={to} weighted={weighted} showLevels={showLevels}
+            data={sceneData} fitZ={geo.fitZ} fitH={geo.fitH} startZoom="fit" autoRotate rotateSpeed={6} theme={T} sel={s} from={from} to={to} weighted={weighted} showLevels={showLevels}
             sizeByScore={sizeByScore} gatherCone={gatherCone} blastTargets={blastTargets} frameKey={blast ? blastTargets.join('-') : ''} view={view} labelStyle="inside"
             ariaLabel={(i) => `${labels[i]}, ${names[i]}, ${rankText(i).toLowerCase()}`}
             tip={(i) => ({ title: `${labels[i]} · ${names[i]}`, line: `${rankText(i)} · ${showValues ? `Score ${scoreText(i)}` : `Centrality ${band[i]}`} · Importance ${LV_FULL[result.importance[i]]}` })}
             onSelect={select}
-            overlay={() => (
+            overlay={(info, c) => (
               <>
                 <GraphCaption big title={metricTitle} sub={caption} />
                 <GraphLegend T={T} from={from} to={to} levels={weighted && showLevels} blast={blast} />
+                <RotateButton info={info} c={c} />
               </>
             )}
           />
@@ -463,6 +488,7 @@ export function DashboardPage() {
 
   return (
     <div style={css('min-height: 100vh; display: flex; flex-direction: column; background: var(--page); color: var(--text)')}>
+      <AppBar />
       <div style={css('background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px')}>
         <div style={css('min-width: 0')}>
           <nav aria-label="Breadcrumb" style={css('display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-3)')}>
@@ -490,14 +516,29 @@ export function DashboardPage() {
       </div>
 
       <div style={css('display: flex; align-items: flex-start')}>
-      <div style={css('flex: 1; min-width: 0')}>
+      <div ref={graphWrap} style={css('flex: 1; min-width: 0')}>
       <GraphView
-          data={sceneData} fitZ={geo.fitZ} startZoom={ds.hasPositions ? 1 : geo.fitZ} theme={T} sel={s} from={from} to={to} weighted={weighted} showLevels={showLevels}
+          data={sceneData} fitZ={geo.fitZ} fitH={geo.fitH} startZoom={ds.hasPositions ? 1 : 'fit'} height={graphH} theme={T} sel={s} from={from} to={to} weighted={weighted} showLevels={showLevels}
           sizeByScore={sizeByScore} gatherCone={gatherCone} blastTargets={blastTargets} frameKey={blast ? blastTargets.join('-') : ''} view={view} labelStyle="inside"
           ariaLabel={(i) => `${labels[i]}, ${names[i]}, ${rankText(i).toLowerCase()}`}
           tip={(i) => ({ title: `${labels[i]} · ${names[i]}`, line: `${labels[i] !== result.ids[i] ? `ID ${result.ids[i]} · ` : ''}${rankText(i)} · ${showValues ? `Score ${scoreText(i)}` : `Centrality ${band[i]}`} · Importance ${LV_FULL[result.importance[i]]}` })}
           onSelect={select} overlay={overlay}
         />
+        <div role="separator" aria-orientation="horizontal" aria-label="Graph height" tabIndex={0}
+          aria-valuemin={GRAPH_MIN} aria-valuemax={Math.round(graphMax)} aria-valuenow={graphH}
+          title="Drag to change the graph's height · double-click to reset"
+          onPointerDown={(e) => { if (graphH == null) return; e.currentTarget.setPointerCapture(e.pointerId); resizeFrom.current = { y: e.clientY, h: graphH }; }}
+          onPointerMove={(e) => { const r = resizeFrom.current; if (r) setSavedH(clampH(r.h + e.clientY - r.y)); }}
+          onPointerUp={() => { resizeFrom.current = null; }}
+          onDoubleClick={() => setSavedH(null)}
+          onKeyDown={(e) => {
+            if (graphH == null || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown')) return;
+            e.preventDefault();
+            setSavedH(clampH(graphH + (e.key === 'ArrowUp' ? -24 : 24)));
+          }}
+          style={css('height: 12px; display: flex; align-items: center; justify-content: center; background: var(--surface); border-bottom: 1px solid var(--border); cursor: row-resize; touch-action: none')}>
+          <span aria-hidden="true" style={css('width: 40px; height: 4px; border-radius: 2px; background: var(--control-border)')} />
+        </div>
       </div>
       {blast && (
         // Beside the graph so both cones and both lists fit one screen (deliverable 2).

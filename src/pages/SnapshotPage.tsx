@@ -213,7 +213,7 @@ export function SnapshotPage({ params }: { params: URLSearchParams }) {
       <div style={css('flex: 1; min-height: 0; display: flex')}>
         <div style={css(`flex: none; width: calc((100vh - ${HEADER_H}px) * 1400 / 1200); border-right: 1px solid var(--border)`)}>
           <GraphView
-            data={sceneData} fitZ={geo.fitZ} startZoom={geo.fitZ} theme={T} sel={blast ? pair[0] : V.order[0]} from={from} to={to} weighted showLevels
+            data={sceneData} fitZ={geo.fitZ} fitH={geo.fitH} startZoom="fit" theme={T} sel={blast ? pair[0] : V.order[0]} from={from} to={to} weighted showLevels
             sizeByScore gatherCone blastTargets={pair} frameKey={pair.join('-')} view="3d" labelStyle="inside"
             ariaLabel={(i) => `${labels[i]}, ${names[i]}, ${rankText(i).toLowerCase()}`}
             tip={(i) => ({ title: `${labels[i]} · ${names[i]}`, line: `${rankText(i)} · Importance ${LV_FULL[result.importance[i]]}` })}

@@ -1,7 +1,7 @@
 // Small overlays for graph views outside the main dashboard: the 1D vs 2D comparison and Present mode.
 import type { ReactNode } from 'react';
 import type { GraphTheme } from '../graph/graph-theme';
-import type { GraphControls } from '../graph/GraphView';
+import type { CameraInfo, GraphControls } from '../graph/GraphView';
 import { useApp } from '../state';
 import { css } from './css';
 import { Icon, LevelChip } from './ui';
@@ -41,6 +41,17 @@ export function GraphButtons({ c }: { c: GraphControls }) {
       <button type="button" aria-label="Fit to screen" onClick={c.fitView} style={css(BTN)}><Icon name="fit" /></button>
       <button type="button" aria-label="Reset view" onClick={c.resetView} style={css(BTN)}><Icon name="reset" /></button>
     </div>
+  );
+}
+
+/** Present mode: play / pause the slow rotation. */
+export function RotateButton({ info, c }: { info: CameraInfo; c: GraphControls }) {
+  return (
+    <button data-ui="1" type="button" onClick={c.toggleAuto} aria-pressed={info.auto} aria-label={info.auto ? 'Stop rotating' : 'Rotate slowly'}
+      title={info.auto ? 'Stop rotating' : 'Rotate slowly'}
+      style={css(`position: absolute; right: 16px; bottom: 16px; width: 36px; height: 32px; display: flex; align-items: center; justify-content: center; ${PANEL}; border-radius: 6px; color: var(--text-2); cursor: pointer`)}>
+      <Icon name={info.auto ? 'pause' : 'play'} />
+    </button>
   );
 }
 
