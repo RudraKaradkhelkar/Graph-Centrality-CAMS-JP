@@ -188,6 +188,12 @@ def test_edge_type_filter_keeps_n():
     assert r["edge_types"] == {"Power": 1, "Control": 1}
 
 
+def test_edge_type_assets_counts_both_ends_once():
+    links = [link("A", "B", 3, kind="Power"), link("B", "C", 2, kind="Power"), link("A", "C", 1, kind="Control")]
+    r = analyze(links, {"edge_types": ["Power"]})
+    assert r["edge_type_assets"] == {"Power": 3, "Control": 2}
+
+
 def test_unlinked_assets_count_in_n():
     r = analyze(SMALL, {"assets": [{"id": x} for x in ["A", "B", "C", "D", "E"]]})
     assert r["n"] == 5 and r["ids"][-1] == "E"

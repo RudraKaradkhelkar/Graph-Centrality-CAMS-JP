@@ -374,7 +374,7 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
     const topOf = (pts: P2[]) => { let tq = pts[0]; pts.forEach((q) => { if (q.y < tq.y) tq = q; }); return tq; };
     for (let h = 0; h < nr; h++) {
       const t = topOf(R[h]), c = G0.rings[h].length;
-      cone.labels.push({ t: (h + 1) + (h === 0 ? ' hop · ' : ' hops · ') + c + (c === 1 ? ' asset' : ' assets'), s: 'position: absolute; left: ' + pc(t.x, W) + '; top: ' + pc(t.y, VH) + '; transform: translate(-50%, -135%); opacity: ' + cone.op });
+      cone.labels.push({ t: (h + 1) + (h === 0 ? ' Hop · ' : ' Hops · ') + c + (c === 1 ? ' Asset' : ' Assets'), s: 'position: absolute; left: ' + pc(t.x, W) + '; top: ' + pc(t.y, VH) + '; transform: translate(-50%, -135%); opacity: ' + cone.op });
     }
     cones.push(cone);
   }

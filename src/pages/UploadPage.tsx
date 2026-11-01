@@ -2,7 +2,7 @@
 import { useRef, useState } from 'react';
 import { navigate } from '../App';
 import { css } from '../components/css';
-import { AppBar, Icon, LevelChip, LV, Segmented, ThemeButton } from '../components/ui';
+import { APP_TAGLINE, Icon, LevelChip, LV, ParetoLink, Segmented, ThemeButton } from '../components/ui';
 import { downloadTemplate, loadSample } from '../data/dataset';
 import { fromTables, hasErrors, parseTwoFiles, readFile, shortName, type Issue, type ParseResult, type SourceFile, type Table } from '../data/parse';
 import { LANES, type Lane } from '../graph/seed';
@@ -57,7 +57,7 @@ function DropZone(props: { id: string; accept: string; title: string; hint: stri
       </span>
       <span style={css('font-size: 16px; font-weight: 600; color: var(--text)')}>{props.title}</span>
       <span style={css('font-size: 13px; color: var(--text-3)')}>{props.hint}</span>
-      <span style={css('margin-top: 4px; height: 36px; padding: 0 16px; display: inline-flex; align-items: center; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font-size: 14px; font-weight: 600; color: var(--text)')}>Browse files</span>
+      <span style={css('margin-top: 4px; height: 36px; padding: 0 16px; display: inline-flex; align-items: center; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font-size: 14px; font-weight: 600; color: var(--text)')}>Browse Files</span>
       {input}
     </label>
   );
@@ -139,20 +139,30 @@ export function UploadPage() {
 
   return (
     <div style={css('min-height: 100vh; background: var(--page); color: var(--text)')}>
-      <AppBar />
-      <main style={css('max-width: 1200px; margin: 0 auto; padding: 40px 32px 64px; box-sizing: border-box')}>
+      <main style={css('max-width: 1200px; margin: 0 auto; padding: 24px 32px 64px; box-sizing: border-box')}>
         <div style={css('display: flex; align-items: center; justify-content: space-between; gap: 12px')}>
           <nav aria-label="Breadcrumb" style={css('display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-3)')}>
             <span>Analyses</span>
             <span aria-hidden="true">/</span>
-            <span style={css('color: var(--text)')}>New analysis</span>
+            <span style={css('color: var(--text)')}>New Analysis</span>
           </nav>
           <ThemeButton />
         </div>
-        <div style={css('margin-top: 12px')}>
-          <h1 style={css('margin: 0; font-size: 20px; line-height: 32px; font-weight: 600; color: var(--text-strong)')}>Import network data</h1>
-          <p style={css('margin: 8px 0 0; max-width: 680px; font-size: 16px; line-height: 24px; color: var(--text-2); text-wrap: pretty')}>Upload the links between your assets and your asset list. CARMA checks both, matches names to IDs and builds the directed network for analysis. Files are read in your browser and never uploaded anywhere.</p>
-        </div>
+        <header style={css('margin-top: 16px; padding: 32px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; border-bottom: 1px solid var(--border)')}>
+          <h1 style={css('margin: 0; font-size: 32px; line-height: 40px; font-weight: 700; letter-spacing: 0.04em; color: var(--text-strong)')}>CARMA</h1>
+          <p style={css('margin: 0; font-size: 16px; line-height: 24px; color: var(--text-2)')}>{APP_TAGLINE}</p>
+          <label htmlFor="hero-input" style={css('margin-top: 16px; height: 48px; padding: 0 24px; display: inline-flex; align-items: center; gap: 12px; border-radius: 6px; background: var(--primary); color: var(--primary-text); font-size: 16px; font-weight: 600; cursor: pointer')}>
+            <Icon name="upload" size={20} />Upload Your Network Infrastructure File
+            <input id="hero-input" type="file" accept=".xlsx,.xls" disabled={!!reading} style={css('position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none')}
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) { setMode('workbook'); setPair({}); onWorkbook(f); } e.target.value = ''; }} />
+          </label>
+          <p style={css('margin: 0; font-size: 13px; line-height: 20px; color: var(--text-3)')}>
+            Accepted formats: <span style={css('font-weight: 600; color: var(--text-2)')}>.xlsx</span> or <span style={css('font-weight: 600; color: var(--text-2)')}>.xls</span> (one workbook with Links and Assets sheets),
+            or two <span style={css('font-weight: 600; color: var(--text-2)')}>.csv</span> files in UTF-8 (choose Two Files below). Up to 100 MB each.
+            <br />Files are read in your browser and never uploaded anywhere.
+          </p>
+          <p style={css('margin: 8px 0 0; font-size: 12px; color: var(--text-3)')}>Created by Rudra Karadkhelkar | Concept: Dr. Ranjan Pal</p>
+        </header>
 
         <div style={css('display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; margin-top: 28px')}>
           <div style={css('flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 24px')}>
@@ -160,18 +170,18 @@ export function UploadPage() {
             <section aria-labelledby="file-h" style={css(CARD)}>
               <div style={css('display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px 20px')}>
                 <div style={css('min-width: 0')}>
-                  <h2 id="file-h" style={css('margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; color: var(--text-strong)')}>Data files</h2>
+                  <h2 id="file-h" style={css('margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; color: var(--text-strong)')}>Data Files</h2>
                   <p style={css('margin: 4px 0 0; font-size: 13px; line-height: 20px; color: var(--text-3)')}>
                     {mode === 'workbook' ? 'One Excel workbook with two sheets: Links (one row per directed link) and Assets (asset IDs and names).' : 'A links file (one row per directed link) and a separate asset list (asset IDs and names).'}
                   </p>
                 </div>
                 <Segmented label="How your data is packaged" value={mode} onChange={(m) => { setMode(m); setPair({}); }}
-                  options={[{ id: 'workbook', label: 'One workbook' }, { id: 'two', label: 'Two files' }]} />
+                  options={[{ id: 'workbook', label: 'One Workbook' }, { id: 'two', label: 'Two Files' }]} />
               </div>
 
               <div role="note" aria-label="Accepted file types" style={css('margin-top: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 16px; border: 1px solid var(--info-border); border-radius: 6px; background: var(--info-bg)')}>
                 <Icon name="info" size={18} stroke="var(--info-icon)" style="flex: none" />
-                <span style={css('font-size: 13px; font-weight: 600; color: var(--text)')}>Accepted file types</span>
+                <span style={css('font-size: 13px; font-weight: 600; color: var(--text)')}>Accepted File Types</span>
                 <span style={css('display: flex; flex-wrap: wrap; gap: 8px')}>
                   {['.xlsx', '.xls', '.csv'].map((t) => (
                     <span key={t} style={css(`height: 24px; padding: 0 8px; display: inline-flex; align-items: center; border-radius: 6px; font-size: 12px; font-weight: 600; ${t === '.csv' ? 'background: var(--blue-soft-bg); color: var(--blue-soft-text)' : 'background: var(--green-bg); color: var(--green)'}`)}>{t}</span>
@@ -181,10 +191,10 @@ export function UploadPage() {
               </div>
 
               {mode === 'workbook' ? (
-                <DropZone id="wb-input" accept=".xlsx,.xls" title="Drag and drop your workbook here" hint="One Excel file (.xlsx or .xls) with a Links sheet and an Assets sheet" onFile={onWorkbook} />
+                <DropZone id="wb-input" accept=".xlsx,.xls" title="Drag and Drop Your Workbook Here" hint="One Excel file (.xlsx or .xls) with a Links sheet and an Assets sheet" onFile={onWorkbook} />
               ) : (
                 <div style={css('margin-top: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 16px')}>
-                  {([['links', 'links-input', '1 · Links file', 'Drop the file with one row per link, or '], ['assets', 'assets-input', '2 · Asset list', 'Drop the file that maps asset IDs to names, or ']] as const).map(([part, id, title, hint]) => (
+                  {([['links', 'links-input', '1 · Links File', 'Drop the file with one row per link, or '], ['assets', 'assets-input', '2 · Asset List', 'Drop the file that maps asset IDs to names, or ']] as const).map(([part, id, title, hint]) => (
                     <div key={id} style={css('display: flex; flex-direction: column; gap: 12px')}>
                       <div style={css('display: flex; align-items: baseline; justify-content: space-between; gap: 8px')}>
                         <span style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>{title}</span>
@@ -210,7 +220,7 @@ export function UploadPage() {
                       <div style={css('margin-top: 2px; font-size: 13px; color: var(--text-3)')}>{formatSize(f.size)} · {f.format}{d.sample ? ' · Sample network' : ''}</div>
                     </div>
                     <span style={css(`flex: none; display: inline-flex; align-items: center; gap: 8px; height: 24px; padding: 0 12px; border-radius: 6px; font-size: 12px; font-weight: 600; ${blocked ? 'background: var(--error-bg); color: var(--error)' : 'background: var(--green-bg); color: var(--green)'}`)}>
-                      {blocked ? <>Needs fixes</> : <><Icon name="check" size={14} width={2.2} />Ready</>}
+                      {blocked ? <>Needs Fixes</> : <><Icon name="check" size={14} width={2.2} />Ready</>}
                     </span>
                     <button type="button" aria-label={`Remove ${f.name}`} onClick={clear} style={css('flex: none; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 6px; background: transparent; color: var(--text-3); cursor: pointer')}>
                       <Icon name="close" size={18} width={1.8} />
@@ -221,7 +231,7 @@ export function UploadPage() {
                       {f.sheets.map((sh) => (
                         <div key={sh.name} style={css('display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 6px; background: var(--subtle)')}>
                           <Icon name="check" size={16} width={2.2} stroke="var(--green)" style="flex: none" />
-                          <span style={css('font-size: 13px; color: var(--text)')}><span style={css('font-weight: 600')}>{f.format === 'CSV file' ? (sh.role === 'links' ? 'Links' : 'Asset list') : sh.name}</span>{f.format === 'CSV file' ? '' : ' sheet'} · {sh.rows} rows</span>
+                          <span style={css('font-size: 13px; color: var(--text)')}><span style={css('font-weight: 600')}>{f.format === 'CSV file' ? (sh.role === 'links' ? 'Links' : 'Asset List') : sh.name}</span>{f.format === 'CSV file' ? '' : ' sheet'} · {sh.rows} rows</span>
                         </div>
                       ))}
                     </div>
@@ -233,7 +243,7 @@ export function UploadPage() {
                 <div style={css('margin-top: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 12px')}>
                   {(['links', 'assets'] as const).map((kind) => (
                     <div key={kind} style={css('display: flex; flex-direction: column; gap: 8px')}>
-                      <label htmlFor={`pick-${kind}`} style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>{kind === 'links' ? 'Network to analyse (links sheet)' : 'Asset list sheet'}</label>
+                      <label htmlFor={`pick-${kind}`} style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>{kind === 'links' ? 'Network to Analyse (Links Sheet)' : 'Asset List Sheet'}</label>
                       <div style={css('position: relative')}>
                         <select id={`pick-${kind}`} value={p.sheetChoice!.chosen[kind]} onChange={(e) => pickSheets({ ...p.sheetChoice!.chosen, [kind]: e.target.value })} style={css(SELECT + '; width: 100%; height: 36px')}>
                           {p.sheetChoice![kind].map((n) => <option key={n} value={n}>{n}</option>)}
@@ -248,7 +258,7 @@ export function UploadPage() {
               {p && (
                 <>
                   <h3 style={css('margin: 24px 0 0; font-size: 13px; font-weight: 600; color: var(--text-2)')}>
-                    Structure check{errorCount ? ` · ${errorCount} ${errorCount === 1 ? 'problem' : 'problems'} to fix before analysis` : ''}
+                    Structure Check{errorCount ? ` · ${errorCount} ${errorCount === 1 ? 'problem' : 'problems'} to fix before analysis` : ''}
                   </h3>
                   <ul style={css('list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column')}>
                     {issues.map((c, i) => (
@@ -266,11 +276,11 @@ export function UploadPage() {
 
               {types.length > 0 && (
                 <>
-                  <h3 style={css('margin: 20px 0 0; font-size: 13px; font-weight: 600; color: var(--text-2)')}>Graph lanes</h3>
+                  <h3 style={css('margin: 20px 0 0; font-size: 13px; font-weight: 600; color: var(--text-2)')}>Graph Lanes</h3>
                   <p style={css('margin: 4px 0 0; font-size: 13px; color: var(--text-3)')}>Each asset type is drawn as one cluster. Suggested lanes follow how its assets link: mostly sending, mostly receiving, or both.</p>
                   <div style={css('margin-top: 12px; border: 1px solid var(--border); border-radius: 6px; overflow-x: auto')}>
                     <table style={css('width: 100%; border-collapse: collapse; font-size: 13px; color: var(--text)')}>
-                      <thead><tr style={css('background: var(--table-head); text-align: left')}><th scope="col" style={css(TH)}>Asset type</th><th scope="col" style={css(TH + '; text-align: right')}>Assets</th><th scope="col" style={css(TH)}>Lane</th></tr></thead>
+                      <thead><tr style={css('background: var(--table-head); text-align: left')}><th scope="col" style={css(TH)}>Asset Type</th><th scope="col" style={css(TH + '; text-align: right')}>Assets</th><th scope="col" style={css(TH)}>Lane</th></tr></thead>
                       <tbody>
                         {types.map(({ t, count }) => (
                           <tr key={t}>
@@ -309,7 +319,7 @@ export function UploadPage() {
                     <table style={css('width: 100%; min-width: 760px; border-collapse: collapse; font-size: 13px; color: var(--text)')}>
                       <thead>
                         <tr style={css('background: var(--table-head); text-align: left; vertical-align: top')}>
-                          {[['Source', 'Asset ID'], ['Target', 'Asset ID'], ['Edge type', 'Category'], ['Edge importance', '1–3'], ['Source asset importance', '1–3'], ['Target asset importance', '1–3']].map(([h, sub]) => (
+                          {[['Source', 'Asset ID'], ['Target', 'Asset ID'], ['Edge Type', 'Category'], ['Edge Importance', '1–3'], ['Source Asset Importance', '1–3'], ['Target Asset Importance', '1–3']].map(([h, sub]) => (
                             <th key={h} scope="col" style={css(TH + (sub === '1–3' ? '; text-align: right' : ''))}>{h}<div style={css(TH_SUB)}>{sub}</div></th>
                           ))}
                         </tr>
@@ -333,7 +343,7 @@ export function UploadPage() {
                     <table style={css('width: 100%; min-width: 640px; border-collapse: collapse; font-size: 13px; color: var(--text)')}>
                       <thead>
                         <tr style={css('background: var(--table-head); text-align: left; vertical-align: top')}>
-                          {[['Asset ID', 'Matches Source and Target'], ...(d.hasAbbr ? [['Abbreviation', 'Graph label']] : []), ['Asset name', 'As uploaded'], ...(d.hasTypes ? [['Asset type', d.typeSource === 'id-prefix' ? 'From the ID prefix' : d.typeSource === 'id-suffix' ? 'From the ID suffix' : 'Graph cluster']] : []), ['Shown in legend', 'Up to 5 words']].map(([h, sub]) => (
+                          {[['Asset ID', 'Matches Source and Target'], ...(d.hasAbbr ? [['Abbreviation', 'Graph label']] : []), ['Asset Name', 'As uploaded'], ...(d.hasTypes ? [['Asset Type', d.typeSource === 'id-prefix' ? 'From the ID prefix' : d.typeSource === 'id-suffix' ? 'From the ID suffix' : 'Graph cluster']] : []), ['Shown in Legend', 'Up to 5 words']].map(([h, sub]) => (
                             <th key={h} scope="col" style={css(TH)}>{h}<div style={css(TH_SUB)}>{sub}</div></th>
                           ))}
                         </tr>
@@ -361,9 +371,9 @@ export function UploadPage() {
 
           <aside style={css('flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 24px')}>
             <section aria-labelledby="set-h" style={css(CARD)}>
-              <h2 id="set-h" style={css('margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; color: var(--text-strong)')}>Analysis setup</h2>
+              <h2 id="set-h" style={css('margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; color: var(--text-strong)')}>Analysis Setup</h2>
               <div style={css('margin-top: 20px; display: flex; flex-direction: column; gap: 8px')}>
-                <label htmlFor="name-input" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Analysis name</label>
+                <label htmlFor="name-input" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Analysis Name</label>
                 <input id="name-input" type="text" value={app.analysisName} onChange={(e) => app.setAnalysisName(e.target.value)} placeholder="For example: Network review Q4"
                   style={css('height: 40px; padding: 0 12px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 14px; color: var(--text); box-sizing: border-box')} />
               </div>
@@ -371,8 +381,8 @@ export function UploadPage() {
                 <label htmlFor="setup-measure" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Metric</label>
                 <div style={css('position: relative')}>
                   <select id="setup-measure" defaultValue="degree" style={css('width: 100%; height: 40px; padding: 0 36px 0 12px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 14px; color: var(--text); appearance: none; -webkit-appearance: none')}>
-                    <option value="degree">Degree centrality</option>
-                    <option disabled>Betweenness centrality - in development</option>
+                    <option value="degree">Degree Centrality</option>
+                    <option disabled>Betweenness Centrality - In Development</option>
                   </select>
                   <Icon name="chevronDown" size={16} width={2} stroke="var(--text-3)" style="position: absolute; right: 12px; top: 11px; pointer-events: none" />
                 </div>
@@ -382,25 +392,21 @@ export function UploadPage() {
                 <Segmented fill labelledBy="setup-dim" value={su.dim} onChange={(dim) => app.setSetup({ ...su, dim })}
                   options={[{ id: '1d', label: '1D' }, { id: '2d', label: '2D' }]} />
                 <span style={css('font-size: 12px; line-height: 20px; color: var(--text-3)')}>
-                  {su.dim === '1d' ? 'One score per asset from its links.' : 'Two values per asset (asset importance and link importance), ranked by Pareto fronts.'}
+                  {su.dim === '1d' ? 'One score per asset from its links.' : <>Two values per asset (asset importance and link importance), ranked by <ParetoLink text="Pareto fronts" />.</>}
                 </span>
               </div>
               <div style={css('margin-top: 20px; display: flex; flex-direction: column; gap: 8px')}>
                 <span id="setup-w" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Weights</span>
-                {app.demo ? (
-                  <span style={css('font-size: 14px; color: var(--text)')}>Weighted <span style={css('color: var(--text-3)')}>· locked in demo mode</span></span>
-                ) : (
-                  <Segmented fill labelledBy="setup-w" value={su.weighted ? 'w' : 'u'} onChange={(v) => app.setSetup({ ...su, weighted: v === 'w' })}
-                    options={[{ id: 'u', label: 'Unweighted' }, { id: 'w', label: 'Weighted' }]} />
-                )}
+                <Segmented fill labelledBy="setup-w" value={su.weighted ? 'w' : 'u'} onChange={(v) => app.setSetup({ ...su, weighted: v === 'w' })}
+                  options={[{ id: 'u', label: 'Unweighted' }, { id: 'w', label: 'Weighted' }]} />
               </div>
               <div style={css('margin-top: 20px; display: flex; flex-direction: column; gap: 8px')}>
-                <span id="setup-k" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Highlight</span>
+                <span id="setup-k" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Highlight Ranks</span>
                 <Segmented fill labelledBy="setup-k" value={kPreset as 0 | 10 | 25 | 50} onChange={(k) => app.setSetup({ ...su, kFrom: 1, kTo: k || su.kTo })}
                   options={[{ id: 10, label: 'Top 10' }, { id: 25, label: 'Top 25' }, { id: 50, label: 'Top 50' }, { id: 0, label: 'Custom' }]} />
                 {!kPreset && (
                   <div style={css('display: flex; align-items: flex-end; gap: 12px')}>
-                    {([['setup-from', 'From rank', 'kFrom'], ['setup-to', 'To rank', 'kTo']] as const).map(([id, label, key], j) => (
+                    {([['setup-from', 'From Rank', 'kFrom'], ['setup-to', 'To Rank', 'kTo']] as const).map(([id, label, key], j) => (
                       <div key={id} style={css('flex: 1; display: flex; align-items: flex-end; gap: 12px')}>
                         {j === 1 && <span aria-hidden="true" style={css('padding-bottom: 8px; color: var(--text-3)')}>–</span>}
                         <div style={css('flex: 1; display: flex; flex-direction: column; gap: 4px')}>
@@ -414,14 +420,14 @@ export function UploadPage() {
                 )}
               </div>
               <div style={css('margin-top: 20px; display: flex; flex-direction: column; gap: 8px')}>
-                <label htmlFor="depth-select" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Blast radius depth</label>
+                <label htmlFor="depth-select" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Blast Radius Depth</label>
                 <div style={css('position: relative')}>
                   <select id="depth-select" value={app.depth} onChange={(e) => app.setDepth(Number(e.target.value))}
                     style={css('width: 100%; height: 40px; padding: 0 36px 0 12px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 14px; color: var(--text); appearance: none; -webkit-appearance: none')}>
-                    <option value={2}>2 hops (recommended)</option>
-                    <option value={1}>1 hop</option>
-                    <option value={3}>3 hops</option>
-                    <option value={4}>4 hops</option>
+                    <option value={2}>2 Hops (Recommended)</option>
+                    <option value={1}>1 Hop</option>
+                    <option value={3}>3 Hops</option>
+                    <option value={4}>4 Hops</option>
                   </select>
                   <Icon name="chevronDown" size={16} width={2} stroke="var(--text-3)" style="position: absolute; right: 12px; top: 11px; pointer-events: none" />
                 </div>
@@ -443,17 +449,17 @@ export function UploadPage() {
             </section>
 
             <section aria-labelledby="req-h" style={css(CARD)}>
-              <h2 id="req-h" style={css('margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; color: var(--text-strong)')}>Expected format</h2>
+              <h2 id="req-h" style={css('margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; color: var(--text-strong)')}>Expected Format</h2>
               <p style={css('margin: 4px 0 0; font-size: 13px; line-height: 20px; color: var(--text-3)')}>Excel (.xlsx, .xls) or CSV (UTF-8). Column names are matched automatically, ignoring case and spaces.</p>
-              <h3 style={css('margin: 20px 0 0; font-size: 13px; font-weight: 600; color: var(--text-label)')}>Links · one row per directed link</h3>
+              <h3 style={css('margin: 20px 0 0; font-size: 13px; font-weight: 600; color: var(--text-label)')}>Links · One Row per Directed Link</h3>
               <dl style={css('margin: 12px 0 0; display: flex; flex-direction: column; gap: 12px')}>
-                {[['Source', 'Required. The asset ID the link starts from.'], ['Target', 'Required. The asset ID that depends on the source.'], ['Edge type', 'Required. Groups links for filtering, such as Power or Control.'], ['Edge importance', 'Required. 1, 2, 3 or Low, Medium, High. Used by the weighted metrics.'], ['Source and target asset importance', 'Required. 1, 2, 3 or Low, Medium, High. Used by the 2D metrics.']].map(([t, dd]) => (
+                {[['Source', 'Required. The asset ID the link starts from.'], ['Target', 'Required. The asset ID that depends on the source.'], ['Edge Type', 'Required. Groups links for filtering, such as Power or Control.'], ['Edge Importance', 'Required. 1, 2, 3 or Low, Medium, High. Used by the weighted metrics.'], ['Source and Target Asset Importance', 'Required. 1, 2, 3 or Low, Medium, High. Used by the 2D metrics.']].map(([t, dd]) => (
                   <div key={t}><dt style={css('font-size: 13px; font-weight: 600; color: var(--text)')}>{t}</dt><dd style={css('margin: 2px 0 0; font-size: 12px; line-height: 20px; color: var(--text-2)')}>{dd}</dd></div>
                 ))}
               </dl>
-              <h3 style={css('margin: 20px 0 0; padding-top: 16px; border-top: 1px solid var(--divider); font-size: 13px; font-weight: 600; color: var(--text-label)')}>Asset list · one row per asset</h3>
+              <h3 style={css('margin: 20px 0 0; padding-top: 16px; border-top: 1px solid var(--divider); font-size: 13px; font-weight: 600; color: var(--text-label)')}>Asset List · One Row per Asset</h3>
               <dl style={css('margin: 12px 0 0; display: flex; flex-direction: column; gap: 12px')}>
-                {[['Asset ID', 'Required. Every ID used in Source and Target must be listed.'], ['Asset name', 'Optional. The legend shows up to 5 words.'], ['Abbreviation', 'Optional. Labels on the graph, matching the architecture diagram.'], ['Asset type', 'Optional. Groups assets into clusters on the graph.']].map(([t, dd]) => (
+                {[['Asset ID', 'Required. Every ID used in Source and Target must be listed.'], ['Asset Name', 'Optional. The legend shows up to 5 words.'], ['Abbreviation', 'Optional. Labels on the graph, matching the architecture diagram.'], ['Asset Type', 'Optional. Groups assets into clusters on the graph.']].map(([t, dd]) => (
                   <div key={t}><dt style={css('font-size: 13px; font-weight: 600; color: var(--text)')}>{t}</dt><dd style={css('margin: 2px 0 0; font-size: 12px; line-height: 20px; color: var(--text-2)')}>{dd}</dd></div>
                 ))}
               </dl>
@@ -462,7 +468,7 @@ export function UploadPage() {
                 Importance 1, 2, 3 appears as Low, Medium, High.
               </div>
               <div style={css('margin-top: 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px')}>
-                <button type="button" onClick={downloadTemplate} style={css(BTN)}><Icon name="download" size={16} />Download template</button>
+                <button type="button" onClick={downloadTemplate} style={css(BTN)}><Icon name="download" size={16} />Download Template</button>
               </div>
             </section>
           </aside>

@@ -6,8 +6,8 @@ import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { Dimension, ReadyVariant, RingMember, VariantKey } from '../analysis-types';
 import { css } from '../components/css';
 import { DistributionChart } from '../components/DistributionChart';
-import { GraphCaption, GraphLegend } from '../components/GraphChrome';
-import { BandChip, LevelChip, LV_FULL } from '../components/ui';
+import { GraphCaption, GraphLegend, IMPORTANCE_KEY } from '../components/GraphChrome';
+import { BandChip, LevelChip, LV_FULL, rankingSubtitle, titleCase } from '../components/ui';
 import { DARK, LIGHT } from '../graph/graph-theme';
 import { GraphView } from '../graph/GraphView';
 import { useNetworkView, useOrderPositions, useScene } from '../graph/useNetworkView';
@@ -48,6 +48,7 @@ export function SnapshotPage({ params }: { params: URLSearchParams }) {
   const scoreText = (i: number) => V.kind === 'scalar' ? V.score![i].toFixed(3) : `${V.normalized![i][0].toFixed(2)}, ${V.normalized![i][1].toFixed(2)}`;
   const rankText = (i: number) => V.kind === 'scalar' ? `Rank ${V.rank[i]}` : `Front ${V.front![i]}`;
   const reachCount = (x: number) => result.blast[x].rings.reduce((t, r) => t + r.length, 0);
+  const chipText = (i: number) => `Rank #${V.kind === 'scalar' ? V.rank[i] : posOf[i]}`;
 
   // The pair must be two different assets with completely separate blast radii (same rule as the dashboard).
   const check = useMemo<PairCheck | null>(() => {
@@ -98,11 +99,12 @@ export function SnapshotPage({ params }: { params: URLSearchParams }) {
   const items = (x: number): ListItem[] => result.blast[x].rings.flatMap((ring, h) => [{ ring: h, count: ring.length }, ...ring.map((m) => ({ m }))]);
   const hidden = pair.map((x, j) => cut[j] == null ? 0 : items(x).slice(cut[j]!).filter((it) => 'm' in it).length);
 
-  const metricTitle = chosen.label;
+  const metricTitle = titleCase(chosen.label);
+  const Way = way === 'upstream' ? 'Upstream' : 'Downstream';
   const pendingNote = pending ? ' · 2D blast-radius score pending supervisor; ranks are 2D direct' : '';
   const caption = blast
-    ? (check?.ok ? `Blast radii of ${labels[check.a]} and ${labels[check.b]} · ${depth} ${depth === 1 ? 'hop' : 'hops'} ${way}${pendingNote}` : 'Blast radius')
-    : `Ranks ${from}–${to} highlighted`;
+    ? (check?.ok ? `Blast Radii of ${labels[check.a]} and ${labels[check.b]} · ${depth} ${depth === 1 ? 'Hop' : 'Hops'} ${Way}${pendingNote}` : 'Blast Radius')
+    : `Ranks ${from}–${to} Highlighted`;
 
   if (check && !check.ok) {
     return (
@@ -116,8 +118,8 @@ export function SnapshotPage({ params }: { params: URLSearchParams }) {
   const header = (
     <div style={css(`flex: none; height: ${HEADER_H}px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px; background: var(--surface); border-bottom: 1px solid var(--border)`)}>
       <div style={css('min-width: 0; display: flex; align-items: baseline; gap: 16px')}>
-        <span style={css('font-size: 20px; font-weight: 600; color: var(--text-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis')}>{app.analysisName || 'Untitled analysis'}</span>
-        <span style={css('font-size: 13px; color: var(--text-3); white-space: nowrap')}>Degree centrality · {result.n} assets · {result.m} directed links</span>
+        <span style={css('font-size: 20px; font-weight: 600; color: var(--text-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis')}>{app.analysisName || 'Untitled Analysis'}</span>
+        <span style={css('font-size: 13px; color: var(--text-3); white-space: nowrap')}>Degree Centrality · {result.n} Assets · {result.m} Directed Links</span>
       </div>
       <span style={css('font-size: 13px; font-weight: 600; color: var(--text-3)')}>CARMA</span>
     </div>
@@ -126,15 +128,16 @@ export function SnapshotPage({ params }: { params: URLSearchParams }) {
   // Key statistics: which ones is still to be confirmed by the supervisor (CLAUDE.md), so only the space is kept.
   const statsSpace = (
     <div data-snap-placeholder="stats" style={css('flex: none; height: 64px; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--border); border-radius: 6px; font-size: 12px; color: var(--text-3)')}>
-      Key statistics · to be confirmed with the supervisor
+      Key Statistics · to be confirmed with the supervisor
     </div>
   );
 
   const rankedList = (
-    <section aria-label="Highlighted assets" style={css(`flex: none; ${CARD}; overflow: hidden`)}>
+    <section aria-label="List of Most Important Critical Assets" style={css(`flex: none; ${CARD}; overflow: hidden`)}>
       <div style={css('padding: 16px 20px; border-bottom: 1px solid var(--divider)')}>
-        <h2 style={css('margin: 0; font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text-strong)')}>Highlighted assets</h2>
-        <p style={css('margin: 2px 0 0; font-size: 12px; color: var(--text-3)')}>Ranks {from}–{to} by {metricTitle}</p>
+        <h2 style={css('margin: 0; font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text-strong)')}>List of Most Important Critical Assets</h2>
+        <p style={css('margin: 2px 0 0; font-size: 12px; color: var(--text-3)')}>{rankingSubtitle(V, from, to, depth, way === 'upstream')}</p>
+        <p style={css('margin: 2px 0 0; font-size: 12px; color: var(--text-3)')}>{IMPORTANCE_KEY}</p>
       </div>
       <div aria-hidden="true" style={css('display: grid; grid-template-columns: 30px minmax(0, 1fr) 64px 76px; gap: 12px; padding: 8px 20px; font-size: 12px; font-weight: 600; color: var(--text-3); border-bottom: 1px solid var(--divider)')}>
         <span style={css('text-align: right')}>#</span><span>Asset</span><span style={css('text-align: center')}>Importance</span><span style={css('text-align: right')}>{showValues ? 'Score' : 'Centrality'}</span>
@@ -158,14 +161,14 @@ export function SnapshotPage({ params }: { params: URLSearchParams }) {
   const chart = (
     <section aria-label="Distribution" style={css(`flex: none; ${CARD}; padding: 16px 20px 12px`)}>
       <div style={css('display: flex; align-items: baseline; justify-content: space-between; gap: 16px')}>
-        <h2 style={css('margin: 0; font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text-strong)')}>{V.distribution.axis === 'score' ? 'Score distribution' : 'Pareto front distribution'}</h2>
+        <h2 style={css('margin: 0; font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text-strong)')}>Importance Statistics for Network Assets</h2>
         <div style={css('display: flex; gap: 16px; font-size: 12px; color: var(--text-2)')}>
           <span style={css('display: flex; align-items: center; gap: 8px')}><span style={css('width: 12px; height: 12px; border-radius: 2px; background: var(--orange)')} />Ranks {from}–{to}</span>
-          <span style={css('display: flex; align-items: center; gap: 8px')}><span style={css('width: 12px; height: 12px; border-radius: 2px; background: var(--hist-other)')} />Other assets</span>
+          <span style={css('display: flex; align-items: center; gap: 8px')}><span style={css('width: 12px; height: 12px; border-radius: 2px; background: var(--hist-other)')} />Other Assets</span>
         </div>
       </div>
       <DistributionChart bare dist={V.distribution} options={{}} onOptions={() => {}} criticalLeft onCriticalLeft={() => {}}
-        showNumbers={showValues} variantLabel={V.label} kFrom={from} kTo={to} busy={false} theme={app.theme} />
+        showNumbers={showValues} variantLabel={titleCase(V.label)} kFrom={from} kTo={to} busy={false} theme={app.theme} />
     </section>
   );
 
@@ -176,10 +179,10 @@ export function SnapshotPage({ params }: { params: URLSearchParams }) {
         <div style={css('flex: none; padding: 16px 16px 12px; border-bottom: 1px solid var(--divider)')}>
           <div style={css('display: flex; align-items: center; gap: 8px')}>
             <span style={css('font-size: 16px; font-weight: 600; color: var(--text-strong)')}>{labels[x]}</span>
-            <span style={css('padding: 2px 8px; border-radius: 6px; background: var(--orange-soft-bg); font-size: 12px; font-weight: 600; color: var(--orange-text)')}>{rankText(x)}</span>
+            <span style={css('padding: 2px 8px; border-radius: 6px; background: var(--orange-soft-bg); font-size: 12px; font-weight: 600; color: var(--orange-text)')}>{chipText(x)}</span>
           </div>
           <div style={css('margin-top: 2px; font-size: 12px; color: var(--text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap')}>{names[x]}</div>
-          <div style={css('margin-top: 8px; font-size: 13px; font-weight: 600; color: var(--text)')}>{total} affected {total === 1 ? 'asset' : 'assets'} · {Math.round(total / (result.n - 1) * 100)}% of network</div>
+          <div style={css('margin-top: 8px; font-size: 13px; font-weight: 600; color: var(--text)')}>{total} Affected {total === 1 ? 'Asset' : 'Assets'} · {Math.round(total / (result.n - 1) * 100)}% of Network</div>
         </div>
         <div ref={listRefs[j]} data-snap-list={j} data-snap-hidden={hidden[j]} style={css('position: relative; flex: 1; min-height: 0; overflow: hidden; padding: 0 8px')}>
           {shown.map((it) => 'm' in it ? (
@@ -194,7 +197,7 @@ export function SnapshotPage({ params }: { params: URLSearchParams }) {
             </div>
           ) : (
             <div key={`r${it.ring}`} style={css('height: 32px; display: flex; align-items: flex-end; padding: 0 8px 4px; box-sizing: border-box; font-size: 12px; font-weight: 600; color: var(--text-2)')}>
-              Ring {it.ring + 1} · {it.ring + 1} {it.ring ? 'hops' : 'hop'}<span style={css('font-weight: 500; color: var(--text-3)')}>&nbsp;· {it.count} {it.count === 1 ? 'asset' : 'assets'}</span>
+              Ring {it.ring + 1} · {it.ring + 1} {it.ring ? 'Hops' : 'Hop'}{it.ring === 0 ? ' (Inner)' : ''}<span style={css('font-weight: 500; color: var(--text-3)')}>&nbsp;· {it.count} {it.count === 1 ? 'Asset' : 'Assets'}</span>
             </div>
           ))}
         </div>
@@ -221,7 +224,7 @@ export function SnapshotPage({ params }: { params: URLSearchParams }) {
             overlay={() => (
               <>
                 <GraphCaption big title={metricTitle} sub={caption} />
-                <GraphLegend T={T} from={from} to={to} levels blast={blast} />
+                <GraphLegend T={T} from={from} to={to} levels blast={blast} depth={depth} />
               </>
             )}
           />

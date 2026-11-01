@@ -11,6 +11,25 @@ import { css } from './css';
 
 export const LV = ['', 'L', 'M', 'H'];
 export const LV_FULL = ['', 'Low', 'Medium', 'High'];
+export const APP_TAGLINE = 'A Critical Asset Risk Management Dashboard for Enterprise Networks';
+
+const MINOR_WORDS = new Set(['a', 'an', 'and', 'as', 'at', 'by', 'for', 'in', 'of', 'on', 'or', 'the', 'to', 'vs', 'with']);
+
+/** Title Case for labels built in Python (e.g. "2D (weighted), blast radius (2 hops)" -> "2D (Weighted), Blast Radius (2 Hops)"). */
+export function titleCase(s: string) {
+  return s.replace(/[A-Za-z][\w']*/g, (w, at: number) => (at > 0 && MINOR_WORDS.has(w.toLowerCase()) ? w : w[0].toUpperCase() + w.slice(1)));
+}
+
+/** Ranking subtitle, e.g. "Ranks 1–10 · 2D · Weighted · Blast Radius: 2 Hops". */
+export function rankingSubtitle(v: { dimension: string; weighted: boolean; scope: string }, from: number, to: number, depth: number, against: boolean) {
+  const blast = v.scope === 'blast' ? ` · Blast Radius: ${depth} ${depth === 1 ? 'Hop' : 'Hops'}${against ? ' (Against Links)' : ''}` : '';
+  return `Ranks ${from}–${to} · ${v.dimension.toUpperCase()} · ${v.weighted ? 'Weighted' : 'Unweighted'}${blast}`;
+}
+
+/** "Pareto front" as a link to its definition (opens in a new tab). */
+export function ParetoLink({ text = 'Pareto front' }: { text?: string }) {
+  return <a href="https://en.wikipedia.org/wiki/Pareto_front" target="_blank" rel="noopener noreferrer" style={css('color: var(--link); font-weight: 600')}>{text}</a>;
+}
 
 const SEG_ON = 'height: 28px; border: 0; border-radius: 4px; background: var(--seg-on-bg); color: var(--seg-on-text); font: inherit; font-size: 13px; font-weight: 600; box-shadow: var(--seg-on-shadow); white-space: nowrap';
 const SEG_OFF = 'height: 28px; border: 0; border-radius: 4px; background: transparent; color: var(--seg-off-text); font: inherit; font-size: 13px; font-weight: 400; white-space: nowrap';
@@ -23,9 +42,12 @@ export function Segmented<const T extends string | number>(props: {
   labelledBy?: string;
   /** Buttons share the width equally. */
   fill?: boolean;
+  /** Long labels wrap onto a second line instead of overflowing. */
+  wrap?: boolean;
   role?: 'group' | 'tablist';
 }) {
   const pad = props.fill ? 'flex: 1; padding: 0 8px; ' : 'padding: 0 12px; ';
+  const wrap = props.wrap ? '; min-height: 28px; height: auto; padding-top: 4px; padding-bottom: 4px; line-height: 16px; white-space: normal' : '';
   return (
     <div role={props.role ?? 'group'} aria-label={props.label} aria-labelledby={props.labelledBy}
       style={css('display: flex; gap: 2px; padding: 2px; background: var(--seg-bg); border-radius: 6px')}>
@@ -34,7 +56,7 @@ export function Segmented<const T extends string | number>(props: {
         return (
           <button key={String(o.id)} type="button" disabled={o.disabled}
             {...(props.role === 'tablist' ? { role: 'tab', 'aria-selected': on } : { 'aria-pressed': on })}
-            onClick={() => props.onChange(o.id)} style={css(pad + (on ? SEG_ON : SEG_OFF))}>
+            onClick={() => props.onChange(o.id)} style={css(pad + (on ? SEG_ON : SEG_OFF) + wrap)}>
             {o.label}
           </button>
         );
@@ -68,7 +90,7 @@ export function AppBar() {
   return (
     <header style={css('height: 48px; padding: 0 24px; display: flex; align-items: baseline; gap: 12px; background: var(--surface); border-bottom: 1px solid var(--border); box-sizing: border-box')}>
       <span style={css('line-height: 48px; font-size: 16px; font-weight: 600; letter-spacing: 0.04em; color: var(--text-strong)')}>CARMA</span>
-      <span style={css('font-size: 13px; color: var(--text-3)')}>Critical Asset Risk Management Analytics</span>
+      <span style={css('font-size: 13px; color: var(--text-3)')}>{APP_TAGLINE}</span>
     </header>
   );
 }

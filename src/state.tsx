@@ -16,8 +16,8 @@ export interface Setup {
 }
 
 /**
- * Demo mode (default): weighted variants only, unweighted controls hidden. Researchers add ?research to the
- * address (e.g. .../Graph-Centrality-CAMS-JP/?research) to show them; the code is the same either way.
+ * Demo mode (default): opens weighted, with a Weighted / Unweighted toggle (Dr. Pal's feedback, 2026-10-31). Researchers
+ * add ?research to the address (e.g. .../Graph-Centrality-CAMS-JP/?research) for the Research Mode badge.
  */
 export const DEMO_MODE = !/[?&]research\b/.test(location.search + location.hash);
 
@@ -80,7 +80,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [theme, setTheme] = useState<Theme>(initialTheme);
   const [setup, setSetupRaw] = useState<Setup>({ dim: '1d', weighted: true, kFrom: 1, kTo: 10 });
-  const setSetup = (s: Setup) => setSetupRaw(DEMO_MODE ? { ...s, weighted: true } : s);
+  const setSetup = (s: Setup) => setSetupRaw(s);
   const [showValues, setShowValues] = useState(false);
   const [present, setPresentRaw] = useState(false);
   useEffect(() => {

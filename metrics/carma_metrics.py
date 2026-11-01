@@ -157,8 +157,10 @@ def analyze(links: list[dict], options: dict | None = None) -> dict:
 
     full, ids, warnings = build_graph(links, opts["assets"])
     edge_type_counts = {}
-    for _, _, data in full.edges(data=True):
+    edge_type_assets = {}  # assets at either end of at least one link of the type
+    for a, b, data in full.edges(data=True):
         edge_type_counts[data["type"]] = edge_type_counts.get(data["type"], 0) + 1
+        edge_type_assets.setdefault(data["type"], set()).update((a, b))
     G = filter_edge_types(full, opts["edge_types"])
     n = len(ids)
     if n < 2:
@@ -201,6 +203,7 @@ def analyze(links: list[dict], options: dict | None = None) -> dict:
         "out_links": [G.out_degree(node) for node in ids],
         "in_links": [G.in_degree(node) for node in ids],
         "edge_types": edge_type_counts,
+        "edge_type_assets": {t: len(s) for t, s in edge_type_assets.items()},
         "link_types": list(edge_type_counts),
         "warnings": warnings,
         "variants": variants,

@@ -5,7 +5,7 @@ import type { ReadyVariant } from '../analysis-types';
 import { navigate } from '../App';
 import { css } from '../components/css';
 import { ExitPresent, GraphButtons, GraphCaption, GraphLegend, PresentButton, RotateButton } from '../components/GraphChrome';
-import { AppBar, BandChip, Icon, LV, LV_FULL, ThemeButton } from '../components/ui';
+import { AppBar, BandChip, Icon, LV, LV_FULL, ThemeButton, titleCase } from '../components/ui';
 import { DARK, LIGHT } from '../graph/graph-theme';
 import { CameraLink, GraphView } from '../graph/GraphView';
 import { DEFAULT_PITCH, DEFAULT_YAW } from '../graph/layout';
@@ -52,12 +52,12 @@ export function ComparePage() {
   const inTop = (V: ReadyVariant, pos: number[], i: number) => pos[i] >= V.k_from && pos[i] <= V.k_to;
   const exportBlast = (x: number) => {
     const cell = (v: string | number) => (/[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v));
-    const head = ['Ring', 'Asset ID', 'Asset name', 'Reached via (asset ID)', 'Link type', 'Link importance',
-      '1D (weighted) rank', '2D (weighted) rank', '2D Pareto front', 'Change (1D rank - 2D rank)'];
+    const head = ['Ring', 'Asset ID', 'Asset Name', 'Reached Via (Asset ID)', 'Link Type', 'Link Importance',
+      '1D (Weighted) Rank', '2D (Weighted) Rank', '2D Pareto Front', 'Change (1D Rank - 2D Rank)'];
     const body = result.blast[x].rings.flatMap((ring, h) => ring.map(([a, p, t, w]) => [
       `Ring ${h + 1}`, result.ids[a], names[a], result.ids[p], result.link_types[t], LV_FULL[w], rank1(a), rank2(a), V2.front![a], rank1(a) - rank2(a),
     ]));
-    const text = [[`# Blast radius of ${result.ids[x]} (${depth} ${depth === 1 ? 'hop' : 'hops'}${against ? ', against links' : ''}), ranked by 1D (weighted) and 2D (weighted)`], head, ...body]
+    const text = [[`# Blast Radius of ${result.ids[x]} (${depth} ${depth === 1 ? 'Hop' : 'Hops'}${against ? ', Against Links' : ''}), Ranked by 1D (Weighted) and 2D (Weighted)`], head, ...body]
       .map((r) => r.map(cell).join(',')).join('\r\n');
     const link = document.createElement('a');
     link.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' }));
@@ -73,8 +73,8 @@ export function ComparePage() {
 
   // lead: the side that frames the blast cone after a selection (the camera is shared, so one side is enough).
   const side = (V: ReadyVariant, data: typeof scene1, pos: number[], present: boolean, lead: boolean) => {
-    const title = V.label;
-    const sub = `${V.kind === 'scalar' ? 'Ranked by score' : 'Ranked by Pareto front, then node importance'} · ranks ${V.k_from}–${V.k_to} highlighted${sel != null ? ` · blast radius of ${labels[sel]} (${affected} ${affected === 1 ? 'asset' : 'assets'})` : ''}`;
+    const title = titleCase(V.label);
+    const sub = `${V.kind === 'scalar' ? 'Ranked by Score' : 'Ranked by Pareto Front, then Node Importance'} · Ranks ${V.k_from}–${V.k_to} Highlighted${sel != null ? ` · Blast Radius of ${labels[sel]} (${affected} ${affected === 1 ? 'asset' : 'assets'})` : ''}`;
     return (
       <GraphView
         data={data} fitZ={geo.fitZ} fitH={geo.fitH} startZoom="fit" link={link} autoRotate={present} rotateSpeed={present ? 6 : undefined} theme={T} sel={sel ?? -1} from={V.k_from} to={V.k_to}
@@ -89,7 +89,7 @@ export function ComparePage() {
         overlay={(info, c) => (
           <>
             <GraphCaption title={title} sub={sub} big={present} />
-            <GraphLegend T={T} from={V.k_from} to={V.k_to} levels blast={sel != null} />
+            <GraphLegend T={T} from={V.k_from} to={V.k_to} levels blast={sel != null} depth={depth} />
             {!present && <GraphButtons c={c} />}
             {present && lead && <RotateButton info={info} c={c} />}
           </>
@@ -136,7 +136,7 @@ export function ComparePage() {
           <nav aria-label="Breadcrumb" style={css('display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-3)')}>
             <a href="#/upload" style={css('color: var(--text-3); text-decoration: none')}>Analyses</a>
             <span aria-hidden="true">/</span>
-            <a href="#/dashboard" style={css('color: var(--text-3); text-decoration: none')}>{app.analysisName || 'Untitled analysis'}</a>
+            <a href="#/dashboard" style={css('color: var(--text-3); text-decoration: none')}>{app.analysisName || 'Untitled Analysis'}</a>
             <span aria-hidden="true">/</span>
             <span>Compare 1D vs 2D</span>
           </nav>
@@ -146,7 +146,7 @@ export function ComparePage() {
           </div>
         </div>
         <div style={css('margin-left: auto; display: flex; flex-wrap: wrap; gap: 8px')}>
-          <button type="button" onClick={() => navigate('/dashboard')} style={css(BTN)}><Icon name="chevronLeft" size={14} width={2.2} />Back to dashboard</button>
+          <button type="button" onClick={() => navigate('/dashboard')} style={css(BTN)}><Icon name="chevronLeft" size={14} width={2.2} />Back to Dashboard</button>
           <PresentButton />
           <ThemeButton />
         </div>
@@ -161,9 +161,9 @@ export function ComparePage() {
 
       <div style={css('padding: 16px 24px 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(560px, 100%), 1fr)); gap: 16px')}>
         {([[V1, scene1, pos1], [V2, scene2, pos2]] as const).map(([V, data, pos]) => (
-          <section key={V.key} aria-label={V.label} style={css(`${CARD}; overflow: hidden`)}>
+          <section key={V.key} aria-label={titleCase(V.label)} style={css(`${CARD}; overflow: hidden`)}>
             {side(V, data, pos, false, V === V1)}
-            <div style={css('padding: 12px 16px 4px; font-size: 13px; font-weight: 600')}>{V.label} · ranks {V.k_from}–{V.k_to}</div>
+            <div style={css('padding: 12px 16px 4px; font-size: 13px; font-weight: 600')}>{titleCase(V.label)} · Ranks {V.k_from}–{V.k_to}</div>
             {list(V, pos)}
           </section>
         ))}
@@ -174,7 +174,7 @@ export function ComparePage() {
           <div style={css('padding: 16px 16px; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--divider)')}>
             <div>
               <h2 id="blastcmp-h" style={css('margin: 0; font-size: 16px; font-weight: 600; color: var(--text-strong)')}>
-                Blast radius of {labels[sel]}: {affected} {affected === 1 ? 'asset' : 'assets'}, ranked by 1D and 2D
+                Blast Radius of {labels[sel]}: {affected} {affected === 1 ? 'Asset' : 'Assets'}, Ranked by 1D and 2D
               </h2>
               <p style={css('margin: 2px 0 0; font-size: 12px; color: var(--text-3)')}>
                 The same assets are affected under both methods ({depth} {depth === 1 ? 'hop' : 'hops'}{against ? ' against the links' : ' downstream'}); what differs is how critical each one is.
@@ -188,16 +188,16 @@ export function ComparePage() {
               <thead>
                 <tr>
                   <th scope="col" style={css(TH + '; text-align: left')}>Asset</th>
-                  <th scope="col" style={css(TH + '; text-align: left')}>Reached via</th>
-                  <th scope="col" style={css(TH + '; text-align: right')}>1D (weighted) rank</th>
-                  <th scope="col" style={css(TH + '; text-align: right')}>2D (weighted) rank</th>
+                  <th scope="col" style={css(TH + '; text-align: left')}>Reached Via</th>
+                  <th scope="col" style={css(TH + '; text-align: right')}>1D (Weighted) Rank</th>
+                  <th scope="col" style={css(TH + '; text-align: right')}>2D (Weighted) Rank</th>
                   <th scope="col" style={css(TH + '; text-align: right')}>Change</th>
                 </tr>
               </thead>
               {result.blast[sel].rings.map((ring, h) => (
                 <tbody key={h} style={css('font-variant-numeric: tabular-nums')}>
                   <tr><th colSpan={5} scope="rowgroup" style={css('padding: 8px 12px 4px; text-align: left; font-size: 12px; font-weight: 600; color: var(--text-2); background: var(--surface)')}>
-                    Ring {h + 1} · {h + 1} {h ? 'hops' : 'hop'} <span style={css('font-weight: 500; color: var(--text-3)')}>· {ring.length} {ring.length === 1 ? 'asset' : 'assets'}</span>
+                    Ring {h + 1} · {h + 1} {h ? 'Hops' : 'Hop'}{h === 0 ? ' (Inner)' : ''} <span style={css('font-weight: 500; color: var(--text-3)')}>· {ring.length} {ring.length === 1 ? 'Asset' : 'Assets'}</span>
                   </th></tr>
                   {ring.map(([a, p, t, w]) => (
                     <tr key={a} onClick={() => setSel(a)} style={{ cursor: 'pointer' }}>
@@ -219,14 +219,14 @@ export function ComparePage() {
       <section aria-labelledby="change-h" style={css(`margin: 0 24px 32px; ${CARD}; overflow: hidden`)}>
         <div style={css('padding: 16px 16px; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--divider)')}>
           <div>
-            <h2 id="change-h" style={css('margin: 0; font-size: 16px; font-weight: 600; color: var(--text-strong)')}>Rank change, 1D (weighted) to 2D (weighted)</h2>
+            <h2 id="change-h" style={css('margin: 0; font-size: 16px; font-weight: 600; color: var(--text-strong)')}>Rank Change, 1D (Weighted) to 2D (Weighted)</h2>
             <p style={css('margin: 2px 0 0; font-size: 12px; color: var(--text-3)')}>
               Change = 1D rank − 2D rank: ▲ moves up (more critical) in 2D, ▼ moves down. Word labels (“Rises strongly” …) await the supervisor’s thresholds.
             </p>
           </div>
           <label style={css('display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer')}>
             <input type="checkbox" checked={all} onChange={(e) => setAll(e.target.checked)} style={css('width: 16px; height: 16px; margin: 0; accent-color: var(--check)')} />
-            All assets <span style={css('color: var(--text-3)')}>(otherwise the highlighted ranks of either side)</span>
+            All Assets <span style={css('color: var(--text-3)')}>(otherwise the highlighted ranks of either side)</span>
           </label>
         </div>
         <div style={css('max-height: 480px; overflow: auto')}>
@@ -234,8 +234,8 @@ export function ComparePage() {
             <thead>
               <tr>
                 <th scope="col" style={css(TH + '; text-align: left')}>Asset</th>
-                <th scope="col" style={css(TH + '; text-align: right')}>1D (weighted) rank</th>
-                <th scope="col" style={css(TH + '; text-align: right')}>2D (weighted) rank</th>
+                <th scope="col" style={css(TH + '; text-align: right')}>1D (Weighted) Rank</th>
+                <th scope="col" style={css(TH + '; text-align: right')}>2D (Weighted) Rank</th>
                 <th scope="col" style={css(TH + '; text-align: right')}>Change</th>
               </tr>
             </thead>

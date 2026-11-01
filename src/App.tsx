@@ -31,7 +31,7 @@ function Routes() {
   // Each page opens at the top (the upload page is usually scrolled down to Analyze).
   useEffect(() => { scrollTo(0, 0); }, [page]);
   useEffect(() => {
-    document.title = `${APP_NAME} · ${page === 'dashboard' || page === 'snapshot' ? 'Analysis dashboard' : page === 'compare' ? 'Compare 1D vs 2D' : 'Import network data'}`;
+    document.title = `${APP_NAME} · ${page === 'dashboard' || page === 'snapshot' ? 'Analysis Dashboard' : page === 'compare' ? 'Compare 1D vs 2D' : 'Import Network Data'}`;
     if ((path === '/dashboard' || path === '/compare' || path === '/snapshot') && !result) navigate('/upload');
   }, [page, path, result]);
   if (page === 'snapshot') return <SnapshotPage key={query} params={new URLSearchParams(query)} />;

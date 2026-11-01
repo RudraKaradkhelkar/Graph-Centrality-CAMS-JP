@@ -85,8 +85,8 @@ export function DistributionChart(p: Props) {
   const [ruleKind, setRuleKind] = useState<'' | 'zero' | 'below' | 'above'>('');
   const [ruleValue, setRuleValue] = useState('');
 
-  const defaultX = isScore ? `Degree centrality score, ${p.variantLabel}` : `Pareto front (1 = most critical), ${p.variantLabel}`;
-  const X_TITLE = xTitle ?? defaultX, Y_TITLE = yTitle ?? 'Number of assets';
+  const defaultX = isScore ? `Degree Centrality Score, ${p.variantLabel}` : `Pareto Front (1 = Most Critical), ${p.variantLabel}`;
+  const X_TITLE = xTitle ?? defaultX, Y_TITLE = yTitle ?? 'Number of Assets';
 
   // ---- Horizontal layout: main bars, plus the zero bar at the low-score end. --------------------------
   const zero = isScore && dist.zero_bar && !dist.zero_bar.excluded ? dist.zero_bar : null;
@@ -205,7 +205,7 @@ export function DistributionChart(p: Props) {
   return (
     <div>
       {!p.bare && <div style={css('display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 16px')}>
-        <span style={css('display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2)')}>Most critical
+        <span style={css('display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2)')}>Most Critical
           <Segmented label="Most critical side" value={p.criticalLeft ? 'left' : 'right'} onChange={(v) => p.onCriticalLeft(v === 'left')}
             options={[{ id: 'left', label: 'Left' }, { id: 'right', label: 'Right' }]} />
         </span>
@@ -230,8 +230,8 @@ export function DistributionChart(p: Props) {
             }} style={css(INPUT + '; width: auto; padding: 0 8px')}>
               <option value="">Exclude…</option>
               <option value="zero">Score 0</option>
-              <option value="below">Below a value</option>
-              <option value="above">Above a value</option>
+              <option value="below">Below a Value</option>
+              <option value="above">Above a Value</option>
             </select>
             {(ruleKind === 'below' || ruleKind === 'above') && (
               <>
@@ -242,7 +242,7 @@ export function DistributionChart(p: Props) {
           </span>
         )}
         <span style={css('margin-left: auto; display: inline-flex; gap: 8px')}>
-          <button type="button" disabled={isDefault} onClick={() => p.onOptions({})} style={css(SMALL_BTN)}><Icon name="reset" size={14} />Reset chart</button>
+          <button type="button" disabled={isDefault} onClick={() => p.onOptions({})} style={css(SMALL_BTN)}><Icon name="reset" size={14} />Reset Chart</button>
           <button type="button" onClick={exportPng} style={css(SMALL_BTN)}><Icon name="download" size={14} />PNG</button>
           <button type="button" onClick={exportSvg} style={css(SMALL_BTN)}><Icon name="download" size={14} />SVG</button>
         </span>
@@ -345,11 +345,11 @@ export function DistributionChart(p: Props) {
       </div>
 
       {!p.bare && <details style={css('margin-top: 8px; font-size: 12px; color: var(--text-2)')}>
-        <summary style={css('cursor: pointer')}>Axis titles</summary>
+        <summary style={css('cursor: pointer')}>Axis Titles</summary>
         <div style={css('margin-top: 8px; display: flex; flex-wrap: wrap; gap: 12px')}>
           <label style={css('display: flex; align-items: center; gap: 8px')}>X <input value={X_TITLE} onChange={(e) => setXTitle(e.target.value)} style={css(INPUT + '; width: 360px')} /></label>
           <label style={css('display: flex; align-items: center; gap: 8px')}>Y <input value={Y_TITLE} onChange={(e) => setYTitle(e.target.value)} style={css(INPUT + '; width: 200px')} /></label>
-          {(xTitle != null || yTitle != null) && <button type="button" onClick={() => { setXTitle(null); setYTitle(null); }} style={css(SMALL_BTN)}>Default titles</button>}
+          {(xTitle != null || yTitle != null) && <button type="button" onClick={() => { setXTitle(null); setYTitle(null); }} style={css(SMALL_BTN)}>Default Titles</button>}
         </div>
       </details>}
     </div>

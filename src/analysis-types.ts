@@ -128,6 +128,8 @@ export interface AnalysisResult {
   out_links: number[];
   in_links: number[];
   edge_types: Record<string, number>;
+  /** Assets at either end of at least one link of each type (full network, before filtering). */
+  edge_type_assets: Record<string, number>;
   link_types: string[];
   warnings: { code: 'importance_conflict'; asset: string; values: number[]; used: number }[];
   variants: Record<VariantKey, Variant>;
