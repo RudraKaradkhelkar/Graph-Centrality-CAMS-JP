@@ -95,6 +95,17 @@ export function AppBar() {
   );
 }
 
+/** Page footer on Upload, Dashboard and Compare: who made CARMA. */
+export function Footer() {
+  return (
+    <footer style={css('margin-top: auto; padding: 24px; border-top: 1px solid var(--border); background: var(--surface); text-align: center; font-size: 20px; line-height: 28px; color: var(--text-2)')}>
+      Created by <span style={css('font-weight: 600; color: var(--text-strong)')}>Rudra Karadkhelkar</span>
+      <span aria-hidden="true" style={css('margin: 0 12px; color: var(--text-3)')}>|</span>
+      Concept: <span style={css('font-weight: 600; color: var(--text-strong)')}>Dr. Ranjan Pal</span>
+    </footer>
+  );
+}
+
 export function ThemeButton() {
   const { theme, toggleTheme } = useApp();
   const dark = theme === 'dark';

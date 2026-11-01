@@ -2,7 +2,7 @@
 import { useRef, useState } from 'react';
 import { navigate } from '../App';
 import { css } from '../components/css';
-import { APP_TAGLINE, Icon, LevelChip, LV, ParetoLink, Segmented, ThemeButton } from '../components/ui';
+import { APP_TAGLINE, Footer, Icon, LevelChip, LV, ParetoLink, Segmented, ThemeButton } from '../components/ui';
 import { downloadTemplate, loadSample } from '../data/dataset';
 import { fromTables, hasErrors, parseTwoFiles, readFile, shortName, type Issue, type ParseResult, type SourceFile, type Table } from '../data/parse';
 import { LANES, type Lane } from '../graph/seed';
@@ -138,17 +138,10 @@ export function UploadPage() {
   );
 
   return (
-    <div style={css('min-height: 100vh; background: var(--page); color: var(--text)')}>
-      <main style={css('max-width: 1200px; margin: 0 auto; padding: 24px 32px 64px; box-sizing: border-box')}>
-        <div style={css('display: flex; align-items: center; justify-content: space-between; gap: 12px')}>
-          <nav aria-label="Breadcrumb" style={css('display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-3)')}>
-            <span>Analyses</span>
-            <span aria-hidden="true">/</span>
-            <span style={css('color: var(--text)')}>New Analysis</span>
-          </nav>
-          <ThemeButton />
-        </div>
-        <header style={css('margin-top: 16px; padding: 32px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; border-bottom: 1px solid var(--border)')}>
+    <div style={css('min-height: 100vh; display: flex; flex-direction: column; background: var(--page); color: var(--text)')}>
+      <main style={css('width: 100%; max-width: 1200px; margin: 0 auto; padding: 16px 32px 40px; box-sizing: border-box')}>
+        <header style={css('position: relative; padding: 16px 24px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; border-bottom: 1px solid var(--border)')}>
+          <div style={css('position: absolute; right: 0; top: 0')}><ThemeButton /></div>
           <h1 style={css('margin: 0; font-size: 32px; line-height: 40px; font-weight: 700; letter-spacing: 0.04em; color: var(--text-strong)')}>CARMA</h1>
           <p style={css('margin: 0; font-size: 16px; line-height: 24px; color: var(--text-2)')}>{APP_TAGLINE}</p>
           <label htmlFor="hero-input" style={css('margin-top: 16px; height: 48px; padding: 0 24px; display: inline-flex; align-items: center; gap: 12px; border-radius: 6px; background: var(--primary); color: var(--primary-text); font-size: 16px; font-weight: 600; cursor: pointer')}>
@@ -161,10 +154,9 @@ export function UploadPage() {
             or two <span style={css('font-weight: 600; color: var(--text-2)')}>.csv</span> files in UTF-8 (choose Two Files below). Up to 100 MB each.
             <br />Files are read in your browser and never uploaded anywhere.
           </p>
-          <p style={css('margin: 8px 0 0; font-size: 12px; color: var(--text-3)')}>Created by Rudra Karadkhelkar | Concept: Dr. Ranjan Pal</p>
         </header>
 
-        <div style={css('display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; margin-top: 28px')}>
+        <div style={css('display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; margin-top: 24px')}>
           <div style={css('flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 24px')}>
 
             <section aria-labelledby="file-h" style={css(CARD)}>
@@ -474,6 +466,7 @@ export function UploadPage() {
           </aside>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

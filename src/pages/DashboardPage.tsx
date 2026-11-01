@@ -5,7 +5,7 @@ import { navigate } from '../App';
 import { css } from '../components/css';
 import { DistributionChart } from '../components/DistributionChart';
 import { ExitPresent, GraphCaption, GraphLegend, IMPORTANCE_KEY, PresentButton, RingKey, RotateButton } from '../components/GraphChrome';
-import { AppBar, BandChip, Icon, LevelChip, LV, LV_FULL, ParetoLink, rankingSubtitle, Segmented, ThemeButton, titleCase } from '../components/ui';
+import { AppBar, BandChip, Footer, Icon, LevelChip, LV, LV_FULL, ParetoLink, rankingSubtitle, Segmented, ThemeButton, titleCase } from '../components/ui';
 import { shortName } from '../data/dataset';
 import { DARK, LIGHT } from '../graph/graph-theme';
 import { GraphView, type CameraInfo, type GraphControls } from '../graph/GraphView';
@@ -667,7 +667,8 @@ export function DashboardPage() {
           </section>
         </aside>
 
-        <div aria-label="Outputs" style={css('flex: 999 1 640px; min-width: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 24px; align-items: start')}>
+        {/* At most two columns (list and selected asset), each half the width; one column below 2 x 340px. */}
+        <div aria-label="Outputs" style={css('flex: 999 1 640px; min-width: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(max(340px, calc((100% - 24px) / 2)), 100%), 1fr)); gap: 24px; align-items: start')}>
           <section aria-labelledby="rank-list-h" style={css(`min-width: 0; ${CARD}; overflow: hidden`)}>
             <div style={css('padding: 16px 20px 16px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--divider)')}>
               <div style={css('min-width: 0')}>
@@ -808,6 +809,7 @@ export function DashboardPage() {
           </section>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

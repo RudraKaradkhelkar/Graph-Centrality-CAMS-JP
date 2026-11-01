@@ -476,8 +476,8 @@ def distribution(values: list[float], axis: str = "score", options: dict | None 
     values: one per asset (1D: normalized score; 2D: Pareto front). axis: "score" or "front".
     options:
       cuts     [a, b] band cut-offs in value units (default: equal thirds of the full range; the app never sets it)
-      scale    "linear" or "log" (scores only); zero scores always get their own "0" bar
-      bins     number of equal-width score bins (default: Rice rule 2 * n^(1/3), 6-30); fronts: one bar each
+      scale    "linear" or "log" (x axis; fronts too); zero scores always get their own "0" bar
+      bins     number of equal-width bins (scores default: Rice rule 2 * n^(1/3), 6-30; fronts default: one per front)
       exclude  rules hiding assets from the bars, applied in order, each counted once:
                {"rule": "zero"}, {"rule": "below", "value": x}, {"rule": "above", "value": x},
                {"rule": "range", "lo": a, "hi": b, "closed": bool} (one bar), {"rule": "front", "value": f}
@@ -520,7 +520,7 @@ def distribution(values: list[float], axis: str = "score", options: dict | None 
 
     zero_bar = None
     suggest_log = False
-    scale = o["scale"] if axis == "score" else "linear"
+    scale = o["scale"]
     if axis == "score":
         if any(v == 0 for v in values):
             zeros = [i for i in shown if values[i] == 0]
@@ -553,13 +553,18 @@ def distribution(values: list[float], axis: str = "score", options: dict | None 
         bars, domain, ticks = [], None, []
         if fs:
             f_lo, f_hi = (max(min(fs), int(zoom[0])), min(max(fs), int(zoom[1]))) if zoom else (min(fs), max(fs))
-            for f in range(f_lo, f_hi + 1):
-                members = [i for i in shown if int(values[i]) == f]
-                gone = any(e["rule"] == "front" and e["value"] == f for e in o["exclude"])
-                bars.append({**bar(f, f, members), "excluded": gone})
+            for g_lo, g_hi in front_groups(f_lo, f_hi, o["bins"], scale == "log"):
+                members = [i for i in shown if g_lo <= int(values[i]) <= g_hi]
+                # Excluded: every asset on these fronts is hidden by an exclusion rule (drawn as an empty outline).
+                on_fronts = [i for i in range(n) if g_lo <= int(values[i]) <= g_hi]
+                gone = bool(on_fronts) and all(hidden[i] for i in on_fronts)
+                bars.append({**bar(g_lo, g_hi, members), "excluded": gone})
             domain = [f_lo, f_hi]
-            step = max(1, math.ceil((f_hi - f_lo + 1) / 12))
-            ticks = list(range(f_lo, f_hi + 1, step))
+            if scale == "log":
+                ticks = [int(t) for t in log_ticks(domain)] if f_hi > f_lo else [f_lo]
+            else:
+                step = max(1, math.ceil((f_hi - f_lo + 1) / 12))
+                ticks = list(range(f_lo, f_hi + 1, step))
 
     # Chart zones: equal thirds of the shown assets' range, so they re-split as bars are excluded or zoomed.
     shown_values = [values[i] for i in shown]
@@ -573,6 +578,24 @@ def distribution(values: list[float], axis: str = "score", options: dict | None 
         "hidden": n - len(visible), "outside_zoom": len(visible) - len(shown), "shown": len(shown), "total": n,
         "y_max": max(counts) if counts else 0, "suggest_log": suggest_log,
     }
+
+
+def front_groups(lo: int, hi: int, bins: int | None, log: bool) -> list[tuple[int, int]]:
+    """Consecutive front ranges [a, b] drawn as one bar each: one per front by default, or exactly `bins` groups.
+
+    Front f spans [f, f + 1) on the axis (linear, or log10 when `log`); group edges split that span into equal widths
+    and snap to the nearest front, keeping every group at least one front wide."""
+    count = hi - lo + 1
+    if not bins or bins >= count:
+        return [(f, f) for f in range(lo, hi + 1)]
+    bins = max(1, int(bins))
+    tx, back = (math.log10, lambda x: 10 ** x) if log else ((lambda v: v), (lambda x: x))
+    a, b = tx(lo), tx(hi + 1)
+    starts = [lo]
+    for k in range(1, bins):
+        edge = math.floor(back(a + k * (b - a) / bins) + 0.5)
+        starts.append(min(max(edge, starts[-1] + 1), hi - (bins - 1 - k)))
+    return [(s, (starts[k + 1] - 1) if k + 1 < bins else hi) for k, s in enumerate(starts)]
 
 
 def nice_ticks(domain: list[float], target: int = 5) -> list[float]:

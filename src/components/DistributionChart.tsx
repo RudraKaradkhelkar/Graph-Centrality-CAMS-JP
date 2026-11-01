@@ -58,7 +58,7 @@ function ruleText(e: ExclusionRule & { count: number }, isScore: boolean): strin
     case 'zero': return `${n} with score 0`;
     case 'below': return `${n} below ${fmt(e.value)}`;
     case 'above': return `${n} above ${fmt(e.value)}`;
-    case 'range': return `${n} in ${fmt(e.lo)}–${fmt(e.hi)}`;
+    case 'range': return isScore ? `${n} in ${fmt(e.lo)}–${fmt(e.hi)}` : `${n} on fronts ${e.lo}–${e.hi}`;
     case 'front': return `${n} on front ${e.value}`;
     default: return isScore ? n : n;
   }
@@ -76,7 +76,7 @@ export function DistributionChart(p: Props) {
   const { dist, options } = p;
   const C = useMemo(readColours, [p.theme]); // eslint-disable-line react-hooks/exhaustive-deps
   const isScore = dist.axis === 'score';
-  const log = isScore && dist.scale === 'log';
+  const log = dist.scale === 'log';
   const svgRef = useRef<SVGSVGElement>(null);
   const [xTitle, setXTitle] = useState<string | null>(null);
   const [yTitle, setYTitle] = useState<string | null>(null);
@@ -97,15 +97,19 @@ export function DistributionChart(p: Props) {
   const dom = dist.domain;
   const tx = (v: number) => (log ? Math.log10(Math.max(v, 1e-300)) : v);
   const [ta, tb] = dom ? [tx(dom[0]), tx(dom[1])] : [0, 1];
-  const fLo = dom ? dom[0] : 1, slots = dom ? dom[1] - dom[0] + 1 : 1, sw = mainW / slots;
-  // Value -> x. Scores: continuous; fronts: slot centres (cuts may fall between fronts, e.g. 3.5).
+  // Fronts: front f spans [f, f + 1) on the axis (linear or log), so a bar of fronts lo-hi spans [lo, hi + 1).
+  const fLo = dom ? dom[0] : 1, fA = tx(fLo), fB = tx((dom ? dom[1] : 1) + 1);
+  const frontEdgeX = (f: number) => {
+    const off = (tx(f) - fA) / (fB - fA) * mainW;
+    return p.criticalLeft ? mainL + off : mainR - off;
+  };
+  // Value -> x. Scores: continuous; fronts: front centres (cuts may fall between fronts, e.g. 3.5).
   const xOf = (v: number): number => {
     if (isScore) {
       const t = tb > ta ? (tx(v) - ta) / (tb - ta) : 0.5;
       return p.criticalLeft ? mainR - t * mainW : mainL + t * mainW;
     }
-    const off = (v - fLo + 0.5) * sw;
-    return p.criticalLeft ? mainL + off : mainR - off;
+    return frontEdgeX(v + 0.5);
   };
   const vOf = (x: number): number => {
     if (isScore) {
@@ -113,8 +117,8 @@ export function DistributionChart(p: Props) {
       const tv = ta + t * (tb - ta);
       return log ? 10 ** tv : tv;
     }
-    const off = p.criticalLeft ? x - mainL : mainR - x;
-    return off / sw + fLo - 0.5;
+    const tv = fA + (p.criticalLeft ? x - mainL : mainR - x) / mainW * (fB - fA);
+    return (log ? 10 ** tv : tv) - 0.5;
   };
   const clampX = (x: number) => Math.max(mainL, Math.min(mainR, x));
 
@@ -181,12 +185,12 @@ export function DistributionChart(p: Props) {
 
   // ---- Bars -------------------------------------------------------------------------------------------
   const barRects = dist.bars.map((b, k) => {
-    const [xa, xb] = isScore ? [xOf(b.lo), xOf(b.hi)] : [xOf(b.lo) - sw / 2, xOf(b.lo) + sw / 2];
+    const [xa, xb] = isScore ? [xOf(b.lo), xOf(b.hi)] : [frontEdgeX(b.lo), frontEdgeX(b.hi + 1)];
     const x = Math.min(xa, xb) + 1.5, w = Math.max(1, Math.abs(xb - xa) - 3);
     return { b, k, x, w, last: k === dist.bars.length - 1 };
   });
   const barTitle = (b: DistBar, kind: 'zero' | 'bar') => {
-    const where = kind === 'zero' ? 'Score 0' : isScore ? `${fmt(b.lo)}–${fmt(b.hi)}` : `Front ${b.lo}`;
+    const where = kind === 'zero' ? 'Score 0' : isScore ? `${fmt(b.lo)}–${fmt(b.hi)}` : b.hi > b.lo ? `Fronts ${b.lo}–${b.hi}` : `Front ${b.lo}`;
     return `${where}: ${b.count} ${b.count === 1 ? 'asset' : 'assets'}${b.top_count ? ` (${b.top_count} in ranks ${p.kFrom}–${p.kTo})` : ''}`;
   };
   const stack = (x: number, w: number, b: DistBar) => {
@@ -199,6 +203,8 @@ export function DistributionChart(p: Props) {
     );
   };
 
+  // Fronts: at most one bar per front in view.
+  const maxBins = isScore ? 60 : dom ? dom[1] - dom[0] + 1 : 1;
   const hasRules = (options.exclude ?? []).length > 0 || !!options.zoom;
   const isDefault = !hasRules && !options.bins && (options.scale ?? 'linear') === 'linear';
 
@@ -209,19 +215,15 @@ export function DistributionChart(p: Props) {
           <Segmented label="Most critical side" value={p.criticalLeft ? 'left' : 'right'} onChange={(v) => p.onCriticalLeft(v === 'left')}
             options={[{ id: 'left', label: 'Left' }, { id: 'right', label: 'Right' }]} />
         </span>
-        {isScore && (
-          <span style={css('display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2)')}>Scale
-            <Segmented label="Scale" value={dist.scale} onChange={(v) => set({ scale: v })} options={[{ id: 'linear', label: 'Linear' }, { id: 'log', label: 'Log' }]} />
-            {dist.suggest_log && dist.scale === 'linear' && <span style={css('font-size: 12px; color: var(--info-icon)')}>Log suggested: scores span 2+ orders of magnitude</span>}
-          </span>
-        )}
-        {isScore && (
-          <span role="group" aria-label="Number of bins" style={css('display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2)')}>Bins
-            <button type="button" aria-label="Fewer bins" disabled={dist.bars.length <= 3} onClick={() => set({ bins: Math.max(3, dist.bars.length - 1) })} style={css(SMALL_BTN + '; width: 32px; padding: 0; justify-content: center')}>−</button>
-            <span style={css('min-width: 24px; text-align: center; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums')}>{dist.bars.length}</span>
-            <button type="button" aria-label="More bins" disabled={dist.bars.length >= 60} onClick={() => set({ bins: Math.min(60, dist.bars.length + 1) })} style={css(SMALL_BTN + '; width: 32px; padding: 0; justify-content: center')}>+</button>
-          </span>
-        )}
+        <span style={css('display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2)')}>Scale
+          <Segmented label="Scale" value={dist.scale} onChange={(v) => set({ scale: v })} options={[{ id: 'linear', label: 'Linear' }, { id: 'log', label: 'Log' }]} />
+          {dist.suggest_log && dist.scale === 'linear' && <span style={css('font-size: 12px; color: var(--info-icon)')}>Log suggested: scores span 2+ orders of magnitude</span>}
+        </span>
+        <span role="group" aria-label="Number of bins" style={css('display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2)')}>Bins
+          <button type="button" aria-label="Fewer bins" disabled={dist.bars.length <= 3} onClick={() => set({ bins: Math.max(3, dist.bars.length - 1) })} style={css(SMALL_BTN + '; width: 32px; padding: 0; justify-content: center')}>−</button>
+          <span style={css('min-width: 24px; text-align: center; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums')}>{dist.bars.length}</span>
+          <button type="button" aria-label="More bins" disabled={dist.bars.length >= maxBins} onClick={() => set({ bins: Math.min(maxBins, dist.bars.length + 1) })} style={css(SMALL_BTN + '; width: 32px; padding: 0; justify-content: center')}>+</button>
+        </span>
         {isScore && (
           <span style={css('display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2)')}>
             <select aria-label="Exclude assets by rule" value={ruleKind} onChange={(e) => {
@@ -336,7 +338,8 @@ export function DistributionChart(p: Props) {
               {barTitle(pick.bar, pick.kind)}
               <button type="button" style={css(SMALL_BTN + '; height: 24px')} onClick={() => exclude(
                 pick.kind === 'zero' ? { rule: 'zero' }
-                  : isScore ? { rule: 'range', lo: pick.bar.lo, hi: pick.bar.hi, closed: pick.last } : { rule: 'front', value: pick.bar.lo },
+                  : isScore ? { rule: 'range', lo: pick.bar.lo, hi: pick.bar.hi, closed: pick.last }
+                    : pick.bar.hi > pick.bar.lo ? { rule: 'range', lo: pick.bar.lo, hi: pick.bar.hi, closed: true } : { rule: 'front', value: pick.bar.lo },
               )}>Exclude</button>
               <button type="button" aria-label="Close" onClick={() => setPick(null)} style={css('border: 0; background: transparent; color: var(--text-3); cursor: pointer')}><Icon name="close" size={12} width={2.2} /></button>
             </div>

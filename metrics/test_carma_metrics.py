@@ -314,6 +314,36 @@ def test_front_axis_has_one_bar_per_front():
     assert d["zero_bar"] is None
 
 
+FRONTS = [f for f in range(1, 11) for _ in range(f)]  # front f holds f assets, fronts 1-10
+
+
+def test_front_bins_merge_neighbouring_fronts_into_exactly_that_many_bars():
+    d = distribution(FRONTS, "front", {"bins": 4})
+    assert [(b["lo"], b["hi"]) for b in d["bars"]] == [(1, 3), (4, 5), (6, 8), (9, 10)]
+    assert [b["count"] for b in d["bars"]] == [6, 9, 21, 19]
+    assert sum(b["count"] for b in d["bars"]) == len(FRONTS)
+
+
+def test_front_bins_at_or_above_the_front_count_keep_one_bar_per_front():
+    assert len(distribution(FRONTS, "front", {"bins": 60})["bars"]) == 10
+    assert distribution(FRONTS, "front")["scale"] == "linear"
+
+
+def test_front_log_scale_gives_the_most_critical_fronts_their_own_bars():
+    d = distribution(FRONTS, "front", {"scale": "log", "bins": 4})
+    assert d["scale"] == "log"
+    # Front f spans [f, f + 1) on the axis; equal log widths over [1, 11) put edges near 1.8, 3.3 and 6.0.
+    assert [(b["lo"], b["hi"]) for b in d["bars"]] == [(1, 1), (2, 2), (3, 5), (6, 10)]
+    assert d["ticks"] == [1, 2, 5, 10]
+    # Ranks, bands and zones never depend on the scale or bins.
+    assert d["band"] == distribution(FRONTS, "front")["band"]
+
+
+def test_front_bar_is_excluded_when_a_range_rule_hides_all_its_fronts():
+    d = distribution(FRONTS, "front", {"bins": 5, "exclude": [{"rule": "range", "lo": 3, "hi": 4, "closed": True}]})
+    assert [(b["lo"], b["hi"], b["count"], b["excluded"]) for b in d["bars"]][:3] == [(1, 2, 3, False), (3, 4, 0, True), (5, 6, 11, False)]
+
+
 def test_analyze_bands_come_from_its_distribution():
     v = analyze(SMALL)["variants"]["1d-direct-w"]
     assert v["band"] == v["distribution"]["band"]
