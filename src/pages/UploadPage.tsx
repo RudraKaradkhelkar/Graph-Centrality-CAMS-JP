@@ -2,7 +2,7 @@
 import { useRef, useState } from 'react';
 import { navigate } from '../App';
 import { css } from '../components/css';
-import { APP_TAGLINE, Footer, Icon, LevelChip, LV, ParetoLink, Segmented, ThemeButton } from '../components/ui';
+import { APP_TAGLINE, Footer, Icon, LabelWithInfo, LevelChip, LV, ParetoLink, Segmented, ThemeButton } from '../components/ui';
 import { downloadTemplate, loadSample } from '../data/dataset';
 import { fromTables, hasErrors, parseTwoFiles, readFile, shortName, type Issue, type ParseResult, type SourceFile, type Table } from '../data/parse';
 import { LANES, type Lane } from '../graph/seed';
@@ -144,6 +144,14 @@ export function UploadPage() {
           <div style={css('position: absolute; right: 0; top: 0')}><ThemeButton /></div>
           <h1 style={css('margin: 0; font-size: 32px; line-height: 40px; font-weight: 700; letter-spacing: 0.04em; color: var(--text-strong)')}>CARMA</h1>
           <p style={css('margin: 0; font-size: 16px; line-height: 24px; color: var(--text-2)')}>{APP_TAGLINE}</p>
+          <ol aria-label="How it works" style={css('margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px 12px; font-size: 14px; line-height: 20px; color: var(--text-2)')}>
+            {['Upload your network file', 'CARMA checks its structure', 'See your most critical assets and what each one affects'].map((t, k) => (
+              <li key={k} style={css('display: inline-flex; align-items: center; gap: 12px')}>
+                {k > 0 && <Icon name="arrowRight" size={14} stroke="var(--text-3)" />}
+                <span><span style={css('font-weight: 600; color: var(--text-strong)')}>{k + 1}.</span> {t}</span>
+              </li>
+            ))}
+          </ol>
           <label htmlFor="hero-input" style={css('margin-top: 16px; height: 48px; padding: 0 24px; display: inline-flex; align-items: center; gap: 12px; border-radius: 6px; background: var(--primary); color: var(--primary-text); font-size: 16px; font-weight: 600; cursor: pointer')}>
             <Icon name="upload" size={20} />Upload Your Network Infrastructure File
             <input id="hero-input" type="file" accept=".xlsx,.xls" disabled={!!reading} style={css('position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none')}
@@ -164,7 +172,7 @@ export function UploadPage() {
                 <div style={css('min-width: 0')}>
                   <h2 id="file-h" style={css('margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; color: var(--text-strong)')}>Data Files</h2>
                   <p style={css('margin: 4px 0 0; font-size: 13px; line-height: 20px; color: var(--text-3)')}>
-                    {mode === 'workbook' ? 'One Excel workbook with two sheets: Links (one row per directed link) and Assets (asset IDs and names).' : 'A links file (one row per directed link) and a separate asset list (asset IDs and names).'}
+                    {mode === 'workbook' ? 'One Excel workbook with two sheets: Links (one row per directed edge) and Assets (asset IDs and names).' : 'An edges file (one row per directed edge) and a separate asset list (asset IDs and names).'}
                   </p>
                 </div>
                 <Segmented label="How your data is packaged" value={mode} onChange={(m) => { setMode(m); setPair({}); }}
@@ -186,7 +194,7 @@ export function UploadPage() {
                 <DropZone id="wb-input" accept=".xlsx,.xls" title="Drag and Drop Your Workbook Here" hint="One Excel file (.xlsx or .xls) with a Links sheet and an Assets sheet" onFile={onWorkbook} />
               ) : (
                 <div style={css('margin-top: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 16px')}>
-                  {([['links', 'links-input', '1 · Links File', 'Drop the file with one row per link, or '], ['assets', 'assets-input', '2 · Asset List', 'Drop the file that maps asset IDs to names, or ']] as const).map(([part, id, title, hint]) => (
+                  {([['links', 'links-input', '1 · Edges File', 'Drop the file with one row per edge, or '], ['assets', 'assets-input', '2 · Asset List', 'Drop the file that maps asset IDs to names, or ']] as const).map(([part, id, title, hint]) => (
                     <div key={id} style={css('display: flex; flex-direction: column; gap: 12px')}>
                       <div style={css('display: flex; align-items: baseline; justify-content: space-between; gap: 8px')}>
                         <span style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>{title}</span>
@@ -269,7 +277,7 @@ export function UploadPage() {
               {types.length > 0 && (
                 <>
                   <h3 style={css('margin: 20px 0 0; font-size: 13px; font-weight: 600; color: var(--text-2)')}>Graph Lanes</h3>
-                  <p style={css('margin: 4px 0 0; font-size: 13px; color: var(--text-3)')}>Each asset type is drawn as one cluster. Suggested lanes follow how its assets link: mostly sending, mostly receiving, or both.</p>
+                  <p style={css('margin: 4px 0 0; font-size: 13px; color: var(--text-3)')}>Each asset type is drawn as one cluster. Suggested lanes follow how its assets connect: mostly sending, mostly receiving, or both.</p>
                   <div style={css('margin-top: 12px; border: 1px solid var(--border); border-radius: 6px; overflow-x: auto')}>
                     <table style={css('width: 100%; border-collapse: collapse; font-size: 13px; color: var(--text)')}>
                       <thead><tr style={css('background: var(--table-head); text-align: left')}><th scope="col" style={css(TH)}>Asset Type</th><th scope="col" style={css(TH + '; text-align: right')}>Assets</th><th scope="col" style={css(TH)}>Lane</th></tr></thead>
@@ -301,10 +309,10 @@ export function UploadPage() {
                 <div style={css('display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px 20px')}>
                   <div>
                     <h2 id="prev-h" style={css('margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; color: var(--text-strong)')}>Preview</h2>
-                    <p style={css('margin: 4px 0 0; font-size: 13px; color: var(--text-3)')}>{tab === 'links' ? `First 5 of ${d.links.length} links read` : `First 5 of ${d.assets.length} assets`}</p>
+                    <p style={css('margin: 4px 0 0; font-size: 13px; color: var(--text-3)')}>{tab === 'links' ? `First 5 of ${d.links.length} edges read` : `First 5 of ${d.assets.length} assets`}</p>
                   </div>
                   <Segmented role="tablist" label="Preview" value={tab} onChange={setTab}
-                    options={[{ id: 'links', label: 'Links' }, { id: 'assets', label: 'Assets' }]} />
+                    options={[{ id: 'links', label: 'Edges' }, { id: 'assets', label: 'Assets' }]} />
                 </div>
                 {tab === 'links' ? (
                   <div style={css('margin-top: 16px; border: 1px solid var(--border); border-radius: 6px; overflow-x: auto')}>
@@ -370,7 +378,7 @@ export function UploadPage() {
                   style={css('height: 40px; padding: 0 12px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 14px; color: var(--text); box-sizing: border-box')} />
               </div>
               <div style={css('margin-top: 20px; display: flex; flex-direction: column; gap: 8px')}>
-                <label htmlFor="setup-measure" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Metric</label>
+                <LabelWithInfo term="Degree Centrality"><label htmlFor="setup-measure" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Metric</label></LabelWithInfo>
                 <div style={css('position: relative')}>
                   <select id="setup-measure" defaultValue="degree" style={css('width: 100%; height: 40px; padding: 0 36px 0 12px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 14px; color: var(--text); appearance: none; -webkit-appearance: none')}>
                     <option value="degree">Degree Centrality</option>
@@ -378,24 +386,28 @@ export function UploadPage() {
                   </select>
                   <Icon name="chevronDown" size={16} width={2} stroke="var(--text-3)" style="position: absolute; right: 12px; top: 11px; pointer-events: none" />
                 </div>
+                <span style={css('font-size: 12px; line-height: 20px; color: var(--text-3)')}>Ranks assets by their connections: the more (and more important) edges an asset has, the more of the network its failure reaches.</span>
               </div>
               <div style={css('margin-top: 20px; display: flex; flex-direction: column; gap: 8px')}>
-                <span id="setup-dim" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Dimension</span>
+                <LabelWithInfo term="Dimension"><span id="setup-dim" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Dimension</span></LabelWithInfo>
                 <Segmented fill labelledBy="setup-dim" value={su.dim} onChange={(dim) => app.setSetup({ ...su, dim })}
                   options={[{ id: '1d', label: '1D' }, { id: '2d', label: '2D' }]} />
                 <span style={css('font-size: 12px; line-height: 20px; color: var(--text-3)')}>
-                  {su.dim === '1d' ? 'One score per asset from its links.' : <>Two values per asset (asset importance and link importance), ranked by <ParetoLink text="Pareto fronts" />.</>}
+                  {su.dim === '1d' ? 'Ranks each asset by how connected it is: one score from its edges.'
+                    : <>Also counts how important the assets at the other end of its edges are: two scores per asset, ranked by <ParetoLink text="Pareto fronts" />.</>}
                 </span>
               </div>
               <div style={css('margin-top: 20px; display: flex; flex-direction: column; gap: 8px')}>
-                <span id="setup-w" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Weights</span>
+                <LabelWithInfo term="Weights"><span id="setup-w" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Weights</span></LabelWithInfo>
                 <Segmented fill labelledBy="setup-w" value={su.weighted ? 'w' : 'u'} onChange={(v) => app.setSetup({ ...su, weighted: v === 'w' })}
                   options={[{ id: 'u', label: 'Unweighted' }, { id: 'w', label: 'Weighted' }]} />
+                <span style={css('font-size: 12px; line-height: 20px; color: var(--text-3)')}>{su.weighted ? 'Important edges count more (High 3, Medium 2, Low 1).' : 'Every edge counts the same, whatever its importance.'}</span>
               </div>
               <div style={css('margin-top: 20px; display: flex; flex-direction: column; gap: 8px')}>
-                <span id="setup-k" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Highlight Ranks</span>
+                <LabelWithInfo term="Highlight Ranks"><span id="setup-k" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Highlight Ranks</span></LabelWithInfo>
                 <Segmented fill labelledBy="setup-k" value={kPreset as 0 | 10 | 25 | 50} onChange={(k) => app.setSetup({ ...su, kFrom: 1, kTo: k || su.kTo })}
                   options={[{ id: 10, label: 'Top 10' }, { id: 25, label: 'Top 25' }, { id: 50, label: 'Top 50' }, { id: 0, label: 'Custom' }]} />
+                <span style={css('font-size: 12px; line-height: 20px; color: var(--text-3)')}>How many of the most critical assets to highlight in orange on the graph and in the list.</span>
                 {!kPreset && (
                   <div style={css('display: flex; align-items: flex-end; gap: 12px')}>
                     {([['setup-from', 'From Rank', 'kFrom'], ['setup-to', 'To Rank', 'kTo']] as const).map(([id, label, key], j) => (
@@ -412,7 +424,7 @@ export function UploadPage() {
                 )}
               </div>
               <div style={css('margin-top: 20px; display: flex; flex-direction: column; gap: 8px')}>
-                <label htmlFor="depth-select" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Blast Radius Depth</label>
+                <LabelWithInfo term="Blast Radius Depth"><label htmlFor="depth-select" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Blast Radius Depth</label></LabelWithInfo>
                 <div style={css('position: relative')}>
                   <select id="depth-select" value={app.depth} onChange={(e) => app.setDepth(Number(e.target.value))}
                     style={css('width: 100%; height: 40px; padding: 0 36px 0 12px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 14px; color: var(--text); appearance: none; -webkit-appearance: none')}>
@@ -423,7 +435,7 @@ export function UploadPage() {
                   </select>
                   <Icon name="chevronDown" size={16} width={2} stroke="var(--text-3)" style="position: absolute; right: 12px; top: 11px; pointer-events: none" />
                 </div>
-                <span style={css('font-size: 12px; line-height: 20px; color: var(--text-3)')}>How far downstream a failure can spread from an asset. You can change this later.</span>
+                <span style={css('font-size: 12px; line-height: 20px; color: var(--text-3)')}>How many steps a failure can travel from an asset: 1 hop reaches the assets that depend on it directly, 2 hops also reaches the assets that depend on those. You can change this later.</span>
               </div>
               <div style={css('margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--divider); display: flex; flex-direction: column; gap: 12px')}>
                 <button type="button" onClick={onAnalyze} disabled={!app.dataset || app.busy || load.stage === 'error'}
@@ -443,9 +455,9 @@ export function UploadPage() {
             <section aria-labelledby="req-h" style={css(CARD)}>
               <h2 id="req-h" style={css('margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; color: var(--text-strong)')}>Expected Format</h2>
               <p style={css('margin: 4px 0 0; font-size: 13px; line-height: 20px; color: var(--text-3)')}>Excel (.xlsx, .xls) or CSV (UTF-8). Column names are matched automatically, ignoring case and spaces.</p>
-              <h3 style={css('margin: 20px 0 0; font-size: 13px; font-weight: 600; color: var(--text-label)')}>Links · One Row per Directed Link</h3>
+              <h3 style={css('margin: 20px 0 0; font-size: 13px; font-weight: 600; color: var(--text-label)')}>Links Sheet · One Row per Directed Edge</h3>
               <dl style={css('margin: 12px 0 0; display: flex; flex-direction: column; gap: 12px')}>
-                {[['Source', 'Required. The asset ID the link starts from.'], ['Target', 'Required. The asset ID that depends on the source.'], ['Edge Type', 'Required. Groups links for filtering, such as Power or Control.'], ['Edge Importance', 'Required. 1, 2, 3 or Low, Medium, High. Used by the weighted metrics.'], ['Source and Target Asset Importance', 'Required. 1, 2, 3 or Low, Medium, High. Used by the 2D metrics.']].map(([t, dd]) => (
+                {[['Source', 'Required. The asset ID the edge starts from.'], ['Target', 'Required. The asset ID that depends on the source.'], ['Edge Type', 'Required. Groups edges for filtering, such as Power or Control.'], ['Edge Importance', 'Required. 1, 2, 3 or Low, Medium, High. Used by the weighted metrics.'], ['Source and Target Asset Importance', 'Required. 1, 2, 3 or Low, Medium, High. Used by the 2D metrics.']].map(([t, dd]) => (
                   <div key={t}><dt style={css('font-size: 13px; font-weight: 600; color: var(--text)')}>{t}</dt><dd style={css('margin: 2px 0 0; font-size: 12px; line-height: 20px; color: var(--text-2)')}>{dd}</dd></div>
                 ))}
               </dl>
@@ -457,7 +469,7 @@ export function UploadPage() {
               </dl>
               <div style={css('margin-top: 20px; display: flex; align-items: center; gap: 12px; padding: 12px 12px; border-radius: 6px; background: var(--subtle); font-size: 12px; color: var(--text-2)')}>
                 <span style={css('display: flex; gap: 4px')} aria-hidden="true">{[1, 2, 3].map((v) => <LevelChip key={v} lv={v} alt />)}</span>
-                Importance 1, 2, 3 appears as Low, Medium, High.
+                Assigned importance 1, 2, 3 appears as Low, Medium, High.
               </div>
               <div style={css('margin-top: 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px')}>
                 <button type="button" onClick={downloadTemplate} style={css(BTN)}><Icon name="download" size={16} />Download Template</button>

@@ -7,7 +7,7 @@ import type { Dimension, ReadyVariant, RingMember, VariantKey } from '../analysi
 import { css } from '../components/css';
 import { DistributionChart } from '../components/DistributionChart';
 import { GraphCaption, GraphLegend, IMPORTANCE_KEY } from '../components/GraphChrome';
-import { BandChip, LevelChip, LV_FULL, rankingSubtitle, titleCase } from '../components/ui';
+import { BandChip, LevelChip, LV_FULL, rankingSubtitle, variantTitle } from '../components/ui';
 import { DARK, LIGHT } from '../graph/graph-theme';
 import { GraphView } from '../graph/GraphView';
 import { useNetworkView, useOrderPositions, useScene } from '../graph/useNetworkView';
@@ -99,7 +99,7 @@ export function SnapshotPage({ params }: { params: URLSearchParams }) {
   const items = (x: number): ListItem[] => result.blast[x].rings.flatMap((ring, h) => [{ ring: h, count: ring.length }, ...ring.map((m) => ({ m }))]);
   const hidden = pair.map((x, j) => cut[j] == null ? 0 : items(x).slice(cut[j]!).filter((it) => 'm' in it).length);
 
-  const metricTitle = titleCase(chosen.label);
+  const metricTitle = variantTitle(chosen.label);
   const Way = way === 'upstream' ? 'Upstream' : 'Downstream';
   const pendingNote = pending ? ' · 2D blast-radius score pending supervisor; ranks are 2D direct' : '';
   const caption = blast
@@ -119,7 +119,7 @@ export function SnapshotPage({ params }: { params: URLSearchParams }) {
     <div style={css(`flex: none; height: ${HEADER_H}px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px; background: var(--surface); border-bottom: 1px solid var(--border)`)}>
       <div style={css('min-width: 0; display: flex; align-items: baseline; gap: 16px')}>
         <span style={css('font-size: 20px; font-weight: 600; color: var(--text-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis')}>{app.analysisName || 'Untitled Analysis'}</span>
-        <span style={css('font-size: 13px; color: var(--text-3); white-space: nowrap')}>Degree Centrality · {result.n} Assets · {result.m} Directed Links</span>
+        <span style={css('font-size: 13px; color: var(--text-3); white-space: nowrap')}>Degree Centrality · {result.n} Assets · {result.m} Directed Edges</span>
       </div>
       <span style={css('font-size: 13px; font-weight: 600; color: var(--text-3)')}>CARMA</span>
     </div>
@@ -139,12 +139,12 @@ export function SnapshotPage({ params }: { params: URLSearchParams }) {
         <p style={css('margin: 2px 0 0; font-size: 12px; color: var(--text-3)')}>{rankingSubtitle(V, from, to, depth, way === 'upstream')}</p>
         <p style={css('margin: 2px 0 0; font-size: 12px; color: var(--text-3)')}>{IMPORTANCE_KEY}</p>
       </div>
-      <div aria-hidden="true" style={css('display: grid; grid-template-columns: 30px minmax(0, 1fr) 64px 76px; gap: 12px; padding: 8px 20px; font-size: 12px; font-weight: 600; color: var(--text-3); border-bottom: 1px solid var(--divider)')}>
-        <span style={css('text-align: right')}>#</span><span>Asset</span><span style={css('text-align: center')}>Importance</span><span style={css('text-align: right')}>{showValues ? 'Score' : 'Centrality'}</span>
+      <div aria-hidden="true" style={css('display: grid; grid-template-columns: 30px minmax(0, 1fr) 80px 76px; gap: 12px; padding: 8px 20px; font-size: 12px; font-weight: 600; color: var(--text-3); border-bottom: 1px solid var(--divider)')}>
+        <span style={css('text-align: right')}>#</span><span>Asset</span><span style={css('text-align: center')}>Assigned Importance</span><span style={css('text-align: right')}>{showValues ? 'Score' : 'Criticality'}</span>
       </div>
       <ol style={css('list-style: none; margin: 0; padding: 4px 8px')}>
         {range.map((i, j) => (
-          <li key={i} style={css('height: 40px; display: grid; grid-template-columns: 30px minmax(0, 1fr) 64px 76px; align-items: center; gap: 12px; padding: 0 12px')}>
+          <li key={i} style={css('height: 40px; display: grid; grid-template-columns: 30px minmax(0, 1fr) 80px 76px; align-items: center; gap: 12px; padding: 0 12px')}>
             <span style={css('text-align: right; font-size: 12px; color: var(--text-3); font-variant-numeric: tabular-nums')}>{V.kind === 'scalar' ? V.rank[i] : from + j}</span>
             <span style={css('min-width: 0')}>
               <span style={css('display: block; font-size: 13px; font-weight: 600; color: var(--text)')}>{labels[i]}</span>
@@ -168,7 +168,7 @@ export function SnapshotPage({ params }: { params: URLSearchParams }) {
         </div>
       </div>
       <DistributionChart bare dist={V.distribution} options={{}} onOptions={() => {}} criticalLeft onCriticalLeft={() => {}}
-        showNumbers={showValues} variantLabel={titleCase(V.label)} kFrom={from} kTo={to} busy={false} theme={app.theme} />
+        showNumbers={showValues} variantLabel={variantTitle(V.label)} kFrom={from} kTo={to} busy={false} theme={app.theme} />
     </section>
   );
 
@@ -219,7 +219,7 @@ export function SnapshotPage({ params }: { params: URLSearchParams }) {
             data={sceneData} fitZ={geo.fitZ} fitH={geo.fitH} startZoom="fit" theme={T} sel={blast ? pair[0] : V.order[0]} from={from} to={to} weighted showLevels
             sizeByScore gatherCone blastTargets={pair} frameKey={pair.join('-')} view="3d" labelStyle="inside"
             ariaLabel={(i) => `${labels[i]}, ${names[i]}, ${rankText(i).toLowerCase()}`}
-            tip={(i) => ({ title: `${labels[i]} · ${names[i]}`, line: `${rankText(i)} · Importance ${LV_FULL[result.importance[i]]}` })}
+            tip={(i) => ({ title: `${labels[i]} · ${names[i]}`, line: `${rankText(i)} · Assigned Importance ${LV_FULL[result.importance[i]]}` })}
             onSelect={() => {}}
             overlay={() => (
               <>

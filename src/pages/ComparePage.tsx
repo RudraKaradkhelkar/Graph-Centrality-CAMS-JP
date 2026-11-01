@@ -5,7 +5,7 @@ import type { ReadyVariant } from '../analysis-types';
 import { navigate } from '../App';
 import { css } from '../components/css';
 import { ExitPresent, GraphButtons, GraphCaption, GraphLegend, PresentButton, RotateButton } from '../components/GraphChrome';
-import { AppBar, BandChip, Footer, Icon, LV, LV_FULL, ThemeButton, titleCase } from '../components/ui';
+import { AppBar, BandChip, Footer, Icon, LV, LV_FULL, ThemeButton, variantTitle } from '../components/ui';
 import { DARK, LIGHT } from '../graph/graph-theme';
 import { CameraLink, GraphView } from '../graph/GraphView';
 import { DEFAULT_PITCH, DEFAULT_YAW } from '../graph/layout';
@@ -52,12 +52,12 @@ export function ComparePage() {
   const inTop = (V: ReadyVariant, pos: number[], i: number) => pos[i] >= V.k_from && pos[i] <= V.k_to;
   const exportBlast = (x: number) => {
     const cell = (v: string | number) => (/[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v));
-    const head = ['Ring', 'Asset ID', 'Asset Name', 'Reached Via (Asset ID)', 'Link Type', 'Link Importance',
+    const head = ['Ring', 'Asset ID', 'Asset Name', 'Reached Via (Asset ID)', 'Edge Type', 'Edge Importance',
       '1D (Weighted) Rank', '2D (Weighted) Rank', '2D Pareto Front', 'Change (1D Rank - 2D Rank)'];
     const body = result.blast[x].rings.flatMap((ring, h) => ring.map(([a, p, t, w]) => [
       `Ring ${h + 1}`, result.ids[a], names[a], result.ids[p], result.link_types[t], LV_FULL[w], rank1(a), rank2(a), V2.front![a], rank1(a) - rank2(a),
     ]));
-    const text = [[`# Blast Radius of ${result.ids[x]} (${depth} ${depth === 1 ? 'Hop' : 'Hops'}${against ? ', Against Links' : ''}), Ranked by 1D (Weighted) and 2D (Weighted)`], head, ...body]
+    const text = [[`# Blast Radius of ${result.ids[x]} (${depth} ${depth === 1 ? 'Hop' : 'Hops'}${against ? ', Against Edges' : ''}), Ranked by 1D (Weighted) and 2D (Weighted)`], head, ...body]
       .map((r) => r.map(cell).join(',')).join('\r\n');
     const link = document.createElement('a');
     link.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' }));
@@ -73,7 +73,7 @@ export function ComparePage() {
 
   // lead: the side that frames the blast cone after a selection (the camera is shared, so one side is enough).
   const side = (V: ReadyVariant, data: typeof scene1, pos: number[], present: boolean, lead: boolean) => {
-    const title = titleCase(V.label);
+    const title = variantTitle(V.label);
     const sub = `${V.kind === 'scalar' ? 'Ranked by Score' : 'Ranked by Pareto Front, then Node Importance'} · Ranks ${V.k_from}–${V.k_to} Highlighted${sel != null ? ` · Blast Radius of ${labels[sel]} (${affected} ${affected === 1 ? 'asset' : 'assets'})` : ''}`;
     return (
       <GraphView
@@ -83,7 +83,7 @@ export function ComparePage() {
         ariaLabel={(i) => `${labels[i]}, ${names[i]}, ${V.kind === 'scalar' ? `rank ${V.rank[i]}` : `order ${pos[i]}, front ${V.front![i]}`}`}
         tip={(i) => ({
           title: `${labels[i]} · ${names[i]}`,
-          line: `${V.kind === 'scalar' ? `Rank ${V.rank[i]}` : `Order ${pos[i]} · Front ${V.front![i]}`} · Centrality ${V.band[i]} · Importance ${LV_FULL[result.importance[i]]}`,
+          line: `${V.kind === 'scalar' ? `Rank ${V.rank[i]}` : `Order ${pos[i]} · Front ${V.front![i]}`} · Criticality ${V.band[i]} · Assigned Importance ${LV_FULL[result.importance[i]]}`,
         })}
         onSelect={(k) => setSel(k)}
         overlay={(info, c) => (
@@ -142,7 +142,7 @@ export function ComparePage() {
           </nav>
           <h1 style={css('margin: 2px 0 0; font-size: 20px; line-height: 28px; font-weight: 600; color: var(--text-strong)')}>Compare 1D vs 2D</h1>
           <div style={css('margin-top: 2px; font-size: 13px; color: var(--text-3)')}>
-            Same network, ranked two ways. Both graphs move together; select an asset to see its blast radius ({depth} {depth === 1 ? 'hop' : 'hops'}{against ? ', against links' : ''}) on both.
+            Same network, ranked two ways. Both graphs move together; select an asset to see its blast radius ({depth} {depth === 1 ? 'hop' : 'hops'}{against ? ', against edges' : ''}) on both.
           </div>
         </div>
         <div style={css('margin-left: auto; display: flex; flex-wrap: wrap; gap: 8px')}>
@@ -161,9 +161,9 @@ export function ComparePage() {
 
       <div style={css('padding: 16px 24px 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(560px, 100%), 1fr)); gap: 16px')}>
         {([[V1, scene1, pos1], [V2, scene2, pos2]] as const).map(([V, data, pos]) => (
-          <section key={V.key} aria-label={titleCase(V.label)} style={css(`${CARD}; overflow: hidden`)}>
+          <section key={V.key} aria-label={variantTitle(V.label)} style={css(`${CARD}; overflow: hidden`)}>
             {side(V, data, pos, false, V === V1)}
-            <div style={css('padding: 12px 16px 4px; font-size: 13px; font-weight: 600')}>{titleCase(V.label)} · Ranks {V.k_from}–{V.k_to}</div>
+            <div style={css('padding: 12px 16px 4px; font-size: 13px; font-weight: 600')}>{variantTitle(V.label)} · Ranks {V.k_from}–{V.k_to}</div>
             {list(V, pos)}
           </section>
         ))}
@@ -177,7 +177,7 @@ export function ComparePage() {
                 Blast Radius of {labels[sel]}: {affected} {affected === 1 ? 'Asset' : 'Assets'}, Ranked by 1D and 2D
               </h2>
               <p style={css('margin: 2px 0 0; font-size: 12px; color: var(--text-3)')}>
-                The same assets are affected under both methods ({depth} {depth === 1 ? 'hop' : 'hops'}{against ? ' against the links' : ' downstream'}); what differs is how critical each one is.
+                The same assets are affected under both methods ({depth} {depth === 1 ? 'hop' : 'hops'}{against ? ' against the edges' : ' downstream'}); what differs is how critical each one is.
                 {' '}In ranks {V1.k_from}–{V1.k_to}: {result.blast[sel].rings.flat().filter(([a]) => inTop(V1, pos1, a)).length} in 1D, {result.blast[sel].rings.flat().filter(([a]) => inTop(V2, pos2, a)).length} in 2D.
               </p>
             </div>

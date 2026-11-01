@@ -52,6 +52,8 @@ let failed = 0;
 const done = [];
 try {
   const context = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 2, colorScheme: theme });
+  // The dashboard's "How to Read" guide stays closed in the deliverable screenshots.
+  await context.addInitScript(() => { try { localStorage.setItem('carma-guide-closed', '1'); } catch { /* no storage */ } });
   const page = await context.newPage();
   page.on('pageerror', () => { failed++; console.error('FAIL: the app hit an error (open the dashboard in a browser to see it).'); });
   await page.goto(`${base}#/upload`);

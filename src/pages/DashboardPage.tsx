@@ -5,7 +5,7 @@ import { navigate } from '../App';
 import { css } from '../components/css';
 import { DistributionChart } from '../components/DistributionChart';
 import { ExitPresent, GraphCaption, GraphLegend, IMPORTANCE_KEY, PresentButton, RingKey, RotateButton } from '../components/GraphChrome';
-import { AppBar, BandChip, Footer, Icon, LevelChip, LV, LV_FULL, ParetoLink, rankingSubtitle, Segmented, ThemeButton, titleCase } from '../components/ui';
+import { AppBar, BandChip, Footer, GLOSSARY, Icon, InfoTip, LabelWithInfo, LevelChip, LV, LV_FULL, ParetoLink, rankingSubtitle, Segmented, ThemeButton, variantTitle } from '../components/ui';
 import { shortName } from '../data/dataset';
 import { DARK, LIGHT } from '../graph/graph-theme';
 import { GraphView, type CameraInfo, type GraphControls } from '../graph/GraphView';
@@ -21,6 +21,14 @@ const CHECK = 'width: 16px; height: 16px; margin: 0; accent-color: var(--check)'
 // Graph height: dragged by the handle under it, remembered in this browser; opens filling the window.
 const GRAPH_MIN = 400;
 const GRAPH_H_KEY = 'carma-graph-height';
+// "How to Read This Dashboard": open until closed once in this browser.
+const GUIDE_KEY = 'carma-guide-closed';
+const GUIDE = [
+  'The graph is your network. Each sphere is an asset and each arrow an edge, pointing to the asset that depends on it. Orange spheres are the highlighted ranks; bigger spheres score higher.',
+  'Click a sphere, or a row in the list below the graph, to select an asset. Selected Asset shows its edges, its importance and how many assets depend on it.',
+  'To see what an asset could take down, set Scope to Blast Radius in Inputs. A cone covers every affected asset, and the list beside the graph names them ring by ring.',
+  'The chart at the bottom shows how many assets have High, Medium and Low criticality. Hover any ⓘ for a definition.',
+];
 
 function fmtTuple(t: [number, number]) {
   return `${t[0].toFixed(2)}, ${t[1].toFixed(2)}`;
@@ -56,6 +64,11 @@ export function DashboardPage() {
   const [chartRes, setChartRes] = useState<{ v: ReadyVariant; optsKey: string; dist: Distribution } | null>(null);
   const [chartBusy, setChartBusy] = useState(false);
   const [legendOpen, setLegendOpen] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(() => { try { return localStorage.getItem(GUIDE_KEY) !== '1'; } catch { return true; } });
+  const showGuide = (on: boolean) => {
+    setGuideOpen(on);
+    try { if (on) localStorage.removeItem(GUIDE_KEY); else localStorage.setItem(GUIDE_KEY, '1'); } catch { /* storage unavailable */ }
+  };
   const [q, setQ] = useState('');
   const [sizeByScore, setSizeByScore] = useState(true);
   const [showLevels, setShowLevels] = useState(true);
@@ -76,7 +89,7 @@ export function DashboardPage() {
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [app.present]);
+  }, [app.present, guideOpen]);
   useEffect(() => {
     try { if (savedH == null) localStorage.removeItem(GRAPH_H_KEY); else localStorage.setItem(GRAPH_H_KEY, String(savedH)); } catch { /* storage unavailable */ }
   }, [savedH]);
@@ -157,7 +170,7 @@ export function DashboardPage() {
   const rankText = (i: number) => V.kind === 'scalar' ? `Rank ${V.rank[i]}` : `Front ${V.front![i]}`;
   // Chip beside an asset's name: its place in the ranking (2D: Order position, the list's # column).
   const chipText = (i: number) => `Rank #${V.kind === 'scalar' ? V.rank[i] : posOf[i]}`;
-  const vLabel = titleCase(V.label);
+  const vLabel = variantTitle(V.label);
 
   const range = V.order.slice(from - 1, to);
   const pos = range.indexOf(s);
@@ -175,7 +188,7 @@ export function DashboardPage() {
   const linksOf = (x: number) => result.out_links[x] + result.in_links[x];
   const reachCount = (x: number) => result.blast[x].rings.reduce((t, r) => t + r.length, 0);
   const navStat = pair ? `${labels[pinA!]}: ${reachCount(pinA!)} · ${labels[pairB!]}: ${reachCount(pairB!)} ${Way}`
-    : blast ? (down ? `${down} ${Way} · ${pct} of Network` : `No ${Way} Assets`) : `${linksOf(s)} ${linksOf(s) === 1 ? 'Direct Link' : 'Direct Links'}`;
+    : blast ? (down ? `${down} ${Way} · ${pct} of Network` : `No ${Way} Assets`) : `${linksOf(s)} ${linksOf(s) === 1 ? 'Direct Edge' : 'Direct Edges'}`;
 
   const variantCell = (vk: VariantKey) => {
     const v = result.variants[vk];
@@ -185,14 +198,14 @@ export function DashboardPage() {
     return { v: v.kind === 'scalar' ? v.score![s].toFixed(3) : `Front ${v.front![s]}`, r };
   };
 
-  const metricTitle = titleCase(chosen.label);
+  const metricTitle = variantTitle(chosen.label);
   const dimTxt = dim === '1d'
-    ? 'Scores each asset by all its links, incoming and outgoing.'
-    : <>Ranks each asset on two values: the importance of the assets at both ends of its links, and {weighted ? 'the importance of the links' : 'the number of links'}. Assets that are not beaten on both share a <ParetoLink />.</>;
+    ? 'Scores each asset by all its edges, incoming and outgoing.'
+    : <>Ranks each asset on two values: the importance of the assets at both ends of its edges, and {weighted ? 'the importance of the edges' : 'the number of edges'}. Assets that are not beaten on both share a <ParetoLink />.</>;
   const scopeTxt = blast
-    ? `Extends to every asset ${spread === 'against' ? 'upstream (against the links)' : 'downstream'} within ${depth} ${depth === 1 ? 'hop' : 'hops'}${dim === '2d' ? '; each adds its own 2D values' : ''}${weighted ? ', weakened at each hop by link importance' : ''}.`
-    : 'Counts only the assets it links to directly.';
-  const weightTxt = weighted ? 'Each link counts by its importance (Low 1, Medium 2, High 3).' : 'Every link counts equally.';
+    ? `Extends to every asset ${spread === 'against' ? 'upstream (against the edges)' : 'downstream'} within ${depth} ${depth === 1 ? 'hop' : 'hops'}${dim === '2d' ? '; each adds its own 2D values' : ''}${weighted ? ', weakened at each hop by edge importance' : ''}.`
+    : 'Counts only its own edges.';
+  const weightTxt = weighted ? 'Each edge counts by its importance (Low 1, Medium 2, High 3).' : 'Every edge counts equally.';
   const pendingTxt = pending ? ' The 2D blast-radius score is pending the supervisor; ranks shown are 2D direct.' : '';
 
   const legendRows = useMemo(() => {
@@ -204,8 +217,8 @@ export function DashboardPage() {
   const exportCsv = () => {
     const abbr = ds.hasAbbr ? ['Abbreviation'] : [];
     const head = V.kind === 'scalar'
-      ? ['Order', 'Rank', 'Asset ID', ...abbr, 'Asset Name', 'Importance', 'Centrality Band', 'Score']
-      : ['Order', 'Pareto Front', 'Asset ID', ...abbr, 'Asset Name', 'Importance', 'Centrality Band', 'Degree Tuple (Node-Importance, Edge-Importance)', 'Normalized Tuple'];
+      ? ['Order', 'Rank', 'Asset ID', ...abbr, 'Asset Name', 'Assigned Importance', 'Criticality Band', 'Score']
+      : ['Order', 'Pareto Front', 'Asset ID', ...abbr, 'Asset Name', 'Assigned Importance', 'Criticality Band', 'Degree Tuple (Node-Importance, Edge-Importance)', 'Normalized Tuple'];
     const rows = range.map((i, j) => {
       const who = [result.ids[i], ...(ds.hasAbbr ? [assetsById.get(result.ids[i])?.abbr ?? ''] : []), names[i], LV_FULL[result.importance[i]], band[i]];
       return V.kind === 'scalar'
@@ -229,14 +242,14 @@ export function DashboardPage() {
   };
 
   const exportBlast = (x: number) => {
-    const head = ['Ring', 'Hops', 'Asset ID', ...(ds.hasAbbr ? ['Abbreviation'] : []), 'Asset Name', 'Asset Type', 'Reached Via (Asset ID)', 'Link Type',
-      'Link Importance', 'Centrality Band', V.kind === 'scalar' ? 'Rank' : 'Pareto Front', V.kind === 'scalar' ? 'Score' : 'Normalized Tuple'];
+    const head = ['Ring', 'Hops', 'Asset ID', ...(ds.hasAbbr ? ['Abbreviation'] : []), 'Asset Name', 'Asset Type', 'Reached Via (Asset ID)', 'Edge Type',
+      'Edge Importance', 'Criticality Band', V.kind === 'scalar' ? 'Rank' : 'Pareto Front', V.kind === 'scalar' ? 'Score' : 'Normalized Tuple'];
     const rows = result.blast[x].rings.flatMap((ring, h) => ring.map(([a, p, t, w]) => [
       `Ring ${h + 1}`, h + 1, result.ids[a], ...(ds.hasAbbr ? [assetsById.get(result.ids[a])?.abbr ?? ''] : []), names[a],
       assetsById.get(result.ids[a])?.type ?? '', result.ids[p], result.link_types[t], LV_FULL[w], band[a],
       V.kind === 'scalar' ? V.rank[a] : V.front![a], V.kind === 'scalar' ? V.score![a] : `(${V.normalized![a].map((v) => v.toFixed(6)).join(', ')})`,
     ]));
-    const text = [[`# Blast Radius of ${result.ids[x]} (${depth} ${depth === 1 ? 'Hop' : 'Hops'}${spread === 'against' ? ', Against Links' : ''}), Ranked by ${vLabel}`], head, ...rows]
+    const text = [[`# Blast Radius of ${result.ids[x]} (${depth} ${depth === 1 ? 'Hop' : 'Hops'}${spread === 'against' ? ', Against Edges' : ''}), Ranked by ${vLabel}`], head, ...rows]
       .map((r) => r.map(csvCell).join(',')).join('\r\n');
     const link = document.createElement('a');
     link.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' }));
@@ -345,7 +358,7 @@ export function DashboardPage() {
         <div data-ui="1" role="group" aria-label="Selected asset" style={css('justify-self: center; min-width: 0; max-width: 100%; pointer-events: auto; min-height: 44px; padding: 6px 8px 6px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; background: var(--overlay-97); border: 1px solid var(--border); border-radius: 6px; box-shadow: var(--selbar-shadow); white-space: nowrap; box-sizing: border-box; cursor: default')}>
           <span style={css(`display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text-2)`)}>
             <span aria-hidden="true" style={css(blast ? 'width: 16px; height: 12px; clip-path: polygon(0 50%, 100% 0, 100% 100%); background: var(--orange)' : 'width: 16px; height: 3px; border-radius: 2px; background: var(--score-bar)')} />
-            {blast ? 'Blast Radius' : 'Direct Links'}
+            {blast ? 'Blast Radius' : 'Direct Edges'}
           </span>
           <div style={css('display: flex; align-items: center; gap: 2px')}>
             <button type="button" aria-label="Previous asset in range" onClick={step(-1)} style={css(NAV_BTN)}><Icon name="chevronLeft" size={14} width={2.2} /></button>
@@ -418,7 +431,7 @@ export function DashboardPage() {
           {weighted && showLevels && (
             <div style={css('display: flex; align-items: center; gap: 8px')}>
               <span aria-hidden="true" style={css('display: flex; gap: 4px')}>{[1, 2, 3].map((v) => <LevelChip key={v} lv={v} size={15} />)}</span>
-              {IMPORTANCE_KEY} (On Spheres and Links)
+              {IMPORTANCE_KEY} (On Spheres and Edges)
             </div>
           )}
         </div>
@@ -470,7 +483,7 @@ export function DashboardPage() {
             data={sceneData} fitZ={geo.fitZ} fitH={geo.fitH} startZoom="fit" autoRotate rotateSpeed={6} theme={T} sel={s} from={from} to={to} weighted={weighted} showLevels={showLevels}
             sizeByScore={sizeByScore} gatherCone={gatherCone} blastTargets={blastTargets} frameKey={blast ? blastTargets.join('-') : ''} view={view} labelStyle="inside"
             ariaLabel={(i) => `${labels[i]}, ${names[i]}, ${rankText(i).toLowerCase()}`}
-            tip={(i) => ({ title: `${labels[i]} · ${names[i]}`, line: `${rankText(i)} · ${showValues ? `Score ${scoreText(i)}` : `Centrality ${band[i]}`} · Importance ${LV_FULL[result.importance[i]]}` })}
+            tip={(i) => ({ title: `${labels[i]} · ${names[i]}`, line: `${rankText(i)} · ${showValues ? `Score ${scoreText(i)}` : `Criticality ${band[i]}`} · Assigned Importance ${LV_FULL[result.importance[i]]}` })}
             onSelect={select}
             overlay={(info, c) => (
               <>
@@ -505,13 +518,16 @@ export function DashboardPage() {
           <div style={css('margin-top: 2px; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--text-3)')}>
             <span>{ds.files.map((f) => f.name).join(' + ')}</span>
             <span>{n} Assets</span>
-            <span>{result.m} Directed Links{result.options.edge_types ? ' (Filtered)' : ''}</span>
+            <span>{result.m} Directed Edges{result.options.edge_types ? ' (Filtered)' : ''}</span>
           </div>
         </div>
         <div style={css('margin-left: auto; display: flex; flex-wrap: wrap; gap: 8px')}>
           {!app.demo && (
             <span title="Unweighted variants are shown. Remove ?research from the address for demo mode."
               style={css('height: 36px; padding: 0 12px; display: inline-flex; align-items: center; border-radius: 6px; background: var(--blue-soft-bg); color: var(--blue-soft-text); font-size: 13px; font-weight: 600')}>Research Mode</span>
+          )}
+          {!guideOpen && (
+            <button type="button" onClick={() => showGuide(true)} style={css('height: 36px; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer')}><Icon name="info" size={16} />How to Read This Dashboard</button>
           )}
           <button type="button" onClick={() => navigate('/upload')} style={css('height: 36px; padding: 0 16px; display: inline-flex; align-items: center; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer')}>Replace Data</button>
           <button type="button" onClick={() => navigate('/compare')} style={css('height: 36px; padding: 0 16px; display: inline-flex; align-items: center; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer')}>Compare 1D vs 2D</button>
@@ -520,13 +536,26 @@ export function DashboardPage() {
         </div>
       </div>
 
+      {guideOpen && (
+        <section aria-labelledby="guide-h" style={css('padding: 12px 24px 16px; display: flex; align-items: flex-start; gap: 16px; background: var(--surface); border-bottom: 1px solid var(--border)')}>
+          <div style={css('flex: 1; min-width: 0')}>
+            <h2 id="guide-h" style={css('margin: 0; font-size: 14px; line-height: 20px; font-weight: 600; color: var(--text-strong)')}>How to Read This Dashboard</h2>
+            <ol style={css('margin: 8px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 8px 24px; font-size: 13px; line-height: 20px; color: var(--text-2)')}>
+              {GUIDE.map((t, k) => (
+                <li key={k} style={css('display: flex; gap: 8px')}><span style={css('flex: none; font-weight: 600; color: var(--text-strong); font-variant-numeric: tabular-nums')}>{k + 1}.</span><span>{t}</span></li>
+              ))}
+            </ol>
+          </div>
+          <button type="button" aria-label="Close the guide" title="Close the guide (reopen it from the header)" onClick={() => showGuide(false)} style={css('flex: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 6px; background: transparent; color: var(--text-3); cursor: pointer')}><Icon name="close" size={16} /></button>
+        </section>
+      )}
       <div style={css('display: flex; align-items: flex-start')}>
       <div ref={graphWrap} style={css('flex: 1; min-width: 0')}>
       <GraphView
           data={sceneData} fitZ={geo.fitZ} fitH={geo.fitH} startZoom={ds.hasPositions ? 1 : 'fit'} height={graphH} theme={T} sel={s} from={from} to={to} weighted={weighted} showLevels={showLevels}
           sizeByScore={sizeByScore} gatherCone={gatherCone} blastTargets={blastTargets} frameKey={blast ? blastTargets.join('-') : ''} view={view} labelStyle="inside"
           ariaLabel={(i) => `${labels[i]}, ${names[i]}, ${rankText(i).toLowerCase()}`}
-          tip={(i) => ({ title: `${labels[i]} · ${names[i]}`, line: `${labels[i] !== result.ids[i] ? `ID ${result.ids[i]} · ` : ''}${rankText(i)} · ${showValues ? `Score ${scoreText(i)}` : `Centrality ${band[i]}`} · Importance ${LV_FULL[result.importance[i]]}` })}
+          tip={(i) => ({ title: `${labels[i]} · ${names[i]}`, line: `${labels[i] !== result.ids[i] ? `ID ${result.ids[i]} · ` : ''}${rankText(i)} · ${showValues ? `Score ${scoreText(i)}` : `Criticality ${band[i]}`} · Assigned Importance ${LV_FULL[result.importance[i]]}` })}
           onSelect={select} overlay={overlay}
         />
         <div role="separator" aria-orientation="horizontal" aria-label="Graph height" tabIndex={0}
@@ -566,7 +595,7 @@ export function DashboardPage() {
           </div>
 
           <div style={css('display: flex; flex-direction: column; gap: 8px')}>
-            <label htmlFor="measure" style={css('font-size: 12px; font-weight: 600; color: var(--text-3)')}>Centrality Measure</label>
+            <LabelWithInfo term="Degree Centrality"><label htmlFor="measure" style={css('font-size: 12px; font-weight: 600; color: var(--text-3)')}>Centrality Measure</label></LabelWithInfo>
             <div style={css('position: relative')}>
               <select id="measure" defaultValue="degree" style={css('width: 100%; height: 36px; padding: 0 36px 0 12px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 14px; font-weight: 600; color: var(--text); appearance: none; -webkit-appearance: none')}>
                 <option value="degree">Degree Centrality</option>
@@ -579,15 +608,15 @@ export function DashboardPage() {
           <section aria-labelledby="variant-h" style={css('display: flex; flex-direction: column; gap: 16px')}>
             <h3 id="variant-h" style={css('margin: 0; font-size: 12px; font-weight: 600; color: var(--text-3)')}>Variant</h3>
             <div style={css('display: flex; flex-direction: column; gap: 8px')}>
-              <span id="dim-l" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Dimension</span>
+              <LabelWithInfo term="Dimension"><span id="dim-l" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Dimension</span></LabelWithInfo>
               <Segmented fill labelledBy="dim-l" value={dim} onChange={setDim} options={[{ id: '1d', label: '1D' }, { id: '2d', label: '2D' }]} />
             </div>
             <div style={css('display: flex; flex-direction: column; gap: 8px')}>
-              <span id="scope-l" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Scope</span>
+              <LabelWithInfo term="Scope"><span id="scope-l" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Scope</span></LabelWithInfo>
               <Segmented fill wrap labelledBy="scope-l" value={scope} onChange={setScope} options={[{ id: 'direct', label: 'Asset Importance Rankings' }, { id: 'blast', label: 'Blast Radius' }]} />
               {blast && (
                 <div style={css('margin-top: 4px; display: flex; align-items: center; justify-content: space-between; gap: 8px')}>
-                  <span id="depth-l" style={css('font-size: 13px; color: var(--text-2)')}>Blast Radius Depth</span>
+                  <LabelWithInfo term="Blast Radius Depth"><span id="depth-l" style={css('font-size: 13px; color: var(--text-2)')}>Blast Radius Depth</span></LabelWithInfo>
                   <div role="group" aria-labelledby="depth-l" style={css('display: flex; align-items: center; border: 1px solid var(--control-border); border-radius: 6px; overflow: hidden')}>
                     <button type="button" aria-label="Fewer hops" disabled={depth <= 1} onClick={() => setDepth(depth - 1)} style={css('width: 32px; height: 32px; border: 0; background: var(--control-bg); color: var(--text-2); font: inherit; font-size: 16px; cursor: pointer')}>−</button>
                     <span aria-live="polite" style={css('min-width: 64px; text-align: center; font-size: 13px; font-weight: 600; color: var(--text); background: var(--control-bg); border-left: 1px solid var(--border); border-right: 1px solid var(--border); line-height: 32px')}>{depth} {depth === 1 ? 'Hop' : 'Hops'}</span>
@@ -597,14 +626,14 @@ export function DashboardPage() {
               )}
               {blast && (
                 <div style={css('margin-top: 4px; display: flex; flex-direction: column; gap: 8px')}>
-                  <span id="spread-l" style={css('font-size: 13px; color: var(--text-2)')}>Spreads</span>
+                  <LabelWithInfo term="Spreads"><span id="spread-l" style={css('font-size: 13px; color: var(--text-2)')}>Spreads</span></LabelWithInfo>
                   <Segmented fill labelledBy="spread-l" value={spread} onChange={setSpread}
-                    options={[{ id: 'follow', label: 'Along Links' }, { id: 'against', label: 'Against Links' }]} />
+                    options={[{ id: 'follow', label: 'Along Edges' }, { id: 'against', label: 'Against Edges' }]} />
                 </div>
               )}
             </div>
             <div style={css('display: flex; flex-direction: column; gap: 8px')}>
-              <span id="weight-l" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Weights</span>
+              <LabelWithInfo term="Weights"><span id="weight-l" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Weights</span></LabelWithInfo>
               <Segmented fill labelledBy="weight-l" value={weighted ? 'w' : 'u'} onChange={(v) => setWeighted(v === 'w')} options={[{ id: 'u', label: 'Unweighted' }, { id: 'w', label: 'Weighted' }]} />
             </div>
             <div style={css('padding: 12px 16px; background: var(--subtle); border-radius: 6px')}>
@@ -614,7 +643,7 @@ export function DashboardPage() {
           </section>
 
           <section aria-labelledby="ranks-h" style={css('display: flex; flex-direction: column; gap: 12px')}>
-            <h3 id="ranks-h" style={css('margin: 0; font-size: 12px; font-weight: 600; color: var(--text-3)')}>Highlight Ranks</h3>
+            <LabelWithInfo term="Highlight Ranks"><h3 id="ranks-h" style={css('margin: 0; font-size: 12px; font-weight: 600; color: var(--text-3)')}>Highlight Ranks</h3></LabelWithInfo>
             <Segmented fill label="Quick ranges" value={preset} onChange={(nn) => { setFromTxt('1'); setToTxt(String(nn)); setSel(null); }} options={presets} />
             <div style={css('display: flex; align-items: flex-end; gap: 12px')}>
               {([['rank-from', 'From Rank', fromTxt, setFromTxt], ['rank-to', 'To Rank', toTxt, setToTxt]] as const).map(([id, label, val, set], j) => (
@@ -642,7 +671,7 @@ export function DashboardPage() {
 
           <section aria-labelledby="types-h" style={css('display: flex; flex-direction: column; gap: 8px')}>
             <div style={css('display: flex; align-items: center; justify-content: space-between')}>
-              <h3 id="types-h" style={css('margin: 0; font-size: 12px; font-weight: 600; color: var(--text-3)')}>Edge Types</h3>
+              <LabelWithInfo term="Edge Types"><h3 id="types-h" style={css('margin: 0; font-size: 12px; font-weight: 600; color: var(--text-3)')}>Edge Types</h3></LabelWithInfo>
               {types && (
                 <button type="button" onClick={() => setTypes(null)} style={css('border: 0; padding: 0; background: none; font: inherit; font-size: 12px; font-weight: 600; color: var(--link); cursor: pointer')}>Reset</button>
               )}
@@ -658,12 +687,12 @@ export function DashboardPage() {
                   }} />
                   <span style={css('flex: 1; font-variant-numeric: tabular-nums')}>
                     Edge Type: <span style={css('font-weight: 600')}>{t}</span>
-                    <span style={css('color: var(--text-3)')}> | Assets: {result.edge_type_assets[t]} | Links: {result.edge_types[t]}</span>
+                    <span style={css('color: var(--text-3)')}> | Assets: {result.edge_type_assets[t]} | Edges: {result.edge_types[t]}</span>
                   </span>
                 </label>
               );
             })}
-            {types && <p style={css('margin: 0; font-size: 12px; line-height: 20px; color: var(--text-3)')}>Filtered: rankings use only the checked link types. All {n} assets still count.</p>}
+            {types && <p style={css('margin: 0; font-size: 12px; line-height: 20px; color: var(--text-3)')}>Filtered: rankings use only the checked edge types. All {n} assets still count.</p>}
           </section>
         </aside>
 
@@ -675,16 +704,19 @@ export function DashboardPage() {
                 <h2 id="rank-list-h" style={css('margin: 0; font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text-strong)')}>List of Most Important Critical Assets</h2>
                 <p style={css('margin: 2px 0 0; font-size: 12px; color: var(--text-3)')}>{rankingSubtitle(V, from, to, depth, spread === 'against')}</p>
                 <p style={css('margin: 2px 0 0; font-size: 12px; color: var(--text-3)')}>{IMPORTANCE_KEY}</p>
+                {V.kind === 'pareto' && <p style={css('margin: 2px 0 0; font-size: 12px; line-height: 18px; color: var(--text-3)')}>Front: {GLOSSARY.Front}</p>}
               </div>
               <button type="button" aria-label="Download ranking as CSV" onClick={exportCsv} style={css('flex: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); color: var(--text-2); cursor: pointer')}><Icon name="download" /></button>
             </div>
-            <div aria-hidden="true" style={css('display: grid; grid-template-columns: 30px minmax(0, 1fr) 64px 76px; gap: 12px; padding: 8px 20px; font-size: 12px; font-weight: 600; color: var(--text-3); border-bottom: 1px solid var(--divider)')}>
-              <span style={css('text-align: right')}>#</span><span>Asset</span><span style={css('text-align: center')}>Importance</span><span style={css('text-align: right')}>{showValues ? 'Score' : 'Centrality'}</span>
+            <div style={css('display: grid; grid-template-columns: 30px minmax(0, 1fr) 80px 76px; align-items: end; gap: 12px; padding: 8px 20px; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-3); border-bottom: 1px solid var(--divider)')}>
+              <span style={css('text-align: right')}>#</span><span>Asset</span>
+              <span style={css('justify-self: center; text-align: center')}>Assigned Importance <InfoTip term="Assigned Importance" /></span>
+              <span style={css('justify-self: end; text-align: right')}>{showValues ? 'Score' : <>Criticality <InfoTip term="Criticality" /></>}</span>
             </div>
             <ol style={css('list-style: none; margin: 0; padding: 4px 8px; max-height: 528px; overflow-y: auto')}>
               {range.map((i, j) => (
                 <li key={i}>
-                  <button type="button" aria-pressed={i === s} onClick={(e) => select(i, e.shiftKey)} style={css(`width: 100%; height: 44px; display: grid; grid-template-columns: 30px minmax(0, 1fr) 64px 76px; align-items: center; gap: 12px; padding: 0 12px; border: 0; border-radius: 6px; font: inherit; text-align: left; color: var(--text); cursor: pointer; background: ${i === s ? 'var(--row-selected)' : 'transparent'}`)}>
+                  <button type="button" aria-pressed={i === s} onClick={(e) => select(i, e.shiftKey)} style={css(`width: 100%; height: 44px; display: grid; grid-template-columns: 30px minmax(0, 1fr) 80px 76px; align-items: center; gap: 12px; padding: 0 12px; border: 0; border-radius: 6px; font: inherit; text-align: left; color: var(--text); cursor: pointer; background: ${i === s ? 'var(--row-selected)' : 'transparent'}`)}>
                     <span style={css('text-align: right; font-size: 12px; color: var(--text-3); font-variant-numeric: tabular-nums')}>{V.kind === 'scalar' ? V.rank[i] : from + j}</span>
                     <span style={css('min-width: 0')}>
                       <span style={css('display: block; font-size: 13px; font-weight: 600; color: var(--text)')}>{labels[i]}</span>
@@ -722,13 +754,13 @@ export function DashboardPage() {
               <div style={css('margin-top: 2px; font-size: 13px; color: var(--text-3)')}>{names[s]}{labels[s] !== result.ids[s] ? ` · ID ${result.ids[s]}` : ''}</div>
             </div>
             <dl style={css('margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px')}>
-              {([['Outgoing Links', result.out_links[s]], ['Incoming Links', result.in_links[s]], ['Asset Importance (From File)', `${LV_FULL[result.importance[s]]} (${result.importance[s]})`], [showValues ? `Importance (Centrality) · ${V.kind === 'scalar' ? 'Score' : 'Normalized Tuple'}` : 'Importance (Centrality)', showValues ? scoreText(s) : band[s]]] as const).map(([dt, dd]) => (
-                <div key={dt} style={css('padding: 8px 12px; border-radius: 6px; background: var(--subtle)')}><dt style={css('font-size: 12px; color: var(--text-3)')}>{dt}</dt><dd style={css('margin: 2px 0 0; font-size: 16px; font-weight: 600; color: var(--text-strong); font-variant-numeric: tabular-nums')}>{dd}</dd></div>
+              {([['Outgoing Edges', result.out_links[s]], ['Incoming Edges', result.in_links[s]], ['Assigned Importance', `${LV_FULL[result.importance[s]]} (${result.importance[s]})`], [showValues ? `Importance (Centrality) · ${V.kind === 'scalar' ? 'Score' : 'Normalized Tuple'}` : 'Importance (Centrality)', showValues ? scoreText(s) : band[s]]] as const).map(([dt, dd], k) => (
+                <div key={dt} style={css('padding: 8px 12px; border-radius: 6px; background: var(--subtle)')}><dt style={css('font-size: 12px; color: var(--text-3)')}>{dt}{k >= 2 && <> <InfoTip term={k === 2 ? 'Assigned Importance' : 'Criticality'} /></>}</dt><dd style={css('margin: 2px 0 0; font-size: 16px; font-weight: 600; color: var(--text-strong); font-variant-numeric: tabular-nums')}>{dd}</dd></div>
               ))}
             </dl>
             <div style={css('padding: 12px 16px; border: 1px solid var(--blast-box-border); border-radius: 6px; background: var(--blast-box-bg); display: flex; flex-direction: column; gap: 8px')}>
               <div style={css('display: flex; align-items: baseline; justify-content: space-between; gap: 8px')}>
-                <span style={css('font-size: 13px; font-weight: 600; color: var(--text)')}>Blast Radius ({depth} {depth === 1 ? 'Hop' : 'Hops'})</span>
+                <span style={css('font-size: 13px; font-weight: 600; color: var(--text)')}>Blast Radius ({depth} {depth === 1 ? 'Hop' : 'Hops'}) <InfoTip term="Blast Radius" /></span>
                 <span style={css('font-size: 12px; font-weight: 600; color: var(--orange-text)')}>{pct} of Network</span>
               </div>
               {Array.from({ length: depth }, (_, h) => {
@@ -743,7 +775,7 @@ export function DashboardPage() {
               })}
               <div style={css('font-size: 12px; color: var(--text-2)')}>
                 <span style={css('font-weight: 600; color: var(--text)')}>{down ? `${down} ${down === 1 ? 'Asset' : 'Assets'} ${Way}` : `No Assets ${Way}`}</span>
-                {down > 0 && ` (${hopBreakdown})`} · {result.blast[s].high} High Importance
+                {down > 0 && ` (${hopBreakdown})`} · {result.blast[s].high} with High Assigned Importance
               </div>
             </div>
             <table style={css('width: 100%; border-collapse: separate; border-spacing: 3px; table-layout: fixed; font-size: 12px; color: var(--text)')}>
@@ -785,7 +817,7 @@ export function DashboardPage() {
             <div style={css('display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px')}>
               <div>
                 <h2 id="dist-h" style={css('margin: 0; font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text-strong)')}>Importance Statistics for Network Assets</h2>
-                <p style={css('margin: 2px 0 0; font-size: 12px; color: var(--text-3)')}>How many assets are highly, moderately and weakly central · {vLabel}</p>
+                <p style={css('margin: 2px 0 0; font-size: 12px; color: var(--text-3)')}>How many assets are highly, moderately and weakly critical · {vLabel}</p>
               </div>
               <div style={css('display: flex; gap: 16px; font-size: 12px; color: var(--text-2)')}>
                 <span style={css('display: flex; align-items: center; gap: 8px')}><span style={css('width: 12px; height: 12px; border-radius: 2px; background: var(--orange)')} />Ranks {from}–{to}</span>
@@ -799,9 +831,9 @@ export function DashboardPage() {
               {([
                 [`Ranks ${from}–${to} Share of Total Score`, V.summary.top_share == null ? 'Not defined for 2D' : `${(V.summary.top_share * 100).toFixed(1)}%`],
                 !showValues
-                  ? ['Centrality in Selection', (['High', 'Medium', 'Low'] as const).filter((b) => range.some((i) => band[i] === b)).join(' to ').replace(/ to .* to /, ' to ')]
+                  ? ['Criticality in Selection', (['High', 'Medium', 'Low'] as const).filter((b) => range.some((i) => band[i] === b)).join(' to ').replace(/ to .* to /, ' to ')]
                   : [V.kind === 'scalar' ? 'Score Range in Selection' : 'Fronts in Selection', V.kind === 'scalar' ? `${V.summary.range[0].toFixed(3)}–${V.summary.range[1].toFixed(3)}` : `${V.summary.range[0]}–${V.summary.range[1]}`],
-                ['Assets with No Links', String(noLinks)],
+                ['Assets with No Edges', String(noLinks)],
               ] as const).map(([dt, dd]) => (
                 <div key={dt} style={css('padding: 12px 16px; border-radius: 6px; background: var(--subtle)')}><dt style={css('font-size: 12px; color: var(--text-3)')}>{dt}</dt><dd style={css('margin: 4px 0 0; font-size: 20px; font-weight: 600; color: var(--text-strong); font-variant-numeric: tabular-nums')}>{dd}</dd></div>
               ))}

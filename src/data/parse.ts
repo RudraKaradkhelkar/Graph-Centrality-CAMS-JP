@@ -358,21 +358,21 @@ export function buildDataset(linksTable: Table | null, assetsTable: Table | null
   const renamed = (Object.keys(LINK_FIELDS) as (keyof typeof LINK_FIELDS)[])
     .filter((k) => normalize(linksTable.text[lh][lc[k]!]) !== LINK_FIELDS[k].names[0])
     .map((k) => `${showHeader(linksTable.text[lh][lc[k]!])} → ${LINK_FIELDS[k].label}`);
-  if (missingEnds.length) err(`${plural(missingEnds.length, 'link')} without a Source or Target`, `Fill in both IDs on ${rowList(missingEnds)} of the Links sheet.`);
+  if (missingEnds.length) err(`${plural(missingEnds.length, 'edge')} without a Source or Target`, `Fill in both IDs on ${rowList(missingEnds)} of the Links sheet.`);
   for (const [label, rows] of badLevel) err(`${plural(rows.length, `${label} value`)} not 1, 2 or 3`, `Use 1, 2, 3 or Low, Medium, High on ${rowList(rows)} of the Links sheet.`);
-  if (selfLinks.length) err(`${plural(selfLinks.length, 'link')} from an asset to itself`, `Remove ${rowList(selfLinks)} of the Links sheet (Source and Target are the same).`);
-  if (dupLinks.length) err(`${plural(dupLinks.length, 'duplicate link')}`, `The same Source → Target pair appears again on ${rowList(dupLinks)} of the Links sheet. Keep one row per pair.`);
+  if (selfLinks.length) err(`${plural(selfLinks.length, 'edge')} from an asset to itself`, `Remove ${rowList(selfLinks)} of the Links sheet (Source and Target are the same).`);
+  if (dupLinks.length) err(`${plural(dupLinks.length, 'duplicate edge')}`, `The same Source → Target pair appears again on ${rowList(dupLinks)} of the Links sheet. Keep one row per pair.`);
   if (unknown.size) {
     const ids = [...unknown.keys()];
-    err(`${plural(ids.length, 'link ID')} missing from the asset list`, `${examples(ids)} ${ids.length === 1 ? 'is' : 'are'} used in Links (${rowList([...new Set([...unknown.values()].flat())].sort((a, b) => a - b))}) but not in the asset list.`);
+    err(`${plural(ids.length, 'edge ID')} missing from the asset list`, `${examples(ids)} ${ids.length === 1 ? 'is' : 'are'} used in Links (${rowList([...new Set([...unknown.values()].flat())].sort((a, b) => a - b))}) but not in the asset list.`);
   }
   if (!issues.some((i) => i.level === 'error')) {
-    ok(`Links: all 6 columns matched · ${plural(linksRows, 'directed link')}`,
+    ok(`Links: all 6 columns matched · ${plural(linksRows, 'directed edge')}`,
       `Each row is read as Source → Target: the target depends on the source.${renamed.length ? ` Matched ${renamed.join(', ')}.` : ''}`);
-    ok(`Asset list: ${plural(assets.length, 'asset')}, every link matched`, 'All IDs used in Source and Target appear in the asset list.');
+    ok(`Asset list: ${plural(assets.length, 'asset')}, every edge matched`, 'All IDs used in Source and Target appear in the asset list.');
     ok('Importance values are all 1, 2 or 3', 'Shown on the graph as L (1, Low), M (2, Medium) and H (3, High).');
   }
-  if (blankType.length) warn(`${plural(blankType.length, 'link')} without an edge type`, `${rowList(blankType)} of the Links sheet will be grouped as “Unspecified”.`);
+  if (blankType.length) warn(`${plural(blankType.length, 'edge')} without an edge type`, `${rowList(blankType)} of the Links sheet will be grouped as “Unspecified”.`);
 
   const typeCounts = new Map<string, number>();
   links.forEach((l) => typeCounts.set(l.type, (typeCounts.get(l.type) ?? 0) + 1));
@@ -383,9 +383,9 @@ export function buildDataset(linksTable: Table | null, assetsTable: Table | null
     const col = showHeader(assetsTable.text[ah][ac.importance]);
     const differs = assets.filter((a) => a.importance != null && levelsOf.has(a.id)
       && (levelsOf.get(a.id)!.size > 1 || !levelsOf.get(a.id)!.has(a.importance))).map((a) => a.id);
-    if (badNodeLevel.length) warn(`${plural(badNodeLevel.length, `${col} value`)} not 1, 2 or 3`, `Ignored on ${rowList(badNodeLevel)} of the asset list; the links' asset importance is used.`);
-    if (differs.length) warn(`${plural(differs.length, 'asset')}: asset list importance differs from the links`, `${examples(differs)}. The highest value is used.`);
-    else if (!badNodeLevel.length) ok('Asset importance matches the asset list', `${col} agrees with the source and target asset importance in the links for every asset.`);
+    if (badNodeLevel.length) warn(`${plural(badNodeLevel.length, `${col} value`)} not 1, 2 or 3`, `Ignored on ${rowList(badNodeLevel)} of the asset list; the Links sheet's asset importance is used.`);
+    if (differs.length) warn(`${plural(differs.length, 'asset')}: asset list importance differs from the Links sheet`, `${examples(differs)}. The highest value is used.`);
+    else if (!badNodeLevel.length) ok('Asset importance matches the asset list', `${col} agrees with the source and target asset importance in the Links sheet for every asset.`);
   }
 
   const conflicts = [...levelsOf].filter(([, v]) => v.size > 1).map(([id]) => id);
@@ -393,7 +393,7 @@ export function buildDataset(linksTable: Table | null, assetsTable: Table | null
 
   const linked = new Set(links.flatMap((l) => [l.source, l.target]));
   const unlinked = assets.filter((a) => !linked.has(a.id)).map((a) => a.id);
-  if (unlinked.length) warn(`${plural(unlinked.length, 'asset')} without any links`, `${examples(unlinked)} ${unlinked.length === 1 ? 'is' : 'are'} in the asset list but in no link. ${unlinked.length === 1 ? 'It still counts' : 'They still count'} in the network size (n), which every score is divided by.`);
+  if (unlinked.length) warn(`${plural(unlinked.length, 'asset')} without any edges`, `${examples(unlinked)} ${unlinked.length === 1 ? 'is' : 'are'} in the asset list but in no edge. ${unlinked.length === 1 ? 'It still counts' : 'They still count'} in the network size (n), which every score is divided by.`);
 
   if (ac.abbr != null) {
     const seen = new Map<string, number>();
@@ -423,7 +423,7 @@ export function buildDataset(linksTable: Table | null, assetsTable: Table | null
   positions ? 'The X, Y and Z columns place each asset on the graph.'
     : typeSource === 'column' ? 'Each asset type forms one cluster. Choose the lane for each type below.'
       : typeSource ? `No asset type column, so the part of each ID ${typeSource === 'id-prefix' ? 'before the first' : 'after the last'} underscore (without a trailing number) is used as its type; that end splits the assets into the fewest groups. Check the types and lanes below.`
-        : 'No asset type column: assets that only send links go in the top lane, assets that only receive go on the right, the rest in the middle.');
+        : 'No asset type column: assets with only outgoing edges go in the top lane, assets with only incoming edges go on the right, the rest in the middle.');
 
   return {
     dataset: { files, links, assets, hasTypes: typeSource != null, typeSource, hasAbbr: ac.abbr != null, hasPositions: positions, sample },

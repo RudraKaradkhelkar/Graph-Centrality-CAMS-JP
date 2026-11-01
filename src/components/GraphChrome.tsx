@@ -34,8 +34,8 @@ export function RingKey({ depth, T }: { depth: number; T: GraphTheme }) {
   );
 }
 
-/** Key for the L / M / H letters on spheres, links and in lists. */
-export const IMPORTANCE_KEY = 'Importance (From File): H = High · M = Medium · L = Low';
+/** Key for the L / M / H letters on spheres, edges and in lists. */
+export const IMPORTANCE_KEY = 'Assigned Importance: H = High · M = Medium · L = Low';
 
 /** Bottom-left legend in the graph's own colours. */
 export function GraphLegend({ T, from, to, levels, blast, depth = 2 }: { T: GraphTheme; from: number; to: number; levels: boolean; blast: boolean; depth?: number }) {

@@ -57,11 +57,11 @@ describe('row checks', () => {
 
   it('lists each problem with its Excel row numbers', () => {
     const byTitle = Object.fromEntries(r.issues.filter((i) => i.level === 'error').map((i) => [i.title, i.detail]));
-    expect(byTitle['1 link from an asset to itself']).toContain('row 4');
-    expect(byTitle['1 duplicate link']).toContain('row 5');
+    expect(byTitle['1 edge from an asset to itself']).toContain('row 4');
+    expect(byTitle['1 duplicate edge']).toContain('row 5');
     expect(byTitle['1 Edge importance value not 1, 2 or 3']).toContain('row 6');
-    expect(byTitle['1 link ID missing from the asset list']).toMatch(/^X is used in Links \(row 7\)/);
-    expect(byTitle['1 link without a Source or Target']).toContain('row 8');
+    expect(byTitle['1 edge ID missing from the asset list']).toMatch(/^X is used in Links \(row 7\)/);
+    expect(byTitle['1 edge without a Source or Target']).toContain('row 8');
   });
 
   it('rejects duplicate and missing asset IDs', () => {
@@ -72,7 +72,7 @@ describe('row checks', () => {
   it('warns about conflicting importance, unlinked assets and blank edge types', () => {
     const res = buildDataset(table('Links', [HEAD, ['A', 'B', 'P', 1, 1, 2], ['B', 'C', '', 1, 3, 1]]), assets('A', 'B', 'C', 'D'), files);
     expect(titles(res, 'error')).toEqual([]);
-    expect(titles(res, 'warning')).toEqual(['1 link without an edge type', '1 asset with conflicting importance values', '1 asset without any links']);
+    expect(titles(res, 'warning')).toEqual(['1 edge without an edge type', '1 asset with conflicting importance values', '1 asset without any edges']);
     expect(res.dataset!.links[1].type).toBe('Unspecified');
   });
 

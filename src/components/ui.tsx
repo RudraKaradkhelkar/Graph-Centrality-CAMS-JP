@@ -6,6 +6,7 @@ import {
   Info20Regular, Pause20Regular, Pin20Regular, Play20Regular, Subtract20Regular, Warning20Regular, WeatherMoon20Regular,
   WeatherSunny20Regular, ZoomFit20Regular, type FluentIcon,
 } from '@fluentui/react-icons';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useApp } from '../state';
 import { css } from './css';
 
@@ -20,9 +21,67 @@ export function titleCase(s: string) {
   return s.replace(/[A-Za-z][\w']*/g, (w, at: number) => (at > 0 && MINOR_WORDS.has(w.toLowerCase()) ? w : w[0].toUpperCase() + w.slice(1)));
 }
 
+/** A variant label from analyze() as shown in the UI: Title Case, and "edges" (the UI's word) for "links". */
+export function variantTitle(label: string) {
+  return titleCase(label).replace(/\bLinks\b/g, 'Edges');
+}
+
+/** Plain-language definitions behind the ⓘ buttons, written once and reused on every page. */
+export const GLOSSARY = {
+  'Degree Centrality': 'Ranks assets by their connections. An asset with more edges, and more important ones, sits at the centre of the network, so a failure there reaches more of it.',
+  Dimension: '1D gives each asset one score: its edges added up. 2D gives two scores: how important the assets its edges connect are, and how important the edges themselves are. In 2D an asset only ranks above another if it is at least as high on both.',
+  Scope: 'Asset Importance Rankings ranks each asset by its own edges. Blast Radius ranks each asset by everything it could affect, up to the Blast Radius Depth.',
+  Weights: 'Weighted: each edge counts by its importance (Low 1, Medium 2, High 3). Unweighted: every edge counts the same.',
+  'Highlight Ranks': 'Which ranks are shown in orange on the graph and listed in the ranking.',
+  'Blast Radius': 'The assets that could be affected if this asset fails: every asset that depends on it, directly or through others, up to the Blast Radius Depth.',
+  'Blast Radius Depth': 'How many steps a failure can travel. 1 hop reaches the assets that depend on it directly; 2 hops also reaches the assets that depend on those.',
+  Spreads: 'Along Edges: a failure travels from Source to Target, to the assets that depend on the failed one. Against Edges: it travels back to the assets the failed one depends on.',
+  'Edge Types': 'Each edge has a type from your file, such as Power or Control. Untick a type to rank using only the others; every asset still counts.',
+  'Assigned Importance': 'The Low / Medium / High importance given to each asset in your file. It is an input: CARMA uses it but never changes it.',
+  Criticality: 'Calculated by CARMA from the network: High, Medium or Low compared with the other assets in this network (the range of scores split into equal thirds).',
+  Front: 'Assets in the same front are tied: none of them beats another on both 2D scores. Front 1 is the most critical tier.',
+} as const;
+
+/** ⓘ button that shows a short definition on hover, focus or tap. Positioned fixed so card edges never clip it. */
+export function InfoTip({ term, text }: { term: keyof typeof GLOSSARY | string; text?: string }) {
+  const body = text ?? GLOSSARY[term as keyof typeof GLOSSARY];
+  const ref = useRef<HTMLButtonElement>(null);
+  const [at, setAt] = useState<{ left: number; top: number } | null>(null);
+  const show = () => {
+    const r = ref.current!.getBoundingClientRect();
+    setAt({ left: Math.max(8, Math.min(innerWidth - 288, r.left + r.width / 2 - 140)), top: r.bottom + 6 });
+  };
+  const hide = () => setAt(null);
+  useEffect(() => {
+    if (!at) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') hide(); };
+    addEventListener('scroll', hide, true);
+    addEventListener('keydown', onKey);
+    return () => { removeEventListener('scroll', hide, true); removeEventListener('keydown', onKey); };
+  }, [at]);
+  return (
+    <span style={css('display: inline-flex; vertical-align: middle')} onMouseEnter={show} onMouseLeave={hide}>
+      <button ref={ref} type="button" aria-label={`What is ${term}?`} aria-expanded={!!at} onFocus={show} onBlur={hide} onClick={(e) => { e.preventDefault(); if (at) hide(); else show(); }}
+        style={css('width: 16px; height: 16px; padding: 0; border: 0; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: var(--text-3); cursor: help')}>
+        <Icon name="info" size={14} />
+      </button>
+      {at && (
+        <span role="tooltip" style={{ ...css('position: fixed; z-index: 100; width: 280px; box-sizing: border-box; padding: 8px 12px; background: var(--popover-bg); border: 1px solid var(--popover-border); border-radius: 6px; box-shadow: var(--popover-shadow); font-size: 12px; line-height: 18px; font-weight: 400; letter-spacing: 0; text-align: left; white-space: normal; color: var(--text)'), left: at.left, top: at.top }}>
+          <span style={css('display: block; margin-bottom: 2px; font-weight: 600')}>{term}</span>{body}
+        </span>
+      )}
+    </span>
+  );
+}
+
+/** A form label followed by its ⓘ. */
+export function LabelWithInfo({ children, term, style }: { children: ReactNode; term: keyof typeof GLOSSARY; style?: string }) {
+  return <span style={css(`display: inline-flex; align-items: center; gap: 4px; ${style ?? ''}`)}>{children}<InfoTip term={term} /></span>;
+}
+
 /** Ranking subtitle, e.g. "Ranks 1–10 · 2D · Weighted · Blast Radius: 2 Hops". */
 export function rankingSubtitle(v: { dimension: string; weighted: boolean; scope: string }, from: number, to: number, depth: number, against: boolean) {
-  const blast = v.scope === 'blast' ? ` · Blast Radius: ${depth} ${depth === 1 ? 'Hop' : 'Hops'}${against ? ' (Against Links)' : ''}` : '';
+  const blast = v.scope === 'blast' ? ` · Blast Radius: ${depth} ${depth === 1 ? 'Hop' : 'Hops'}${against ? ' (Against Edges)' : ''}` : '';
   return `Ranks ${from}–${to} · ${v.dimension.toUpperCase()} · ${v.weighted ? 'Weighted' : 'Unweighted'}${blast}`;
 }
 

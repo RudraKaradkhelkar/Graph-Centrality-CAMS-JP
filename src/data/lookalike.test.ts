@@ -63,7 +63,7 @@ describe('asset importance in the asset list', () => {
   it('warns when it differs from the links, which win', () => {
     const r = buildDataset(table('Links', [head, ['A', 'B', 'P', 1, 3, 2]]), table('Nodes', [['Node ID', 'Node importance'], ['A', 1], ['B', 2]]), files);
     expect(errors(r.issues)).toEqual([]);
-    expect(r.issues.find((i) => i.level === 'warning')!.title).toBe('1 asset: asset list importance differs from the links');
+    expect(r.issues.find((i) => i.level === 'warning')!.title).toBe('1 asset: asset list importance differs from the Links sheet');
   });
 
   it('accepts Middle as a word for 2', () => {
