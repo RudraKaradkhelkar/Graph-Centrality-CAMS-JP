@@ -756,7 +756,7 @@ export function DashboardPage() {
                 </tr>
                 <tr>
                   <td />
-                  {['Unwtd', 'Wtd', 'Unwtd', 'Wtd'].map((h, j) => <th key={j} scope="col" style={css('padding: 2px 0; font-size: 12px; font-weight: 500; color: var(--text-3); text-align: right')}>{h}</th>)}
+                  {['Unwtd', 'Wtd', 'Unwtd', 'Wtd'].map((h, j) => <th key={j} scope="col" style={css('padding: 2px 0; font-size: 12px; font-weight: 500; color: var(--text-3); text-align: center')}>{h}</th>)}
                 </tr>
               </thead>
               <tbody style={css('font-variant-numeric: tabular-nums')}>
@@ -769,7 +769,7 @@ export function DashboardPage() {
                       const cell = variantCell(vk);
                       const on = vk === key;
                       return (
-                        <td key={vk} title={result.variants[vk].label} style={css(on ? 'padding: 8px 2px; text-align: right; border-radius: 6px; background: var(--cell-on-bg); box-shadow: inset 0 0 0 1.5px var(--cell-on-ring); color: var(--cell-on-text)' : 'padding: 8px 2px; text-align: right; border-radius: 6px; background: var(--subtle); color: var(--text)')}>
+                        <td key={vk} title={result.variants[vk].label} style={css(on ? 'padding: 8px 2px; text-align: center; border-radius: 6px; background: var(--cell-on-bg); box-shadow: inset 0 0 0 1.5px var(--cell-on-ring); color: var(--cell-on-text)' : 'padding: 8px 2px; text-align: center; border-radius: 6px; background: var(--subtle); color: var(--text)')}>
                           <div style={css('font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis')}>{cell.v}</div>
                           <div style={css('font-size: 12px; color: var(--text-3)')}>{cell.r}</div>
                         </td>
