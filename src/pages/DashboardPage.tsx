@@ -470,17 +470,17 @@ export function DashboardPage() {
   const preset = from === 1 && [10, 25, 50].includes(to) ? to : null;
   const ringPct = (c: number) => (down ? Math.round(c / down * 100) : 0);
 
-  // Present mode: only the graph, fitted and centred, with a caption; the affected-assets lists stay beside it
-  // while a blast cone is shown.
+  // Present mode: only the graph, filling the screen, fitted and centred, with a caption; the affected-assets lists
+  // stay beside it while a blast cone is shown.
   if (app.present) {
     const panel = blast && blastTargets.length > 0;
     const caption = pair ? `Blast Radii of ${labels[pinA!]} and ${labels[pairB!]}` : blast ? `Blast Radius of ${labels[s]}` : `Ranks ${from}–${to} Highlighted`;
     return (
-      <div style={css('position: fixed; inset: 0; z-index: 50; background: var(--graph-bg); display: flex; align-items: center; justify-content: center')}>
+      <div style={css('position: fixed; inset: 0; z-index: 50; background: var(--graph-bg); display: flex')}>
         <ExitPresent />
-        <div style={{ width: `min(calc(100vw - ${panel ? 380 : 0}px), calc(100vh * 1400 / 1200))` }}>
+        <div style={css('flex: 1; min-width: 0')}>
           <GraphView
-            data={sceneData} fitZ={geo.fitZ} fitH={geo.fitH} startZoom="fit" autoRotate rotateSpeed={6} theme={T} sel={s} from={from} to={to} weighted={weighted} showLevels={showLevels}
+            data={sceneData} fitZ={geo.fitZ} fitH={geo.fitH} startZoom="fit" height="100vh" autoRotate rotateSpeed={6} theme={T} sel={s} from={from} to={to} weighted={weighted} showLevels={showLevels}
             sizeByScore={sizeByScore} gatherCone={gatherCone} blastTargets={blastTargets} frameKey={blast ? blastTargets.join('-') : ''} view={view} labelStyle="inside"
             ariaLabel={(i) => `${labels[i]}, ${names[i]}, ${rankText(i).toLowerCase()}`}
             tip={(i) => ({ title: `${labels[i]} · ${names[i]}`, line: `${rankText(i)} · ${showValues ? `Score ${scoreText(i)}` : `Criticality ${band[i]}`} · Assigned Importance ${LV_FULL[result.importance[i]]}` })}
@@ -495,7 +495,7 @@ export function DashboardPage() {
           />
         </div>
         {panel && (
-          <aside aria-label="Affected assets" style={css('flex: none; width: 380px; height: 100vh; display: flex; flex-direction: column; border-left: 1px solid var(--border); background: var(--surface)')}>
+          <aside aria-label="Affected assets" style={css('flex: none; width: 380px; height: 100vh; padding-top: 56px; box-sizing: border-box; display: flex; flex-direction: column; border-left: 1px solid var(--border); background: var(--surface)')}>
             {blastPanelHint()}
             {blastTargets.map((x) => blastList(x))}
           </aside>

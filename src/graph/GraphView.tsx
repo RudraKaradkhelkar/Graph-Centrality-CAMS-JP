@@ -36,8 +36,8 @@ interface Props {
   fitH?: number;
   /** Zoom the view opens (and Reset view returns) at. The reference uses 1 (100%); 'fit' = Fit to screen. */
   startZoom?: number | 'fit';
-  /** Height in px; the drawing stays centred and the empty space above and below is trimmed. Default: 1400:1200. */
-  height?: number;
+  /** Height in px (or a CSS length); the drawing stays centred and the empty space above and below is trimmed. Default: 1400:1200. */
+  height?: number | string;
   /** Start rotating on mount (Present mode). */
   autoRotate?: boolean;
   /** Auto-rotate speed in degrees per second. */

@@ -77,7 +77,7 @@ export function ComparePage() {
     const sub = `${V.kind === 'scalar' ? 'Ranked by Score' : 'Ranked by Pareto Front, then Node Importance'} · Ranks ${V.k_from}–${V.k_to} Highlighted${sel != null ? ` · Blast Radius of ${labels[sel]} (${affected} ${affected === 1 ? 'asset' : 'assets'})` : ''}`;
     return (
       <GraphView
-        data={data} fitZ={geo.fitZ} fitH={geo.fitH} startZoom="fit" link={link} autoRotate={present} rotateSpeed={present ? 6 : undefined} theme={T} sel={sel ?? -1} from={V.k_from} to={V.k_to}
+        data={data} fitZ={geo.fitZ} fitH={geo.fitH} startZoom="fit" height={present ? '100vh' : undefined} link={link} autoRotate={present} rotateSpeed={present ? 6 : undefined} theme={T} sel={sel ?? -1} from={V.k_from} to={V.k_to}
         weighted showLevels sizeByScore gatherCone blastTargets={blastTargets} view="3d" labelStyle="inside"
         frameKey={lead && sel != null ? `${sel}-${present}` : ''}
         ariaLabel={(i) => `${labels[i]}, ${names[i]}, ${V.kind === 'scalar' ? `rank ${V.rank[i]}` : `order ${pos[i]}, front ${V.front![i]}`}`}
@@ -100,10 +100,10 @@ export function ComparePage() {
 
   if (app.present) {
     return (
-      <div style={css('position: fixed; inset: 0; z-index: 50; background: var(--graph-bg); display: flex; align-items: center; justify-content: center')}>
+      <div style={css('position: fixed; inset: 0; z-index: 50; background: var(--graph-bg); display: flex')}>
         <ExitPresent />
         {[[V1, scene1, pos1], [V2, scene2, pos2]].map(([V, data, pos], k) => (
-          <div key={k} style={{ width: 'min(50vw, calc(100vh * 1400 / 1200))' }}>{side(V as ReadyVariant, data as typeof scene1, pos as number[], true, k === 0)}</div>
+          <div key={k} style={css(`flex: 1; min-width: 0${k ? '; border-left: 1px solid var(--border)' : ''}`)}>{side(V as ReadyVariant, data as typeof scene1, pos as number[], true, k === 0)}</div>
         ))}
       </div>
     );
