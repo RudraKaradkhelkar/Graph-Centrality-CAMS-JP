@@ -164,7 +164,7 @@ export function UploadPage() {
           </p>
         </header>
 
-        <div style={css('display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; margin-top: 24px')}>
+        <div style={css('display: flex; flex-wrap: wrap; align-items: stretch; gap: 24px; margin-top: 24px')}>
           <div style={css('flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 24px')}>
 
             <section aria-labelledby="file-h" style={css(CARD)}>
@@ -302,6 +302,38 @@ export function UploadPage() {
                   </div>
                 </>
               )}
+            </section>
+
+            <section aria-labelledby="req-h" style={css(CARD + '; flex: 1 0 auto; display: flex; flex-direction: column')}>
+              <div style={css('display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px 20px')}>
+                <div style={css('min-width: 0')}>
+                  <h2 id="req-h" style={css('margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; color: var(--text-strong)')}>Expected Format</h2>
+                  <p style={css('margin: 4px 0 0; font-size: 13px; line-height: 20px; color: var(--text-3)')}>Excel (.xlsx, .xls) or CSV (UTF-8). Column names are matched automatically, ignoring case and spaces.</p>
+                </div>
+                <button type="button" onClick={downloadTemplate} style={css(BTN)}><Icon name="download" size={16} />Download Template</button>
+              </div>
+              <div style={css('margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 24px 32px')}>
+                <div>
+                  <h3 style={css('margin: 0; font-size: 13px; font-weight: 600; color: var(--text-label)')}>Links Sheet · One Row per Directed Edge</h3>
+                  <dl style={css('margin: 12px 0 0; display: flex; flex-direction: column; gap: 12px')}>
+                    {[['Source', 'Required. The asset ID the edge starts from.'], ['Target', 'Required. The asset ID that depends on the source.'], ['Edge Type', 'Required. Groups edges for filtering, such as Power or Control.'], ['Edge Importance', 'Required. 1, 2, 3 or Low, Medium, High. Used by the weighted metrics.'], ['Source and Target Asset Importance', 'Required. 1, 2, 3 or Low, Medium, High. Used by the 2D metrics.']].map(([t, dd]) => (
+                      <div key={t}><dt style={css('font-size: 13px; font-weight: 600; color: var(--text)')}>{t}</dt><dd style={css('margin: 2px 0 0; font-size: 12px; line-height: 20px; color: var(--text-2)')}>{dd}</dd></div>
+                    ))}
+                  </dl>
+                </div>
+                <div>
+                  <h3 style={css('margin: 0; font-size: 13px; font-weight: 600; color: var(--text-label)')}>Asset List · One Row per Asset</h3>
+                  <dl style={css('margin: 12px 0 0; display: flex; flex-direction: column; gap: 12px')}>
+                    {[['Asset ID', 'Required. Every ID used in Source and Target must be listed.'], ['Asset Name', 'Optional. The legend shows up to 5 words.'], ['Abbreviation', 'Optional. Labels on the graph, matching the architecture diagram.'], ['Asset Type', 'Optional. Groups assets into clusters on the graph.']].map(([t, dd]) => (
+                      <div key={t}><dt style={css('font-size: 13px; font-weight: 600; color: var(--text)')}>{t}</dt><dd style={css('margin: 2px 0 0; font-size: 12px; line-height: 20px; color: var(--text-2)')}>{dd}</dd></div>
+                    ))}
+                  </dl>
+                </div>
+              </div>
+              <div style={css('margin-top: 20px; display: flex; align-items: center; gap: 12px; padding: 12px 12px; border-radius: 6px; background: var(--subtle); font-size: 12px; color: var(--text-2)')}>
+                <span style={css('display: flex; gap: 4px')} aria-hidden="true">{[1, 2, 3].map((v) => <LevelChip key={v} lv={v} alt />)}</span>
+                Assigned importance 1, 2, 3 appears as Low, Medium, High.
+              </div>
             </section>
 
             {d && (
@@ -449,30 +481,6 @@ export function UploadPage() {
                     : !p ? `Load a network to analyze it. ${loadText}.`
                       : blocked ? `Fix the problems in the structure check, then upload the file again. ${loadText}.` : loadText}
                 </div>
-              </div>
-            </section>
-
-            <section aria-labelledby="req-h" style={css(CARD)}>
-              <h2 id="req-h" style={css('margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; color: var(--text-strong)')}>Expected Format</h2>
-              <p style={css('margin: 4px 0 0; font-size: 13px; line-height: 20px; color: var(--text-3)')}>Excel (.xlsx, .xls) or CSV (UTF-8). Column names are matched automatically, ignoring case and spaces.</p>
-              <h3 style={css('margin: 20px 0 0; font-size: 13px; font-weight: 600; color: var(--text-label)')}>Links Sheet · One Row per Directed Edge</h3>
-              <dl style={css('margin: 12px 0 0; display: flex; flex-direction: column; gap: 12px')}>
-                {[['Source', 'Required. The asset ID the edge starts from.'], ['Target', 'Required. The asset ID that depends on the source.'], ['Edge Type', 'Required. Groups edges for filtering, such as Power or Control.'], ['Edge Importance', 'Required. 1, 2, 3 or Low, Medium, High. Used by the weighted metrics.'], ['Source and Target Asset Importance', 'Required. 1, 2, 3 or Low, Medium, High. Used by the 2D metrics.']].map(([t, dd]) => (
-                  <div key={t}><dt style={css('font-size: 13px; font-weight: 600; color: var(--text)')}>{t}</dt><dd style={css('margin: 2px 0 0; font-size: 12px; line-height: 20px; color: var(--text-2)')}>{dd}</dd></div>
-                ))}
-              </dl>
-              <h3 style={css('margin: 20px 0 0; padding-top: 16px; border-top: 1px solid var(--divider); font-size: 13px; font-weight: 600; color: var(--text-label)')}>Asset List · One Row per Asset</h3>
-              <dl style={css('margin: 12px 0 0; display: flex; flex-direction: column; gap: 12px')}>
-                {[['Asset ID', 'Required. Every ID used in Source and Target must be listed.'], ['Asset Name', 'Optional. The legend shows up to 5 words.'], ['Abbreviation', 'Optional. Labels on the graph, matching the architecture diagram.'], ['Asset Type', 'Optional. Groups assets into clusters on the graph.']].map(([t, dd]) => (
-                  <div key={t}><dt style={css('font-size: 13px; font-weight: 600; color: var(--text)')}>{t}</dt><dd style={css('margin: 2px 0 0; font-size: 12px; line-height: 20px; color: var(--text-2)')}>{dd}</dd></div>
-                ))}
-              </dl>
-              <div style={css('margin-top: 20px; display: flex; align-items: center; gap: 12px; padding: 12px 12px; border-radius: 6px; background: var(--subtle); font-size: 12px; color: var(--text-2)')}>
-                <span style={css('display: flex; gap: 4px')} aria-hidden="true">{[1, 2, 3].map((v) => <LevelChip key={v} lv={v} alt />)}</span>
-                Assigned importance 1, 2, 3 appears as Low, Medium, High.
-              </div>
-              <div style={css('margin-top: 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px')}>
-                <button type="button" onClick={downloadTemplate} style={css(BTN)}><Icon name="download" size={16} />Download Template</button>
               </div>
             </section>
           </aside>
