@@ -150,8 +150,14 @@ export function AppBar() {
     <header style={css('height: 48px; padding: 0 24px; display: flex; align-items: baseline; gap: 12px; background: var(--surface); border-bottom: 1px solid var(--border); box-sizing: border-box')}>
       <span style={css('line-height: 48px; font-size: 16px; font-weight: 600; letter-spacing: 0.04em; color: var(--text-strong)')}>CARMA</span>
       <span style={css('font-size: 13px; color: var(--text-3)')}>{APP_TAGLINE}</span>
+      <Copyright style="margin-left: auto" />
     </header>
   );
+}
+
+/** Copyright line, top right of every page. */
+export function Copyright({ style = '' }: { style?: string }) {
+  return <span style={css(`font-size: 13px; color: var(--text-3); white-space: nowrap; ${style}`)}>Copyright © MIT</span>;
 }
 
 /** Page footer on Upload, Dashboard and Compare: who made CARMA. */

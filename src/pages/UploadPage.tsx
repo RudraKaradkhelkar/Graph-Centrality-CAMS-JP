@@ -2,7 +2,7 @@
 import { useRef, useState } from 'react';
 import { navigate } from '../App';
 import { css } from '../components/css';
-import { APP_TAGLINE, Footer, Icon, LabelWithInfo, LevelChip, LV, ParetoLink, Segmented, ThemeButton } from '../components/ui';
+import { APP_TAGLINE, Copyright, Footer, Icon, LabelWithInfo, LevelChip, LV, ParetoLink, Segmented, ThemeButton } from '../components/ui';
 import { downloadTemplate, loadSample } from '../data/dataset';
 import { fromTables, hasErrors, parseTwoFiles, readFile, shortName, type Issue, type ParseResult, type SourceFile, type Table } from '../data/parse';
 import { LANES, type Lane } from '../graph/seed';
@@ -141,8 +141,8 @@ export function UploadPage() {
     <div style={css('min-height: 100vh; display: flex; flex-direction: column; background: var(--page); color: var(--text)')}>
       <main style={css('width: 100%; max-width: 1200px; margin: 0 auto; padding: 16px 32px 40px; box-sizing: border-box')}>
         <header style={css('position: relative; padding: 16px 24px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; border-bottom: 1px solid var(--border)')}>
-          <div style={css('position: absolute; right: 0; top: 0')}><ThemeButton /></div>
-          <h1 style={css('margin: 0; font-size: 32px; line-height: 40px; font-weight: 700; letter-spacing: 0.04em; color: var(--text-strong)')}>CARMA</h1>
+          <div style={css('position: absolute; right: 0; top: 0; display: flex; align-items: center; gap: 12px')}><Copyright /><ThemeButton /></div>
+          <h1 style={css('margin: 16px 0 0; font-size: 64px; line-height: 72px; font-weight: 700; letter-spacing: 0.04em; color: var(--text-strong)')}>CARMA</h1>
           <p style={css('margin: 0; font-size: 16px; line-height: 24px; color: var(--text-2)')}>{APP_TAGLINE}</p>
           <ol aria-label="How it works" style={css('margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px 12px; font-size: 14px; line-height: 20px; color: var(--text-2)')}>
             {['Upload your network file', 'CARMA checks its structure', 'See your most critical assets and what each one affects'].map((t, k) => (
@@ -162,6 +162,12 @@ export function UploadPage() {
             or two <span style={css('font-weight: 600; color: var(--text-2)')}>.csv</span> files in UTF-8 (choose Two Files below). Up to 100 MB each.
             <br />Files are read in your browser and never uploaded anywhere.
           </p>
+          <div role="note" aria-label="Sensitive data" style={css('margin-top: 4px; max-width: 760px; display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border: 1px solid var(--warn); border-radius: 6px; background: var(--band-medium-bg); text-align: left')}>
+            <Icon name="warn" size={20} width={1.8} stroke="var(--warn)" style="flex: none; margin-top: 2px" />
+            <p style={css('margin: 0; font-size: 13px; line-height: 20px; color: var(--text)')}>
+              <span style={css('font-weight: 600')}>Handle With Care: </span>You are entering sensitive, proprietary infrastructure data. Only use files you are authorized to work with, and treat the results, exports and screenshots as carefully as the file itself.
+            </p>
+          </div>
         </header>
 
         <div style={css('display: flex; flex-wrap: wrap; align-items: stretch; gap: 24px; margin-top: 24px')}>
