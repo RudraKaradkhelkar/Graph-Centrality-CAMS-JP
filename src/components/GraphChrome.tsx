@@ -26,7 +26,7 @@ export function RingKey({ depth, T }: { depth: number; T: GraphTheme }) {
       <span style={css('font-weight: 600; color: var(--text)')}>Blast Cone Rings (on the graph):</span>
       {Array.from({ length: depth }, (_, h) => (
         <span key={h} style={css('display: inline-flex; align-items: center; gap: 6px')}>
-          <span aria-hidden="true" style={{ width: 8 + h * 4, height: 8 + h * 4, borderRadius: '50%', border: `1.5px dashed rgb(${T.cone})`, boxSizing: 'border-box' }} />
+          <span aria-hidden="true" style={{ width: 10 + h * 4, height: 10 + h * 4, borderRadius: '50%', border: `1.5px dashed rgb(${T.cone})`, boxSizing: 'border-box' }} />
           Ring {h + 1} = {h + 1} {h ? 'Hops' : 'Hop'}{h === 0 ? ' (Inner)' : h === depth - 1 && depth > 1 ? ' (Outer)' : ''}
         </span>
       ))}

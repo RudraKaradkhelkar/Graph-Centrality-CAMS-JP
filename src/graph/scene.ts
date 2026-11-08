@@ -243,7 +243,7 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
     const pal = isH1 ? T.e1 : (isH2 ? T.e2 : T.e0);
     const w = st.weighted ? [0, 2.6, 3.8, 5][lv] : 3.4;
     const base = 0.9 - 0.5 * depth((P[a].d + P[b].d) / 2);
-    const op = isH1 || isH2 ? 1 : (inner ? base + (0.5 - base) * focus : base + (0.07 - base) * focus);
+    const op = isH1 || isH2 ? 1 : (inner ? base + (0.5 - base) * focus : base + (0.14 - base) * focus);
     const grad = 'linear-gradient(to bottom, ' + pal[0] + ' 0%, ' + pal[1] + ' 55%, ' + pal[2] + ' 100%)';
     const aw = 7 + w * 1.5, ah = 6 + w * 1.3;
     edges.push({
@@ -269,7 +269,7 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
     const q = P[k], n = N[k], on = inRange(k), isSel = k === sel || targets.includes(k), ctx = blastOn && !inBlast(k);
     const c = on ? T.org : T.sph[n.bin];
     const op0 = on || isSel ? 1 : 1 - 0.3 * depth(q.d);
-    const op = ctx ? op0 + ((on ? 0.45 : 0.16) - op0) * focus : op0;
+    const op = ctx ? op0 + ((on ? 0.6 : 0.34) - op0) * focus : op0;
     const sh = T.shadow + (on && T.glow && !ctx ? ', ' + T.glow : '') + (isSel ? ', 0 0 0 2px ' + T.ringGap + ', 0 0 0 4px ' + T.ring + ', 0 0 0 12px ' + T.halo : '');
     let lab = '', ls = 'display: none';
     if (weighted && !(ctx && focus > 0.5)) {

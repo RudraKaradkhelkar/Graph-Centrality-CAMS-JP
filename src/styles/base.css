@@ -44,8 +44,8 @@ tbody tr:hover > td { background: var(--row-hover); }
 .graph-nodes { pointer-events: auto; }
 .graph-nodes button:hover { filter: none; }
 .graph-cone-label {
-  display: inline-block; padding: 2px 8px; border-radius: 9px; background: var(--orange-soft-bg);
-  border: 1px solid var(--cone-label-border); font-size: 11px; font-weight: 600; color: var(--orange-text); white-space: nowrap;
+  display: inline-block; padding: 3px 10px; border-radius: 12px; background: var(--orange-soft-bg);
+  border: 1px solid var(--cone-label-border); font-size: 14px; font-weight: 600; color: var(--orange-text); white-space: nowrap;
 }
 .graph-tip {
   padding: 8px 12px; background: var(--popover-bg); border: 1px solid var(--popover-border); border-radius: 6px;

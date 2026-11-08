@@ -276,12 +276,12 @@ export function DashboardPage() {
   const blastPanelHint = () => {
     const a = notice ? notice.a : pinA;
     if (a == null) {
-      return <p style={css('margin: 0; padding: 12px 16px; font-size: 12px; line-height: 20px; color: var(--text-3); border-bottom: 1px solid var(--divider)')}>Pin an asset (or Shift-click a second one) to show two separate blast radii side by side.</p>;
+      return <p style={css('margin: 0; padding: 12px 16px; font-size: 13px; line-height: 20px; color: var(--text-3); border-bottom: 1px solid var(--divider)')}>Pin an asset (or Shift-click a second one) to show two separate blast radii side by side.</p>;
     }
     if (pair && !notice) return null;
     const sug = suggestFor(a);
     return (
-      <div role="status" style={css(`padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; font-size: 12px; line-height: 20px; border-bottom: 1px solid var(--divider); background: ${notice ? 'var(--band-medium-bg)' : 'var(--subtle)'}; color: var(--text)`)}>
+      <div role="status" style={css(`padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; line-height: 20px; border-bottom: 1px solid var(--divider); background: ${notice ? 'var(--band-medium-bg)' : 'var(--subtle)'}; color: var(--text)`)}>
         <span>
           {notice
             ? `${labels[notice.k]} shares ${notice.shared} affected ${notice.shared === 1 ? 'asset' : 'assets'} with ${labels[a]}, so they can't be shown side by side. Showing ${labels[notice.k]} only.`
@@ -304,26 +304,26 @@ export function DashboardPage() {
       <section key={x} aria-label={`Blast radius of ${labels[x]}`} style={css('flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; border-bottom: 1px solid var(--divider)')}>
         <div style={css('padding: 12px 16px 12px; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--divider)')}>
           <div style={css('min-width: 0')}>
-            <div style={css('font-size: 13px; font-weight: 600; color: var(--text)')}>Blast Radius of {labels[x]}: {total} {total === 1 ? 'Asset' : 'Assets'}</div>
-            <div style={css('margin-top: 2px; font-size: 12px; color: var(--text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap')}>{names[x]} · {chipText(x)} · {depth} {depth === 1 ? 'Hop' : 'Hops'} {Way} · {vLabel}</div>
+            <div style={css('font-size: 16px; font-weight: 600; color: var(--text)')}>Blast Radius of {labels[x]}: {total} {total === 1 ? 'Asset' : 'Assets'}</div>
+            <div style={css('margin-top: 2px; font-size: 13px; color: var(--text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap')}>{names[x]} · {chipText(x)} · {depth} {depth === 1 ? 'Hop' : 'Hops'} {Way} · {vLabel}</div>
           </div>
           <button type="button" aria-label={`Download the blast radius of ${labels[x]} as CSV`} onClick={() => exportBlast(x)} style={css('flex: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); color: var(--text-2); cursor: pointer')}><Icon name="download" size={14} /></button>
         </div>
         <div style={css('flex: 1; min-height: 0; overflow-y: auto; padding: 0 8px 8px')}>
           {rs.map((ring, h) => (
             <div key={h}>
-              <div style={css('position: sticky; top: 0; z-index: 1; padding: 8px 8px 4px; background: var(--surface); font-size: 12px; font-weight: 600; color: var(--text-2)')}>
+              <div style={css('position: sticky; top: 0; z-index: 1; padding: 8px 8px 4px; background: var(--surface); font-size: 14px; font-weight: 600; color: var(--text-2)')}>
                 Ring {h + 1} · {h + 1} {h ? 'Hops' : 'Hop'}{h === 0 ? ' (Inner)' : ''} <span style={css('font-weight: 500; color: var(--text-3)')}>· {ring.length} {ring.length === 1 ? 'Asset' : 'Assets'}</span>
               </div>
               {ring.map(([a, p, t, w]) => (
                 <button key={a} type="button" onClick={(e) => select(a, e.shiftKey)} title={`${labels[a]} · ${names[a]}`}
                   style={css(`width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; align-items: center; padding: 8px 8px; border: 0; border-radius: 6px; background: ${a === s ? 'var(--row-selected)' : 'transparent'}; font: inherit; text-align: left; color: var(--text); cursor: pointer`)}>
-                  <span style={css('font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap')}>{labels[a]}</span>
+                  <span style={css('font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap')}>{labels[a]}</span>
                   <span style={css('justify-self: end')}>{showValues ? <span style={css('font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums')}>{scoreText(a)}</span> : <BandChip band={band[a]} size="sm" />}</span>
-                  <span style={css('font-size: 12px; color: var(--text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap')}>
+                  <span style={css('font-size: 13px; color: var(--text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap')}>
                     {names[a]}{assetsById.get(result.ids[a])?.type ? ` · ${assetsById.get(result.ids[a])!.type}` : ''} · via {labels[p]} ({result.link_types[t]}, {LV[w]})
                   </span>
-                  <span style={css('justify-self: end; font-size: 12px; color: var(--text-3); font-variant-numeric: tabular-nums')}>{rankText(a)}</span>
+                  <span style={css('justify-self: end; font-size: 13px; color: var(--text-3); font-variant-numeric: tabular-nums')}>{rankText(a)}</span>
                 </button>
               ))}
             </div>
@@ -342,9 +342,9 @@ export function DashboardPage() {
             <div style={css('font-size: 12px; color: var(--text-3); white-space: nowrap')}>Degree Centrality · Ranks {from}–{to} Highlighted</div>
             <div style={css('margin-top: 2px; font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap')}>{metricTitle}</div>
           </div>
-          <div data-ui="1" style={css(`width: 252px; max-width: 100%; ${OVERLAY}; background: var(--overlay-96); border-radius: 6px; overflow: hidden; cursor: default`)}>
-            <button type="button" aria-expanded={legendOpen} onClick={() => setLegendOpen(!legendOpen)} style={css('width: 100%; height: 40px; padding: 0 12px; display: flex; align-items: center; justify-content: space-between; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer')}>
-              <span style={css('display: flex; align-items: center; gap: 8px')}>Asset Legend <span style={css('font-size: 12px; font-weight: 500; color: var(--text-3)')}>{n}</span></span>
+          <div data-ui="1" style={css(`width: 280px; max-width: 100%; ${OVERLAY}; background: var(--overlay-96); border-radius: 6px; overflow: hidden; cursor: default`)}>
+            <button type="button" aria-expanded={legendOpen} onClick={() => setLegendOpen(!legendOpen)} style={css('width: 100%; height: 40px; padding: 0 12px; display: flex; align-items: center; justify-content: space-between; border: 0; background: transparent; font: inherit; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer')}>
+              <span style={css('display: flex; align-items: center; gap: 8px; white-space: nowrap')}>Jump to Asset <span style={css('font-size: 13px; font-weight: 500; color: var(--text-3)')}>({n} assets)</span></span>
               <Icon name="chevronDown" size={14} width={2} stroke="var(--text-3)" style={`transition: transform 150ms; transform: rotate(${legendOpen ? 180 : 0}deg)`} />
             </button>
             {legendOpen && (
@@ -423,18 +423,18 @@ export function DashboardPage() {
       </div>
 
       <div style={css('position: absolute; left: 20px; right: 20px; bottom: 20px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: end; gap: 12px; pointer-events: none')}>
-        <div data-ui="1" style={css(`justify-self: start; box-sizing: border-box; ${OVERLAY}; padding: 12px 16px; border-radius: 6px; display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: var(--text-2); white-space: nowrap; cursor: default`)}>
+        <div data-ui="1" style={css(`justify-self: start; box-sizing: border-box; ${OVERLAY}; padding: 12px 16px; border-radius: 6px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--text-2); white-space: nowrap; cursor: default`)}>
           <div style={css('display: flex; align-items: center; gap: 16px')}>
             <span style={css('display: flex; align-items: center; gap: 8px')}>
-              <span aria-hidden="true" style={{ width: 8, height: 8, borderRadius: '50%', background: T.sph[1][1] }} />
-              <span aria-hidden="true" style={{ width: 16, height: 16, borderRadius: '50%', background: T.sph[1][1] }} />
+              <span aria-hidden="true" style={{ width: 10, height: 10, borderRadius: '50%', background: T.sph[1][1] }} />
+              <span aria-hidden="true" style={{ width: 18, height: 18, borderRadius: '50%', background: T.sph[1][1] }} />
               Size = Score
             </span>
             <span style={css('display: flex; align-items: center; gap: 8px')}>
-              <span aria-hidden="true" style={{ width: 12, height: 12, borderRadius: '50%', background: T.org[1] }} />
+              <span aria-hidden="true" style={{ width: 14, height: 14, borderRadius: '50%', background: T.org[1] }} />
               Ranks {from}–{to}
             </span>
-            <span style={css('display: flex; align-items: center; gap: 8px')}><span aria-hidden="true" style={{ width: 8, height: 8, borderRadius: '50%', border: `2px solid ${T.ring}` }} />Selected</span>
+            <span style={css('display: flex; align-items: center; gap: 8px')}><span aria-hidden="true" style={{ width: 10, height: 10, borderRadius: '50%', border: `2px solid ${T.ring}` }} />Selected</span>
             <span style={css('display: flex; align-items: center; gap: 8px')}>
               <span aria-hidden="true" style={{ position: 'relative', width: 20, height: 4, borderRadius: 2, background: T.e0[1] }}>
                 <span style={{ position: 'absolute', right: -3, top: '50%', width: 7, height: 8, marginTop: -4, clipPath: 'polygon(0 0, 100% 50%, 0 100%)', background: T.e0[2] }} />
@@ -444,7 +444,7 @@ export function DashboardPage() {
           </div>
           {blast && (
             <div style={css('display: flex; align-items: center; gap: 8px')}>
-              <span aria-hidden="true" style={{ width: 22, height: 12, clipPath: 'polygon(0 50%, 100% 0, 100% 100%)', background: `rgba(${T.cone}, 0.6)` }} />
+              <span aria-hidden="true" style={{ width: 26, height: 14, clipPath: 'polygon(0 50%, 100% 0, 100% 100%)', background: `rgba(${T.cone}, 0.6)` }} />
               Blast Cone: {app.theme === 'dark' ? 'Brightest' : 'Darkest'} at the Asset
             </div>
           )}
@@ -457,7 +457,7 @@ export function DashboardPage() {
           )}
         </div>
 
-        <div data-ui="1" className="gv-narrow-hide" style={css(`justify-self: center; min-width: 0; max-width: 100%; box-sizing: border-box; overflow: hidden; text-overflow: ellipsis; ${OVERLAY}; padding: 8px 16px; border-radius: 6px; font-size: 12px; white-space: nowrap; color: var(--text-3); cursor: default`)}>
+        <div data-ui="1" className="gv-narrow-hide" style={css(`justify-self: center; min-width: 0; max-width: 100%; box-sizing: border-box; overflow: hidden; text-overflow: ellipsis; ${OVERLAY}; padding: 8px 16px; border-radius: 6px; font-size: 14px; white-space: nowrap; color: var(--text-2); cursor: default`)}>
           {info.nameTier ? `Top ${info.nameTier} named, zoom in for more` : 'All assets named'} · Click to select · Drag to rotate · Ctrl + scroll to zoom
         </div>
 
@@ -597,7 +597,7 @@ export function DashboardPage() {
       </div>
       {blast && (
         // Beside the graph so both cones and both lists fit one screen (deliverable 2).
-        <aside aria-label="Affected assets" style={css('position: relative; flex: none; width: 380px; align-self: stretch; border-left: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface)')}>
+        <aside aria-label="Affected assets" style={css('position: relative; flex: none; width: 440px; align-self: stretch; border-left: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface)')}>
           <div style={css('position: absolute; inset: 0; display: flex; flex-direction: column')}>
             {blastPanelHint()}
             {blastTargets.map((x) => blastList(x))}
