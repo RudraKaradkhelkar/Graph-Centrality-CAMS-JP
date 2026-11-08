@@ -167,7 +167,7 @@ export function SnapshotPage({ params }: { params: URLSearchParams }) {
           <span style={css('display: flex; align-items: center; gap: 8px')}><span style={css('width: 12px; height: 12px; border-radius: 2px; background: var(--hist-other)')} />Other Assets</span>
         </div>
       </div>
-      <DistributionChart bare dist={V.distribution} options={{}} onOptions={() => {}} criticalLeft onCriticalLeft={() => {}}
+      <DistributionChart bare dist={V.distribution} options={{}} onOptions={() => {}} criticalLeft
         showNumbers={showValues} variantLabel={variantTitle(V.label)} kFrom={from} kTo={to} busy={false} theme={app.theme} />
     </section>
   );

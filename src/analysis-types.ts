@@ -119,9 +119,13 @@ export type Variant = PendingVariant | ReadyVariant;
 /** [asset index, parent index, link type index (into link_types), link importance] */
 export type RingMember = [number, number, number, number];
 
+/** Each asset's full blast radius summed (every hop): 2D adds link importance, 1D only asset importance. */
+export type ReachTotals = Record<'1d-u' | '1d-w' | '2d-u' | '2d-w', number[]>;
+
 export interface AnalysisResult {
   n: number;
   m: number;
+  reach_total: ReachTotals;
   options: Required<Omit<AnalyzeOptions, 'assets'>>;
   ids: string[];
   importance: number[];

@@ -15,6 +15,8 @@ import { useApp } from '../state';
 
 const CARD = 'background: var(--surface); border: 1px solid var(--border); border-radius: 6px; box-shadow: var(--card-shadow)';
 const OVERLAY = 'pointer-events: auto; background: var(--overlay-94); box-shadow: var(--overlay-shadow); border: 1px solid var(--border)';
+const TOWER_H = 'margin: 0; font-size: 14px; line-height: 20px; font-weight: 600; color: var(--text-strong)';
+const TOWER_SUB = 'margin: 2px 0 0; font-size: 12px; line-height: 18px; color: var(--text-3)';
 const NAV_BTN = 'width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); color: var(--text); cursor: pointer';
 const TOOL_BTN = 'width: 32px; height: 28px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 6px; background: transparent; color: var(--text-2); cursor: pointer';
 const CHECK = 'width: 16px; height: 16px; margin: 0; accent-color: var(--check)';
@@ -60,7 +62,6 @@ export function DashboardPage() {
   const [notice, setNotice] = useState<{ k: number; a: number; shared: number } | null>(null);
   // Distribution chart: options per variant (cut-offs, scale, bins, exclusions, zoom) and the latest counts.
   const [chartOpts, setChartOpts] = useState<Partial<Record<VariantKey, ChartOptions>>>({});
-  const [criticalLeft, setCriticalLeft] = useState(true);
   const [chartRes, setChartRes] = useState<{ v: ReadyVariant; optsKey: string; dist: Distribution } | null>(null);
   const [chartBusy, setChartBusy] = useState(false);
   const [legendOpen, setLegendOpen] = useState(false);
@@ -135,6 +136,19 @@ export function DashboardPage() {
     return () => { live = false; };
   }, [V, optsKey]); // eslint-disable-line react-hooks/exhaustive-deps
   const dist = chartRes && chartRes.v === V && chartRes.optsKey === optsKey ? chartRes.dist : V.distribution;
+  // Second tower: each asset's full blast radius total (every hop, whatever the depth), drawn the same way.
+  const reachValues = result.reach_total[`${V.dimension}-${V.weighted ? 'w' : 'u'}`];
+  const [reachOpt, setReachOpt] = useState<ChartOptions>({});
+  const reachOptKey = JSON.stringify(reachOpt);
+  const [reachRes, setReachRes] = useState<{ values: number[]; v: ReadyVariant; optsKey: string; dist: Distribution } | null>(null);
+  useEffect(() => {
+    let live = true;
+    distribution(reachValues, 'score', { ...reachOpt, top: V.top_k })
+      .then((d) => { if (live) setReachRes({ values: reachValues, v: V, optsKey: reachOptKey, dist: d }); })
+      .catch(() => { /* keep the last chart */ });
+    return () => { live = false; };
+  }, [reachValues, V, reachOptKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  const reachDist = reachRes && reachRes.values === reachValues && reachRes.v === V ? reachRes.dist : null;
   // Bands everywhere follow the chart's cut-offs (never its exclusions or zoom).
   const band = dist.band;
 
@@ -822,16 +836,33 @@ export function DashboardPage() {
             <div style={css('display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px')}>
               <div>
                 <h2 id="dist-h" style={css('margin: 0; font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text-strong)')}>Importance Statistics for Network Assets</h2>
-                <p style={css('margin: 2px 0 0; font-size: 12px; color: var(--text-3)')}>How many assets are highly, moderately and weakly critical · {vLabel}</p>
+                <p style={css('margin: 2px 0 0; font-size: 12px; color: var(--text-3)')}>How many assets are highly, moderately, and weakly critical, and how far each one's failure reaches · {vLabel}</p>
               </div>
               <div style={css('display: flex; gap: 16px; font-size: 12px; color: var(--text-2)')}>
                 <span style={css('display: flex; align-items: center; gap: 8px')}><span style={css('width: 12px; height: 12px; border-radius: 2px; background: var(--orange)')} />Ranks {from}–{to}</span>
                 <span style={css('display: flex; align-items: center; gap: 8px')}><span style={css('width: 12px; height: 12px; border-radius: 2px; background: var(--hist-other)')} />Other Assets</span>
               </div>
             </div>
-            <DistributionChart key={V.key} dist={dist} options={chartOpt} onOptions={(o) => setChartOpts({ ...chartOpts, [V.key]: o })}
-              criticalLeft={criticalLeft} onCriticalLeft={setCriticalLeft} showNumbers={showValues} variantLabel={vLabel}
-              kFrom={from} kTo={to} busy={chartBusy} theme={app.theme} />
+            <div style={css('margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(460px, 100%), 1fr)); gap: 16px 40px')}>
+              <div style={css('min-width: 0')}>
+                <h3 style={css(TOWER_H)}>Asset Criticality</h3>
+                <p style={css(TOWER_SUB)}>Assets by criticality, most critical on the left.</p>
+                <DistributionChart key={V.key} dist={dist} options={chartOpt} onOptions={(o) => setChartOpts({ ...chartOpts, [V.key]: o })}
+                  criticalLeft showNumbers={showValues} variantLabel={vLabel}
+                  kFrom={from} kTo={to} busy={chartBusy} theme={app.theme} />
+              </div>
+              <div style={css('min-width: 0')}>
+                <h3 style={css(TOWER_H)}>Asset Blast Radius</h3>
+                <p style={css(TOWER_SUB)}>
+                  {V.dimension === '2d' ? 'Importance of every asset and link' : 'Importance of every asset'} each asset's failure reaches, all hops ({V.weighted ? 'L 1, M 2, H 3' : 'each counts 1'}).
+                </p>
+                {reachDist
+                  ? <DistributionChart key={`reach-${V.key}`} dist={reachDist} options={reachOpt} onOptions={setReachOpt}
+                      criticalLeft showNumbers variantLabel={vLabel} kFrom={from} kTo={to} busy={false} theme={app.theme}
+                      xTitle={`Blast Radius Total (All Hops), ${vLabel}`} zeroLabel="reaches none" exportName="carma-blast-radius-distribution" />
+                  : <p style={css('margin: 16px 0 0; font-size: 13px; color: var(--text-3)')}>Counting…</p>}
+              </div>
+            </div>
             <dl style={css('margin: 20px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 12px')}>
               {([
                 [`Ranks ${from}–${to} Share of Total Score`, V.summary.top_share == null ? 'Not defined for 2D' : `${(V.summary.top_share * 100).toFixed(1)}%`],

@@ -1,7 +1,7 @@
-// Distribution chart: how many assets are highly, moderately and weakly central.
+// Distribution chart: how many assets are highly, moderately, and weakly critical (and, reused, blast radius totals).
 // It only draws. Every bar, zone count, tick and exclusion count comes from distribution() in carma_metrics.py.
 // Zone cut-offs are calculated (equal thirds of the assets shown), never set by hand.
-import { useMemo, useRef, useState, type PointerEvent as RPointerEvent } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, type PointerEvent as RPointerEvent } from 'react';
 import type { Band, ChartOptions, DistBar, Distribution, ExclusionRule } from '../analysis-types';
 import { css } from './css';
 import { Icon, Segmented } from './ui';
@@ -10,8 +10,8 @@ interface Props {
   dist: Distribution;
   options: ChartOptions;
   onOptions(o: ChartOptions): void;
+  /** Most critical on the left (the dashboard always draws it so). */
   criticalLeft: boolean;
-  onCriticalLeft(v: boolean): void;
   /** Numeric ticks follow the dashboard's Show values toggle. */
   showNumbers: boolean;
   variantLabel: string;
@@ -22,9 +22,16 @@ interface Props {
   theme: string;
   /** Chart only, no controls (snapshots). */
   bare?: boolean;
+  /** X axis title instead of the variant's score or front. */
+  xTitle?: string;
+  /** Label under the zero bar. */
+  zeroLabel?: string;
+  /** File name for PNG / SVG downloads, without extension. */
+  exportName?: string;
 }
 
-const VB_W = 1000, VB_H = 360, PL = 70, PR = 20, PT = 22, PB = 268;
+// The drawing is as wide as the chart on screen (VB_W, measured), so text stays at its set size in narrow columns.
+const VB_H = 360, PL = 70, PR = 20, PT = 22, PB = 268;
 const FONT = "'Segoe UI Variable Text', 'Segoe UI', -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif";
 const BANDS: Band[] = ['Low', 'Medium', 'High'];
 const SMALL_BTN = 'height: 32px; padding: 0 12px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 12px; font-weight: 600; color: var(--text); cursor: pointer';
@@ -78,6 +85,15 @@ export function DistributionChart(p: Props) {
   const isScore = dist.axis === 'score';
   const log = dist.scale === 'log';
   const svgRef = useRef<SVGSVGElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [VB_W, setVbW] = useState(1000);
+  useLayoutEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setVbW(Math.max(420, Math.round(el.clientWidth))));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   const [xTitle, setXTitle] = useState<string | null>(null);
   const [yTitle, setYTitle] = useState<string | null>(null);
   const [zoomSel, setZoomSel] = useState<{ x0: number; x1: number } | null>(null);
@@ -86,7 +102,7 @@ export function DistributionChart(p: Props) {
   const [ruleValue, setRuleValue] = useState('');
 
   const defaultX = isScore ? `Degree Centrality Score, ${p.variantLabel}` : `Pareto Front (1 = Most Critical), ${p.variantLabel}`;
-  const X_TITLE = xTitle ?? defaultX, Y_TITLE = yTitle ?? 'Number of Assets';
+  const X_TITLE = xTitle ?? p.xTitle ?? defaultX, Y_TITLE = yTitle ?? 'Number of Assets';
 
   // ---- Horizontal layout: main bars, plus the zero bar at the low-score end. --------------------------
   const zero = isScore && dist.zero_bar && !dist.zero_bar.excluded ? dist.zero_bar : null;
@@ -170,7 +186,7 @@ export function DistributionChart(p: Props) {
   const removeRule = (k: number) => set({ exclude: (options.exclude ?? []).filter((_, j) => j !== k) });
 
   const serialize = () => new XMLSerializer().serializeToString(svgRef.current!);
-  const exportSvg = () => download(new Blob([serialize()], { type: 'image/svg+xml' }), 'carma-distribution.svg');
+  const exportSvg = () => download(new Blob([serialize()], { type: 'image/svg+xml' }), `${p.exportName ?? 'carma-distribution'}.svg`);
   const exportPng = () => {
     const img = new Image();
     img.onload = () => {
@@ -178,7 +194,7 @@ export function DistributionChart(p: Props) {
       canvas.width = VB_W * 2; canvas.height = VB_H * 2;
       const ctx = canvas.getContext('2d')!;
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob((b) => b && download(b, 'carma-distribution.png'), 'image/png');
+      canvas.toBlob((b) => b && download(b, `${p.exportName ?? 'carma-distribution'}.png`), 'image/png');
     };
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(serialize());
   };
@@ -203,26 +219,15 @@ export function DistributionChart(p: Props) {
     );
   };
 
-  // Fronts: at most one bar per front in view.
-  const maxBins = isScore ? 60 : dom ? dom[1] - dom[0] + 1 : 1;
   const hasRules = (options.exclude ?? []).length > 0 || !!options.zoom;
   const isDefault = !hasRules && !options.bins && (options.scale ?? 'linear') === 'linear';
 
   return (
     <div>
       {!p.bare && <div style={css('display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 16px')}>
-        <span style={css('display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2)')}>Most Critical
-          <Segmented label="Most critical side" value={p.criticalLeft ? 'left' : 'right'} onChange={(v) => p.onCriticalLeft(v === 'left')}
-            options={[{ id: 'left', label: 'Left' }, { id: 'right', label: 'Right' }]} />
-        </span>
         <span style={css('display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2)')}>Scale
           <Segmented label="Scale" value={dist.scale} onChange={(v) => set({ scale: v })} options={[{ id: 'linear', label: 'Linear' }, { id: 'log', label: 'Log' }]} />
-          {dist.suggest_log && dist.scale === 'linear' && <span style={css('font-size: 12px; color: var(--info-icon)')}>Log suggested: scores span 2+ orders of magnitude</span>}
-        </span>
-        <span role="group" aria-label="Number of bins" style={css('display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2)')}>Bins
-          <button type="button" aria-label="Fewer bins" disabled={dist.bars.length <= 3} onClick={() => set({ bins: Math.max(3, dist.bars.length - 1) })} style={css(SMALL_BTN + '; width: 32px; padding: 0; justify-content: center')}>−</button>
-          <span style={css('min-width: 24px; text-align: center; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums')}>{dist.bars.length}</span>
-          <button type="button" aria-label="More bins" disabled={dist.bars.length >= maxBins} onClick={() => set({ bins: Math.min(maxBins, dist.bars.length + 1) })} style={css(SMALL_BTN + '; width: 32px; padding: 0; justify-content: center')}>+</button>
+          {dist.suggest_log && dist.scale === 'linear' && <span style={css('font-size: 12px; color: var(--info-icon)')}>Log suggested</span>}
         </span>
         {isScore && (
           <span style={css('display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2)')}>
@@ -268,7 +273,7 @@ export function DistributionChart(p: Props) {
         </div>
       )}
 
-      <div style={css('position: relative; margin-top: 12px')}>
+      <div ref={wrapRef} style={css('position: relative; margin-top: 12px')}>
         {p.busy && <span style={css('position: absolute; right: 8px; top: 4px; font-size: 12px; color: var(--text-3)')}>Updating…</span>}
         <svg ref={svgRef} xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 ${VB_W} ${VB_H}`} width={VB_W} height={VB_H} fontFamily={FONT}
           role="img" aria-label={`${X_TITLE}: ${dist.zones.map((z) => `${z.band} ${z.count}`).join(', ')}`}
@@ -321,7 +326,7 @@ export function DistributionChart(p: Props) {
               </text>
             );
           })}
-          {zero && <text x={zeroX + ZW / 2} y={PB + 20} textAnchor="middle" fontSize={12} fill={C.text3} pointerEvents="none">score 0</text>}
+          {zero && <text x={zeroX + ZW / 2} y={PB + 20} textAnchor="middle" fontSize={12} fill={C.text3} pointerEvents="none">{p.zeroLabel ?? 'score 0'}</text>}
           {p.showNumbers && (
             <g pointerEvents="none">
               {/* With the zero bar shown, its own "0" label replaces a 0 tick on the main axis. */}

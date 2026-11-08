@@ -348,3 +348,23 @@ def test_analyze_bands_come_from_its_distribution():
     v = analyze(SMALL)["variants"]["1d-direct-w"]
     assert v["band"] == v["distribution"]["band"]
     assert v["distribution"]["total"] == 4
+
+
+def test_reach_totals_follow_every_hop_and_count_loops_once():
+    # A -> B -> C -> A is a loop; C -> D leaves it. Asset importance A 3, B 2, C 1, D 3.
+    links = [link("A", "B", 3, 3, 2), link("B", "C", 2, 2, 1), link("C", "A", 1, 1, 3), link("C", "D", 2, 1, 3)]
+    r = analyze(links, {"depth": 1})
+    t = {k: dict(zip(r["ids"], v)) for k, v in r["reach_total"].items()}
+    # A reaches B, C and D (2 + 1 + 3 = 6) over all 4 links (3 + 2 + 1 + 2 = 8), whatever the depth setting.
+    assert (t["1d-u"]["A"], t["1d-w"]["A"], t["2d-u"]["A"], t["2d-w"]["A"]) == (3, 6, 7, 14)
+    assert (t["1d-w"]["C"], t["2d-w"]["C"]) == (8, 16)
+    assert (t["1d-u"]["D"], t["2d-w"]["D"]) == (0, 0)
+    # Spreading against the links, D reaches C, B and A (1 + 2 + 3) over the same 4 links.
+    back = analyze(links, {"blast_direction": "against"})
+    assert dict(zip(back["ids"], back["reach_total"]["2d-w"]))["D"] == 14
+
+
+def test_reach_totals_follow_the_edge_type_filter():
+    links = [link("A", "B", 3, 3, 2, kind="Power"), link("B", "C", 2, 2, 1, kind="Control")]
+    r = analyze(links, {"edge_types": ["Power"]})
+    assert dict(zip(r["ids"], r["reach_total"]["2d-w"]))["A"] == 2 + 3

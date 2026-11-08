@@ -207,6 +207,7 @@ def analyze(links: list[dict], options: dict | None = None) -> dict:
         "link_types": list(edge_type_counts),
         "warnings": warnings,
         "variants": variants,
+        "reach_total": reach_totals(G, ids, adj),
         # Compact on purpose (large networks): each ring member is [asset, parent, link type index, importance],
         # with asset/parent as indices into ids and the link type as an index into link_types.
         "blast": [
@@ -331,6 +332,36 @@ def blast_reach(adj: dict, source: str, depth: int) -> list[list[tuple[str, str,
         seen.update(found)
         frontier = list(found)
     return rings
+
+
+def reach_totals(G: nx.DiGraph, ids: list[str], adj: dict) -> dict[str, list[int]]:
+    """Each asset's FULL blast radius summed up, for the statistics' second chart (Dr. Pal, 2026-11-06).
+
+    Reach R(a): every asset reachable from a along `adj` (the Spreads direction), every hop until it ends, whatever
+    the depth setting; a itself excluded. Links L(a): every link leaving a or an asset in R(a) in that direction,
+    including links back to a or to an asset already reached. Each asset and link counts once, so loops can't
+    double-count. Weighted sums use importance 1, 2, 3 (L, M, H); unweighted ones count 1 each:
+      2D: importance of R(a) + importance of L(a)        1D: importance of R(a)
+    Keys follow the variants: "1d-u", "1d-w", "2d-u", "2d-w".
+    """
+    out: dict[str, list[int]] = {"1d-u": [], "1d-w": [], "2d-u": [], "2d-w": []}
+    for a in ids:
+        seen, stack = {a}, [a]
+        n_links = link_weight = 0
+        while stack:
+            for v, w, _, _ in adj[stack.pop()]:
+                n_links += 1
+                link_weight += w
+                if v not in seen:
+                    seen.add(v)
+                    stack.append(v)
+        reached = len(seen) - 1
+        weight = sum(G.nodes[v]["importance"] for v in seen if v != a)
+        out["1d-u"].append(reached)
+        out["1d-w"].append(weight)
+        out["2d-u"].append(reached + n_links)
+        out["2d-w"].append(weight + link_weight)
+    return out
 
 
 def blast_decay(adj: dict, source: str, depth: int) -> dict[str, float]:
