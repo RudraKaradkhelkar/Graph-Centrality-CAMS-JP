@@ -155,3 +155,12 @@ describe('sheets and files', () => {
     expect(r.dataset!.assets).toHaveLength(120);
   });
 });
+
+describe('public version', () => {
+  it('needs both asset and link importance', () => {
+    const noImportance = buildDataset(table('Links', [['Source', 'Target', 'Edge type'], ['A', 'B', 'P']]), assets('A', 'B'), files);
+    expect(noImportance.issues[0].detail).toContain('needs both asset importance and link importance');
+    const blank = buildDataset(table('Links', [HEAD, ['A', 'B', 'P', '', 2, 2]]), assets('A', 'B'), files);
+    expect(blank.issues.find((i) => i.level === 'error')!.detail).toContain('Blank cells aren’t allowed'.replace('’', "'"));
+  });
+});

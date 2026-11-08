@@ -207,6 +207,8 @@ export function findSheet(tables: Table[], kind: 'links' | 'assets'): Table | nu
 }
 
 const SHEET_NAME = { links: 'Link Sheet', assets: 'Asset Sheet' } as const;
+const IMPORTANCE_KEYS = ['importance', 'source_importance', 'target_importance'];
+const PUBLIC_NEEDS_BOTH = 'The public version of CARMA needs both asset importance and link importance.';
 
 /**
  * The sheet to use from the file uploaded as the Link Sheet or the Asset Sheet, or the problem to fix: an empty file,
@@ -350,7 +352,8 @@ export function buildDataset(linksTable: Table | null, assetsTable: Table | null
   const missingLink = (Object.keys(LINK_FIELDS) as (keyof typeof LINK_FIELDS)[]).filter((k) => lc[k] == null);
   if (missingLink.length) {
     err(`Link Sheet: ${plural(missingLink.length, 'required column')} missing`,
-      `Missing ${missingLink.map((k) => LINK_FIELDS[k].label).join(', ')}. Columns found: ${lh >= 0 ? linksTable.text[lh].filter((c) => c != null).map(showHeader).join(', ') : 'none'}.`);
+      `Missing ${missingLink.map((k) => LINK_FIELDS[k].label).join(', ')}. Columns found: ${lh >= 0 ? linksTable.text[lh].filter((c) => c != null).map(showHeader).join(', ') : 'none'}.`
+      + (missingLink.some((k) => IMPORTANCE_KEYS.includes(k)) ? ` ${PUBLIC_NEEDS_BOTH}` : ''));
   }
 
   // --- Assets ---
@@ -436,7 +439,8 @@ export function buildDataset(linksTable: Table | null, assetsTable: Table | null
   if (missingEnds.length) err(`${plural(missingEnds.length, 'edge')} without a Source or Target`, `Fill in both IDs on ${rowList(missingEnds)} of the Link Sheet.`);
   for (const [label, b] of badLevel) {
     err(`${plural(b.rows.length, `${label} value`)} not L, M, H or 1, 2, 3`,
-      `Found ${quoted([...b.values])} on ${rowList(b.rows)} of the Link Sheet. Use L, M, H (Low, Medium, High, any case) or 1, 2, 3.`);
+      `Found ${quoted([...b.values])} on ${rowList(b.rows)} of the Link Sheet. Use L, M, H (Low, Medium, High, any case) or 1, 2, 3.`
+      + (b.values.has('') ? ` Blank cells aren't allowed: ${PUBLIC_NEEDS_BOTH.charAt(0).toLowerCase()}${PUBLIC_NEEDS_BOTH.slice(1)}` : ''));
   }
   if (selfLinks.length) err(`${plural(selfLinks.length, 'edge')} from an asset to itself`, `Remove ${rowList(selfLinks)} of the Link Sheet (Source and Target are the same).`);
   if (dupLinks.length) err(`${plural(dupLinks.length, 'duplicate edge')}`, `The same Source → Target pair appears again on ${rowList(dupLinks)} of the Link Sheet. Keep one row per pair.`);

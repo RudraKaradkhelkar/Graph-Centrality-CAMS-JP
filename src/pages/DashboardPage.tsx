@@ -47,10 +47,10 @@ export function DashboardPage() {
   const ds = app.dataset!;
   const T = app.theme === 'dark' ? DARK : LIGHT;
 
-  const [dim, setDim] = useState<Dimension>(app.setup.dim);
+  // Production is 2D Weighted only; the research branch keeps the 1D / 2D and Weights toggles.
+  const dim = '2d' as Dimension;
   const [scope, setScope] = useState<Scope>('direct');
-  const [weightedChoice, setWeighted] = useState(app.setup.weighted);
-  const weighted = weightedChoice; // opens weighted; Unweighted is one click away, also in demo mode
+  const weighted = true;
   const showValues = app.showValues;
   const [view, setView] = useState<'3d' | 'flat'>('3d');
   const [fromTxt, setFromTxt] = useState(String(result.options.k_from));
@@ -203,14 +203,6 @@ export function DashboardPage() {
   const reachCount = (x: number) => result.blast[x].rings.reduce((t, r) => t + r.length, 0);
   const navStat = pair ? `${labels[pinA!]}: ${reachCount(pinA!)} · ${labels[pairB!]}: ${reachCount(pairB!)} ${Way}`
     : blast ? (down ? `${down} ${Way} · ${pct} of Network` : `No ${Way} Assets`) : `${linksOf(s)} ${linksOf(s) === 1 ? 'Direct Edge' : 'Direct Edges'}`;
-
-  const variantCell = (vk: VariantKey) => {
-    const v = result.variants[vk];
-    if (v.status === 'pending') return { v: 'Pending', r: 'supervisor' };
-    const r = v.kind === 'scalar' ? `#${v.rank[s]}` : `#${v.order.indexOf(s) + 1}`;
-    if (!showValues) return { v: (vk === V.key ? band : v.band)[s], r };
-    return { v: v.kind === 'scalar' ? v.score![s].toFixed(3) : `Front ${v.front![s]}`, r };
-  };
 
   const metricTitle = variantTitle(chosen.label);
   const dimTxt = dim === '1d'
@@ -543,15 +535,10 @@ export function DashboardPage() {
           </div>
         </div>
         <div style={css('margin-left: auto; display: flex; flex-wrap: wrap; gap: 8px')}>
-          {!app.demo && (
-            <span title="Unweighted variants are shown. Remove ?research from the address for demo mode."
-              style={css('height: 36px; padding: 0 12px; display: inline-flex; align-items: center; border-radius: 6px; background: var(--blue-soft-bg); color: var(--blue-soft-text); font-size: 13px; font-weight: 600')}>Research Mode</span>
-          )}
           {!guideOpen && (
             <button type="button" onClick={() => showGuide(true)} style={css('height: 36px; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer')}><Icon name="info" size={16} />How to Read This Dashboard</button>
           )}
           <button type="button" onClick={() => navigate('/upload')} style={css('height: 36px; padding: 0 16px; display: inline-flex; align-items: center; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer')}>Replace Data</button>
-          <button type="button" onClick={() => navigate('/compare')} style={css('height: 36px; padding: 0 16px; display: inline-flex; align-items: center; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer')}>Compare 1D vs 2D</button>
           <PresentButton />
           <ThemeButton />
         </div>
@@ -627,12 +614,7 @@ export function DashboardPage() {
             </div>
           </div>
 
-          <section aria-labelledby="variant-h" style={css('display: flex; flex-direction: column; gap: 16px')}>
-            <h3 id="variant-h" style={css('margin: 0; font-size: 12px; font-weight: 600; color: var(--text-3)')}>Variant</h3>
-            <div style={css('display: flex; flex-direction: column; gap: 8px')}>
-              <LabelWithInfo term="Dimension"><span id="dim-l" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Dimension</span></LabelWithInfo>
-              <Segmented fill labelledBy="dim-l" value={dim} onChange={setDim} options={[{ id: '1d', label: '1D' }, { id: '2d', label: '2D' }]} />
-            </div>
+          <section aria-label="Scope" style={css('display: flex; flex-direction: column; gap: 16px')}>
             <div style={css('display: flex; flex-direction: column; gap: 8px')}>
               <LabelWithInfo term="Scope"><span id="scope-l" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Scope</span></LabelWithInfo>
               <Segmented fill labelledBy="scope-l" value={scope} onChange={setScope} options={[{ id: 'direct', label: 'Asset Criticality' }, { id: 'blast', label: 'Asset Blast Radius' }]} />
@@ -653,10 +635,6 @@ export function DashboardPage() {
                     options={[{ id: 'follow', label: 'Along Edges' }, { id: 'against', label: 'Against Edges' }]} />
                 </div>
               )}
-            </div>
-            <div style={css('display: flex; flex-direction: column; gap: 8px')}>
-              <LabelWithInfo term="Weights"><span id="weight-l" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Weights</span></LabelWithInfo>
-              <Segmented fill labelledBy="weight-l" value={weighted ? 'w' : 'u'} onChange={(v) => setWeighted(v === 'w')} options={[{ id: 'u', label: 'Unweighted' }, { id: 'w', label: 'Weighted' }]} />
             </div>
             <div style={css('padding: 12px 16px; background: var(--subtle); border-radius: 6px')}>
               <div style={css('font-size: 13px; font-weight: 600; color: var(--text)')}>{metricTitle}</div>
@@ -797,39 +775,6 @@ export function DashboardPage() {
                 {down > 0 && ` (${hopBreakdown})`} · {result.blast[s].high} with High Assigned Importance
               </div>
             </div>
-            <table style={css('width: 100%; border-collapse: separate; border-spacing: 3px; table-layout: fixed; font-size: 12px; color: var(--text)')}>
-              <caption style={css('caption-side: top; text-align: left; padding: 0 4px 4px; font-size: 12px; font-weight: 600; color: var(--text-2)')}>All Degree Variants · Score and Rank</caption>
-              <colgroup><col style={{ width: '30%' }} /><col /><col /><col /><col /></colgroup>
-              <thead>
-                <tr>
-                  <td />
-                  {['1D', '2D'].map((h) => <th key={h} scope="colgroup" colSpan={2} style={css('padding: 2px 0; font-size: 12px; font-weight: 600; color: var(--text-2); text-align: center; border-bottom: 1px solid var(--border)')}>{h}</th>)}
-                </tr>
-                <tr>
-                  <td />
-                  {['Unwtd', 'Wtd', 'Unwtd', 'Wtd'].map((h, j) => <th key={j} scope="col" style={css('padding: 2px 0; font-size: 12px; font-weight: 500; color: var(--text-3); text-align: center')}>{h}</th>)}
-                </tr>
-              </thead>
-              <tbody style={css('font-variant-numeric: tabular-nums')}>
-                {(['direct', 'blast'] as const).map((sc) => (
-                  <tr key={sc}>
-                    <th scope="row" style={css('padding: 0 4px 0 0; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); text-align: left')}>{sc === 'direct' ? 'Asset Criticality' : 'Asset Blast Radius'}</th>
-                    {(['1d-u', '1d-w', '2d-u', '2d-w'] as const).map((dw) => {
-                      const [d, w] = dw.split('-');
-                      const vk = `${d}-${sc}-${w}` as VariantKey;
-                      const cell = variantCell(vk);
-                      const on = vk === key;
-                      return (
-                        <td key={vk} title={result.variants[vk].label} style={css(on ? 'padding: 8px 2px; text-align: center; border-radius: 6px; background: var(--cell-on-bg); box-shadow: inset 0 0 0 1.5px var(--cell-on-ring); color: var(--cell-on-text)' : 'padding: 8px 2px; text-align: center; border-radius: 6px; background: var(--subtle); color: var(--text)')}>
-                          <div style={css('font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis')}>{cell.v}</div>
-                          <div style={css('font-size: 12px; color: var(--text-3)')}>{cell.r}</div>
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </section>
 
           <section aria-labelledby="dist-h" style={css(`grid-column: 1 / -1; min-width: 0; ${CARD}; padding: 20px 24px 24px; box-sizing: border-box`)}>
