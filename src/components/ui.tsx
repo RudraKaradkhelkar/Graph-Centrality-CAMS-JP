@@ -30,7 +30,8 @@ export function variantTitle(label: string) {
 export const GLOSSARY = {
   'Degree Centrality': 'Ranks assets by their connections. An asset with more edges, and more important ones, sits at the centre of the network, so a failure there reaches more of it.',
   Dimension: '1D gives each asset one score: its edges added up. 2D gives two scores: how important the assets its edges connect are, and how important the edges themselves are. In 2D an asset only ranks above another if it is at least as high on both.',
-  Scope: 'Asset Importance Rankings ranks each asset by its own edges. Blast Radius ranks each asset by everything it could affect, up to the Blast Radius Depth.',
+  'Managerial Requirement': 'What CARMA measures to rank your assets. Asset Degree Centrality ranks assets by their connections: the more (and more important) edges an asset has, the more of the network its failure reaches.',
+  Scope: 'Asset Criticality ranks each asset by its own edges. Asset Blast Radius ranks each asset by everything it could affect, up to the Blast Radius Depth.',
   Weights: 'Weighted: each edge counts by its importance (Low 1, Medium 2, High 3). Unweighted: every edge counts the same.',
   'Highlight Ranks': 'Which ranks are shown in orange on the graph and listed in the ranking.',
   'Blast Radius': 'The assets that could be affected if this asset fails: every asset that depends on it, directly or through others, up to the Blast Radius Depth.',

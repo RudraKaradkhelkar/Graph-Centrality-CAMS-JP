@@ -355,7 +355,8 @@ export function DashboardPage() {
           </div>
         </div>
 
-        <div data-ui="1" role="group" aria-label="Selected asset" style={css('justify-self: center; min-width: 0; max-width: 100%; pointer-events: auto; min-height: 44px; padding: 6px 8px 6px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; background: var(--overlay-97); border: 1px solid var(--border); border-radius: 6px; box-shadow: var(--selbar-shadow); white-space: nowrap; box-sizing: border-box; cursor: default')}>
+        <div style={css('justify-self: center; min-width: 0; max-width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px')}>
+        <div data-ui="1" role="group" aria-label="Selected asset" style={css(' min-width: 0; max-width: 100%; pointer-events: auto; min-height: 44px; padding: 6px 8px 6px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; background: var(--overlay-97); border: 1px solid var(--border); border-radius: 6px; box-shadow: var(--selbar-shadow); white-space: nowrap; box-sizing: border-box; cursor: default')}>
           <span style={css(`display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text-2)`)}>
             <span aria-hidden="true" style={css(blast ? 'width: 16px; height: 12px; clip-path: polygon(0 50%, 100% 0, 100% 100%); background: var(--orange)' : 'width: 16px; height: 3px; border-radius: 2px; background: var(--score-bar)')} />
             {blast ? 'Blast Radius' : 'Direct Edges'}
@@ -382,6 +383,12 @@ export function DashboardPage() {
               <button type="button" aria-label={`Unpin ${labels[pinA]}`} onClick={unpin} style={css('width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 5px; background: transparent; color: inherit; cursor: pointer')}><Icon name="close" size={12} width={2.2} /></button>
             </span>
           ))}
+        </div>
+        {range.length > 1 && (
+          <div data-ui="1" style={css(`${OVERLAY}; padding: 4px 12px; border-radius: 6px; font-size: 13px; color: var(--text-2); white-space: nowrap; cursor: default`)}>
+            Use the arrows to step through the {range.length} orange assets one at a time.
+          </div>
+        )}
         </div>
 
         <div data-ui="1" className="gv-tools" style={css('justify-self: end; display: flex; gap: 8px; pointer-events: auto; cursor: default')}>
@@ -586,20 +593,21 @@ export function DashboardPage() {
       </div>
 
       <div style={css('padding: 24px; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px')}>
-        <aside aria-labelledby="inputs-h" style={css(`flex: 1 1 320px; min-width: 0; ${CARD}; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px`)}>
-          <div>
-            <h2 id="inputs-h" style={css('margin: 0; font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text-strong)')}>Inputs</h2>
-            <p role="status" aria-live="polite" style={css(`margin: 2px 0 0; font-size: 12px; color: ${app.error ? 'var(--warn)' : 'var(--text-3)'}`)}>
-              {app.error ? `Analysis failed: ${app.error}` : app.busy ? 'Updating results…' : 'Choose what to measure and which assets to highlight.'}
+        <aside aria-label="Controls" style={css(`flex: 1 1 340px; min-width: 0; ${CARD}; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px`)}>
+          {(app.error || app.busy) && (
+            <p role="status" aria-live="polite" style={css(`margin: 0; font-size: 12px; color: ${app.error ? 'var(--warn)' : 'var(--text-3)'}`)}>
+              {app.error ? `Analysis failed: ${app.error}` : 'Updating results…'}
             </p>
-          </div>
+          )}
 
           <div style={css('display: flex; flex-direction: column; gap: 8px')}>
-            <LabelWithInfo term="Degree Centrality"><label htmlFor="measure" style={css('font-size: 12px; font-weight: 600; color: var(--text-3)')}>Centrality Measure</label></LabelWithInfo>
+            <LabelWithInfo term="Managerial Requirement"><label htmlFor="measure" style={css('font-size: 13px; font-weight: 600; color: var(--text-label); white-space: nowrap')}>Managerial Requirement</label></LabelWithInfo>
             <div style={css('position: relative')}>
               <select id="measure" defaultValue="degree" style={css('width: 100%; height: 36px; padding: 0 36px 0 12px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 14px; font-weight: 600; color: var(--text); appearance: none; -webkit-appearance: none')}>
-                <option value="degree">Degree Centrality</option>
-                <option disabled>Betweenness Centrality - In Development</option>
+                <option value="degree">Asset Degree Centrality</option>
+                <option disabled>Asset Betweenness Centrality (Coming soon)</option>
+                <option disabled>Asset Radial Centrality (Coming soon)</option>
+                <option disabled>Combination (Coming soon)</option>
               </select>
               <Icon name="chevronDown" size={16} width={2} stroke="var(--text-3)" style="position: absolute; right: 11px; top: 10px; pointer-events: none" />
             </div>
@@ -613,7 +621,7 @@ export function DashboardPage() {
             </div>
             <div style={css('display: flex; flex-direction: column; gap: 8px')}>
               <LabelWithInfo term="Scope"><span id="scope-l" style={css('font-size: 13px; font-weight: 600; color: var(--text-label)')}>Scope</span></LabelWithInfo>
-              <Segmented fill wrap labelledBy="scope-l" value={scope} onChange={setScope} options={[{ id: 'direct', label: 'Asset Importance Rankings' }, { id: 'blast', label: 'Blast Radius' }]} />
+              <Segmented fill labelledBy="scope-l" value={scope} onChange={setScope} options={[{ id: 'direct', label: 'Asset Criticality' }, { id: 'blast', label: 'Asset Blast Radius' }]} />
               {blast && (
                 <div style={css('margin-top: 4px; display: flex; align-items: center; justify-content: space-between; gap: 8px')}>
                   <LabelWithInfo term="Blast Radius Depth"><span id="depth-l" style={css('font-size: 13px; color: var(--text-2)')}>Blast Radius Depth</span></LabelWithInfo>
@@ -657,7 +665,7 @@ export function DashboardPage() {
                 </div>
               ))}
             </div>
-            <p style={css('margin: 0; font-size: 12px; line-height: 20px; color: var(--text-3)')}>{range.length} assets shown in orange. Use the arrows above the graph to step through them one at a time.</p>
+            <p style={css('margin: 0; font-size: 12px; line-height: 20px; color: var(--text-3)')}>{range.length} {range.length === 1 ? 'asset' : 'assets'} shown in orange.</p>
           </section>
 
           <section aria-labelledby="display-h" style={css('display: flex; flex-direction: column; gap: 12px')}>
@@ -703,26 +711,23 @@ export function DashboardPage() {
               <div style={css('min-width: 0')}>
                 <h2 id="rank-list-h" style={css('margin: 0; font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text-strong)')}>List of Most Important Critical Assets</h2>
                 <p style={css('margin: 2px 0 0; font-size: 12px; color: var(--text-3)')}>{rankingSubtitle(V, from, to, depth, spread === 'against')}</p>
-                <p style={css('margin: 2px 0 0; font-size: 12px; color: var(--text-3)')}>{IMPORTANCE_KEY}</p>
                 {V.kind === 'pareto' && <p style={css('margin: 2px 0 0; font-size: 12px; line-height: 18px; color: var(--text-3)')}>Front: {GLOSSARY.Front}</p>}
               </div>
               <button type="button" aria-label="Download ranking as CSV" onClick={exportCsv} style={css('flex: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); color: var(--text-2); cursor: pointer')}><Icon name="download" /></button>
             </div>
-            <div style={css('display: grid; grid-template-columns: 30px minmax(0, 1fr) 80px 76px; align-items: end; gap: 12px; padding: 8px 20px; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-3); border-bottom: 1px solid var(--divider)')}>
+            <div style={css('display: grid; grid-template-columns: 30px minmax(0, 1fr) 96px; align-items: end; gap: 12px; padding: 8px 20px; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-3); border-bottom: 1px solid var(--divider)')}>
               <span style={css('text-align: right')}>#</span><span>Asset</span>
-              <span style={css('justify-self: center; text-align: center')}>Assigned Importance <InfoTip term="Assigned Importance" /></span>
               <span style={css('justify-self: end; text-align: right')}>{showValues ? 'Score' : <>Criticality <InfoTip term="Criticality" /></>}</span>
             </div>
-            <ol style={css('list-style: none; margin: 0; padding: 4px 8px; max-height: 528px; overflow-y: auto')}>
+            <ol style={css(`list-style: none; margin: 0; padding: 4px 8px; max-height: 452px; overflow-y: ${range.length > 10 ? 'scroll' : 'auto'}; scrollbar-width: thin; scrollbar-color: var(--control-border) transparent`)}>
               {range.map((i, j) => (
                 <li key={i}>
-                  <button type="button" aria-pressed={i === s} onClick={(e) => select(i, e.shiftKey)} style={css(`width: 100%; height: 44px; display: grid; grid-template-columns: 30px minmax(0, 1fr) 80px 76px; align-items: center; gap: 12px; padding: 0 12px; border: 0; border-radius: 6px; font: inherit; text-align: left; color: var(--text); cursor: pointer; background: ${i === s ? 'var(--row-selected)' : 'transparent'}`)}>
+                  <button type="button" aria-pressed={i === s} onClick={(e) => select(i, e.shiftKey)} style={css(`width: 100%; height: 44px; display: grid; grid-template-columns: 30px minmax(0, 1fr) 96px; align-items: center; gap: 12px; padding: 0 12px; border: 0; border-radius: 6px; font: inherit; text-align: left; color: var(--text); cursor: pointer; background: ${i === s ? 'var(--row-selected)' : 'transparent'}`)}>
                     <span style={css('text-align: right; font-size: 12px; color: var(--text-3); font-variant-numeric: tabular-nums')}>{V.kind === 'scalar' ? V.rank[i] : from + j}</span>
                     <span style={css('min-width: 0')}>
                       <span style={css('display: block; font-size: 13px; font-weight: 600; color: var(--text)')}>{labels[i]}</span>
                       <span style={css('display: block; font-size: 12px; color: var(--text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap')}>{V.kind === 'pareto' ? `Front ${V.front![i]} · ` : ''}{names[i]}</span>
                     </span>
-                    <span style={css('justify-self: center')}><LevelChip lv={result.importance[i]} size={20} /></span>
                     {showValues ? (
                       <span style={css('display: flex; flex-direction: column; align-items: flex-end; gap: 4px')}>
                         <span style={css('font-size: 13px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap')}>{scoreText(i)}</span>
@@ -794,7 +799,7 @@ export function DashboardPage() {
               <tbody style={css('font-variant-numeric: tabular-nums')}>
                 {(['direct', 'blast'] as const).map((sc) => (
                   <tr key={sc}>
-                    <th scope="row" style={css('padding: 0 4px 0 0; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); text-align: left')}>{sc === 'direct' ? 'Asset Importance Rankings' : 'Blast Radius'}</th>
+                    <th scope="row" style={css('padding: 0 4px 0 0; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); text-align: left')}>{sc === 'direct' ? 'Asset Criticality' : 'Asset Blast Radius'}</th>
                     {(['1d-u', '1d-w', '2d-u', '2d-w'] as const).map((dw) => {
                       const [d, w] = dw.split('-');
                       const vk = `${d}-${sc}-${w}` as VariantKey;
