@@ -79,7 +79,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [theme, setTheme] = useState<Theme>(initialTheme);
-  const [setup, setSetupRaw] = useState<Setup>({ dim: '1d', weighted: true, kFrom: 1, kTo: 10 });
+  const [setup, setSetupRaw] = useState<Setup>({ dim: '2d', weighted: true, kFrom: 1, kTo: 10 });
   const setSetup = (s: Setup) => setSetupRaw(s);
   const [showValues, setShowValues] = useState(false);
   const [present, setPresentRaw] = useState(false);

@@ -5,7 +5,7 @@ import type { ReadyVariant } from '../analysis-types';
 import { navigate } from '../App';
 import { css } from '../components/css';
 import { ExitPresent, GraphButtons, GraphCaption, GraphLegend, PresentButton, RotateButton } from '../components/GraphChrome';
-import { AppBar, BandChip, Footer, Icon, LV, LV_FULL, ThemeButton, variantTitle } from '../components/ui';
+import { AppBar, BandChip, Icon, LV, LV_FULL, ThemeButton, variantTitle } from '../components/ui';
 import { DARK, LIGHT } from '../graph/graph-theme';
 import { CameraLink, GraphView } from '../graph/GraphView';
 import { DEFAULT_PITCH, DEFAULT_YAW } from '../graph/layout';
@@ -254,7 +254,6 @@ export function ComparePage() {
           </table>
         </div>
       </section>
-      <Footer />
     </div>
   );
 }

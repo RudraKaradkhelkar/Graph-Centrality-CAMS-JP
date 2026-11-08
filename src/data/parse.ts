@@ -118,13 +118,21 @@ export function tablesFromWorkbook(wb: XLSX.WorkBook): Table[] {
 
 export async function readFile(file: File): Promise<{ file: Omit<SourceFile, 'sheets'>; tables: Table[] }> {
   if (file.size > MAX_FILE_BYTES) throw new Error(`${file.name} is larger than 100 MB.`);
-  const csv = /\.csv$/i.test(file.name);
-  if (!csv && !/\.xlsx?$/i.test(file.name)) throw new Error(`${file.name} is not an .xlsx, .xls or .csv file.`);
+  const ext = file.name.match(/\.([^.]+)$/)?.[1].toLowerCase();
+  const csv = ext === 'csv';
+  if (!csv && ext !== 'xlsx' && ext !== 'xls') {
+    throw new Error(`${file.name} is ${ext ? `a .${ext} file` : 'not a spreadsheet'}. Upload an .xlsx, .xls or .csv file.`);
+  }
   const buf = await file.arrayBuffer();
   // CSV: read as UTF-8 text and keep every cell as typed (IDs like 001 stay 001).
-  const wb = csv
-    ? XLSX.read(new TextDecoder('utf-8').decode(buf), { type: 'string', raw: true })
-    : XLSX.read(buf, { type: 'array' });
+  let wb: XLSX.WorkBook;
+  try {
+    wb = csv
+      ? XLSX.read(new TextDecoder('utf-8').decode(buf), { type: 'string', raw: true })
+      : XLSX.read(buf, { type: 'array' });
+  } catch {
+    throw new Error(`${file.name} could not be opened. It may be password-protected or damaged: open it in Excel and save it again as .xlsx.`);
+  }
   const tables = tablesFromWorkbook(wb);
   if (csv && tables.length) tables[0].name = file.name;
   return { file: { name: file.name, size: file.size, format: csv ? 'CSV file' : 'Excel workbook' }, tables };
@@ -198,6 +206,30 @@ export function findSheet(tables: Table[], kind: 'links' | 'assets'): Table | nu
   return sheetCandidates(tables, kind)[0] ?? null;
 }
 
+const SHEET_NAME = { links: 'Link Sheet', assets: 'Asset Sheet' } as const;
+
+/**
+ * The sheet to use from the file uploaded as the Link Sheet or the Asset Sheet, or the problem to fix: an empty file,
+ * the other sheet uploaded by mistake, no sheet with the needed columns (naming the sheets found), or headers only.
+ */
+export function sheetFor(tables: Table[], kind: 'links' | 'assets', fileName: string): { table: Table | null; issue?: Issue } {
+  const what = SHEET_NAME[kind], other = kind === 'links' ? 'assets' : 'links';
+  const fail = (title: string, detail: string) => ({ table: null, issue: { level: 'error' as const, title, detail } });
+  const t = findSheet(tables, kind);
+  if (t) {
+    return dataRows(t) ? { table: t } : fail(`${what}: no rows`, `${tables.length > 1 ? `Sheet ${t.name} in ${fileName}` : fileName} has column headers but no rows below them.`);
+  }
+  const used = tables.filter((s) => headerRowIndex(s) >= 0);
+  if (!used.length) return fail(`${what}: ${fileName} is empty`, 'No sheet in this file has any data.');
+  if (findSheet(tables, other)) {
+    return fail(`${fileName} looks like the ${SHEET_NAME[other]}`,
+      `It has ${kind === 'links' ? 'an Asset ID column but no Source and Target columns' : 'Source and Target columns'}. Upload it with “Upload ${SHEET_NAME[other]}”, and upload the ${what} with “Upload ${what}”.`);
+  }
+  const found = used.slice(0, 3).map((s) => `${s.name} (${s.text[headerRowIndex(s)].filter((c) => c != null).map(showHeader).slice(0, 6).join(', ')})`).join('; ');
+  return fail(`${what}: no sheet with the required columns`,
+    `Expected ${kind === 'links' ? 'Source and Target columns' : 'an Asset ID column'}. Found: ${found}${used.length > 3 ? `, and ${used.length - 3} more sheets` : ''}.`);
+}
+
 const isCompleteLinks = (t: Table) => {
   const h = headerRowIndex(t);
   return h >= 0 && Object.keys(matchColumns(t.text[h], LINK_FIELDS)).length === Object.keys(LINK_FIELDS).length;
@@ -219,6 +251,39 @@ export function parseLevel(v: unknown): number | null {
 
 const cellText = (t: Table, r: number, c: number | undefined) => (c == null ? '' : String(t.text[r]?.[c] ?? '').trim());
 const isBlankRow = (row: unknown[] | undefined) => !row || row.every((c) => c == null || String(c).trim() === '');
+
+/** Excel's error values (#N/A, #REF! ...), as a cell shows them. */
+const EXCEL_ERROR = /^#(N\/A|REF!|VALUE!|DIV\/0!|NAME\?|NUM!|NULL!|SPILL!|CALC!)$/i;
+
+/**
+ * Rows holding an Excel error value in any of the given columns, and one issue describing them (or null).
+ * Those rows are skipped by the other checks, so the same cell isn't reported twice.
+ */
+function excelErrors(t: Table, from: number, cols: [label: string, col: number | undefined][], sheet: string): { rows: Set<number>; issue: Issue | null } {
+  const rows = new Set<number>();
+  const where = new Map<string, { values: Set<string>; rows: number[] }>();
+  for (let r = from; r < t.text.length; r++) {
+    for (const [label, c] of cols) {
+      const v = cellText(t, r, c);
+      if (!EXCEL_ERROR.test(v)) continue;
+      rows.add(r);
+      const w = where.get(label) ?? where.set(label, { values: new Set(), rows: [] }).get(label)!;
+      w.values.add(v.toUpperCase());
+      w.rows.push(t.firstRow + r);
+    }
+  }
+  if (!rows.size) return { rows, issue: null };
+  const parts = [...where].map(([label, w]) => `${[...w.values].join(', ')} in ${label} (${rowList(w.rows)})`);
+  return {
+    rows,
+    issue: { level: 'error', title: `${plural(rows.size, 'row')} with Excel errors in the ${sheet}`,
+      detail: `${parts.join('; ')}. Fix the formulas, or copy the cells and paste them as values.` },
+  };
+}
+
+/** IDs compared without case, spaces, dots, dashes or underscores, to suggest a fix for an unknown ID. */
+const looseId = (id: string) => id.toLowerCase().replace(/[\s._-]/g, '');
+const quoted = (vals: string[]) => vals.slice(0, 3).map((v) => (v ? `“${v}”` : 'blank')).join(', ') + (vals.length > 3 ? ` and ${vals.length - 3} more` : '');
 
 /** "row 4", "rows 4, 9 and 15", "rows 4, 9, 15, 20, 31 and 12 more" */
 export function rowList(rows: number[]): string {
@@ -275,8 +340,8 @@ export function buildDataset(linksTable: Table | null, assetsTable: Table | null
   const ok = (title: string, detail: string) => issues.push({ level: 'ok', title, detail });
   const info = (title: string, detail: string) => issues.push({ level: 'info', title, detail });
 
-  if (!linksTable) err('Links sheet not found', 'Expected a sheet called Links (or one with Source and Target columns).');
-  if (!assetsTable) err('Asset list not found', 'An asset list is required: a sheet called Assets (or one with an Asset ID column), or a second file in Two files mode.');
+  if (!linksTable) err('Link Sheet not found', 'Expected a sheet called Links (or one with Source and Target columns).');
+  if (!assetsTable) err('Asset Sheet not found', 'Expected a sheet called Assets (or one with an Asset ID column).');
   if (!linksTable || !assetsTable) return { dataset: null, issues };
 
   // --- Links ---
@@ -284,7 +349,7 @@ export function buildDataset(linksTable: Table | null, assetsTable: Table | null
   const lc = lh >= 0 ? matchColumns(linksTable.text[lh], LINK_FIELDS) : {};
   const missingLink = (Object.keys(LINK_FIELDS) as (keyof typeof LINK_FIELDS)[]).filter((k) => lc[k] == null);
   if (missingLink.length) {
-    err(`Links: ${plural(missingLink.length, 'column')} not found`,
+    err(`Link Sheet: ${plural(missingLink.length, 'required column')} missing`,
       `Missing ${missingLink.map((k) => LINK_FIELDS[k].label).join(', ')}. Columns found: ${lh >= 0 ? linksTable.text[lh].filter((c) => c != null).map(showHeader).join(', ') : 'none'}.`);
   }
 
@@ -292,20 +357,23 @@ export function buildDataset(linksTable: Table | null, assetsTable: Table | null
   const ah = headerRowIndex(assetsTable);
   const ac = ah >= 0 ? matchColumns(assetsTable.text[ah], ASSET_FIELDS) : {};
   if (ac.id == null) {
-    err('Asset list: Asset ID column not found', `Columns found: ${ah >= 0 ? assetsTable.text[ah].filter((c) => c != null).map(showHeader).join(', ') : 'none'}.`);
+    err('Asset Sheet: required column Asset ID missing', `Columns found: ${ah >= 0 ? assetsTable.text[ah].filter((c) => c != null).map(showHeader).join(', ') : 'none'}.`);
   }
   if (missingLink.length || ac.id == null) return { dataset: null, issues };
 
+  const assetErrors = excelErrors(assetsTable, ah + 1, [[ASSET_FIELDS.id.label, ac.id]], 'Asset Sheet');
+  if (assetErrors.issue) issues.push(assetErrors.issue);
   const assets: AssetRow[] = [];
   const assetIndex = new Map<string, number>();
   const missingIdRows: number[] = [], dupIdRows: number[] = [], badNodeLevel: number[] = [];
+  const dupIds = new Set<string>();
   let positions = ac.x != null && ac.y != null && ac.z != null;
   for (let r = ah + 1; r < assetsTable.text.length; r++) {
-    if (isBlankRow(assetsTable.text[r])) continue;
+    if (isBlankRow(assetsTable.text[r]) || assetErrors.rows.has(r)) continue;
     const row = assetsTable.firstRow + r;
     const id = cellText(assetsTable, r, ac.id);
     if (!id) { missingIdRows.push(row); continue; }
-    if (assetIndex.has(id)) { dupIdRows.push(row); continue; }
+    if (assetIndex.has(id)) { dupIdRows.push(row); dupIds.add(id); continue; }
     const a: AssetRow = { id, name: cellText(assetsTable, r, ac.name) || id };
     if (ac.type != null) a.type = cellText(assetsTable, r, ac.type) || 'Unspecified';
     if (ac.abbr != null) a.abbr = cellText(assetsTable, r, ac.abbr) || undefined;
@@ -321,23 +389,30 @@ export function buildDataset(linksTable: Table | null, assetsTable: Table | null
     assetIndex.set(id, assets.length);
     assets.push(a);
   }
-  if (missingIdRows.length) err(`${plural(missingIdRows.length, 'asset row')} without an Asset ID`, `Fill in the Asset ID on ${rowList(missingIdRows)} of the asset list.`);
-  if (dupIdRows.length) err(`${plural(dupIdRows.length, 'asset ID')} listed more than once`, `Remove the repeated IDs on ${rowList(dupIdRows)} of the asset list.`);
+  if (missingIdRows.length) err(`${plural(missingIdRows.length, 'asset row')} without an Asset ID`, `Fill in the Asset ID on ${rowList(missingIdRows)} of the Asset Sheet.`);
+  if (dupIdRows.length) err(`${plural(dupIdRows.length, 'asset ID')} listed more than once`, `${examples([...dupIds])} ${dupIds.size === 1 ? 'appears' : 'appear'} again on ${rowList(dupIdRows)} of the Asset Sheet. Keep one row per asset.`);
 
+  const linkErrors = excelErrors(linksTable, lh + 1, (Object.keys(LINK_FIELDS) as (keyof typeof LINK_FIELDS)[]).map((k) => [LINK_FIELDS[k].label, lc[k]]), 'Link Sheet');
+  if (linkErrors.issue) issues.push(linkErrors.issue);
   const links: LinkRow[] = [];
   const missingEnds: number[] = [], selfLinks: number[] = [], dupLinks: number[] = [], blankType: number[] = [];
-  const badLevel = new Map<string, number[]>();
+  const badLevel = new Map<string, { rows: number[]; values: Set<string> }>();
   const pairs = new Set<string>();
   const unknown = new Map<string, number[]>();
   const levelsOf = new Map<string, Set<number>>();
   for (let r = lh + 1; r < linksTable.text.length; r++) {
-    if (isBlankRow(linksTable.text[r])) continue;
+    if (isBlankRow(linksTable.text[r]) || linkErrors.rows.has(r)) continue;
     const row = linksTable.firstRow + r;
     const s = cellText(linksTable, r, lc.source), t = cellText(linksTable, r, lc.target);
     if (!s || !t) { missingEnds.push(row); continue; }
     const levels = (['importance', 'source_importance', 'target_importance'] as const).map((k) => {
       const v = parseLevel(linksTable.raw[r]?.[lc[k]!]);
-      if (v == null) (badLevel.get(LINK_FIELDS[k].label) ?? badLevel.set(LINK_FIELDS[k].label, []).get(LINK_FIELDS[k].label)!).push(row);
+      if (v == null) {
+        const label = LINK_FIELDS[k].label;
+        const b = badLevel.get(label) ?? badLevel.set(label, { rows: [], values: new Set() }).get(label)!;
+        b.rows.push(row);
+        b.values.add(cellText(linksTable, r, lc[k]));
+      }
       return v;
     });
     if (s === t) { selfLinks.push(row); continue; }
@@ -358,21 +433,28 @@ export function buildDataset(linksTable: Table | null, assetsTable: Table | null
   const renamed = (Object.keys(LINK_FIELDS) as (keyof typeof LINK_FIELDS)[])
     .filter((k) => normalize(linksTable.text[lh][lc[k]!]) !== LINK_FIELDS[k].names[0])
     .map((k) => `${showHeader(linksTable.text[lh][lc[k]!])} → ${LINK_FIELDS[k].label}`);
-  if (missingEnds.length) err(`${plural(missingEnds.length, 'edge')} without a Source or Target`, `Fill in both IDs on ${rowList(missingEnds)} of the Links sheet.`);
-  for (const [label, rows] of badLevel) err(`${plural(rows.length, `${label} value`)} not 1, 2 or 3`, `Use 1, 2, 3 or Low, Medium, High on ${rowList(rows)} of the Links sheet.`);
-  if (selfLinks.length) err(`${plural(selfLinks.length, 'edge')} from an asset to itself`, `Remove ${rowList(selfLinks)} of the Links sheet (Source and Target are the same).`);
-  if (dupLinks.length) err(`${plural(dupLinks.length, 'duplicate edge')}`, `The same Source → Target pair appears again on ${rowList(dupLinks)} of the Links sheet. Keep one row per pair.`);
+  if (missingEnds.length) err(`${plural(missingEnds.length, 'edge')} without a Source or Target`, `Fill in both IDs on ${rowList(missingEnds)} of the Link Sheet.`);
+  for (const [label, b] of badLevel) {
+    err(`${plural(b.rows.length, `${label} value`)} not L, M, H or 1, 2, 3`,
+      `Found ${quoted([...b.values])} on ${rowList(b.rows)} of the Link Sheet. Use L, M, H (Low, Medium, High, any case) or 1, 2, 3.`);
+  }
+  if (selfLinks.length) err(`${plural(selfLinks.length, 'edge')} from an asset to itself`, `Remove ${rowList(selfLinks)} of the Link Sheet (Source and Target are the same).`);
+  if (dupLinks.length) err(`${plural(dupLinks.length, 'duplicate edge')}`, `The same Source → Target pair appears again on ${rowList(dupLinks)} of the Link Sheet. Keep one row per pair.`);
   if (unknown.size) {
     const ids = [...unknown.keys()];
-    err(`${plural(ids.length, 'edge ID')} missing from the asset list`, `${examples(ids)} ${ids.length === 1 ? 'is' : 'are'} used in Links (${rowList([...new Set([...unknown.values()].flat())].sort((a, b) => a - b))}) but not in the asset list.`);
+    const loose = new Map(assets.map((a) => [looseId(a.id), a.id]));
+    const hints = ids.filter((id) => loose.has(looseId(id))).map((id) => `${id} → ${loose.get(looseId(id))}`);
+    err(`${plural(ids.length, 'asset ID')} in the Link Sheet missing from the Asset Sheet`,
+      `${examples(ids)} ${ids.length === 1 ? 'is' : 'are'} used in the Link Sheet (${rowList([...new Set([...unknown.values()].flat())].sort((a, b) => a - b))}) but not listed in the Asset Sheet.`
+      + (hints.length ? ` Close matches in the Asset Sheet: ${hints.slice(0, 3).join(', ')}${hints.length > 3 ? ` and ${hints.length - 3} more` : ''}. Check capitals, spaces and dashes.` : ' Add them to the Asset Sheet, or correct the IDs.'));
   }
   if (!issues.some((i) => i.level === 'error')) {
-    ok(`Links: all 6 columns matched · ${plural(linksRows, 'directed edge')}`,
+    ok(`Link Sheet: all 6 columns matched · ${plural(linksRows, 'directed edge')}`,
       `Each row is read as Source → Target: the target depends on the source.${renamed.length ? ` Matched ${renamed.join(', ')}.` : ''}`);
-    ok(`Asset list: ${plural(assets.length, 'asset')}, every edge matched`, 'All IDs used in Source and Target appear in the asset list.');
-    ok('Importance values are all 1, 2 or 3', 'Shown on the graph as L (1, Low), M (2, Medium) and H (3, High).');
+    ok(`Asset Sheet: ${plural(assets.length, 'asset')}, every edge matched`, 'All IDs used in Source and Target appear in the Asset Sheet.');
+    ok('Importance values are all L, M, H or 1, 2, 3', 'Shown on the graph as L (Low), M (Medium) and H (High).');
   }
-  if (blankType.length) warn(`${plural(blankType.length, 'edge')} without an edge type`, `${rowList(blankType)} of the Links sheet will be grouped as “Unspecified”.`);
+  if (blankType.length) warn(`${plural(blankType.length, 'edge')} without an edge type`, `${rowList(blankType)} of the Link Sheet will be grouped as “Unspecified”.`);
 
   const typeCounts = new Map<string, number>();
   links.forEach((l) => typeCounts.set(l.type, (typeCounts.get(l.type) ?? 0) + 1));
@@ -383,9 +465,9 @@ export function buildDataset(linksTable: Table | null, assetsTable: Table | null
     const col = showHeader(assetsTable.text[ah][ac.importance]);
     const differs = assets.filter((a) => a.importance != null && levelsOf.has(a.id)
       && (levelsOf.get(a.id)!.size > 1 || !levelsOf.get(a.id)!.has(a.importance))).map((a) => a.id);
-    if (badNodeLevel.length) warn(`${plural(badNodeLevel.length, `${col} value`)} not 1, 2 or 3`, `Ignored on ${rowList(badNodeLevel)} of the asset list; the Links sheet's asset importance is used.`);
-    if (differs.length) warn(`${plural(differs.length, 'asset')}: asset list importance differs from the Links sheet`, `${examples(differs)}. The highest value is used.`);
-    else if (!badNodeLevel.length) ok('Asset importance matches the asset list', `${col} agrees with the source and target asset importance in the Links sheet for every asset.`);
+    if (badNodeLevel.length) warn(`${plural(badNodeLevel.length, `${col} value`)} not L, M, H or 1, 2, 3`, `Ignored on ${rowList(badNodeLevel)} of the Asset Sheet; the Link Sheet's asset importance is used.`);
+    if (differs.length) warn(`${plural(differs.length, 'asset')}: Asset Sheet importance differs from the Link Sheet`, `${examples(differs)}. The highest value is used.`);
+    else if (!badNodeLevel.length) ok('Asset importance matches the Asset Sheet', `${col} agrees with the source and target asset importance in the Link Sheet for every asset.`);
   }
 
   const conflicts = [...levelsOf].filter(([, v]) => v.size > 1).map(([id]) => id);
@@ -393,7 +475,7 @@ export function buildDataset(linksTable: Table | null, assetsTable: Table | null
 
   const linked = new Set(links.flatMap((l) => [l.source, l.target]));
   const unlinked = assets.filter((a) => !linked.has(a.id)).map((a) => a.id);
-  if (unlinked.length) warn(`${plural(unlinked.length, 'asset')} without any edges`, `${examples(unlinked)} ${unlinked.length === 1 ? 'is' : 'are'} in the asset list but in no edge. ${unlinked.length === 1 ? 'It still counts' : 'They still count'} in the network size (n), which every score is divided by.`);
+  if (unlinked.length) warn(`${plural(unlinked.length, 'asset')} without any edges`, `${examples(unlinked)} ${unlinked.length === 1 ? 'is' : 'are'} in the Asset Sheet but in no edge. ${unlinked.length === 1 ? 'It still counts' : 'They still count'} in the network size (n), which every score is divided by.`);
 
   if (ac.abbr != null) {
     const seen = new Map<string, number>();
@@ -454,12 +536,19 @@ export function fromTables(meta: Omit<SourceFile, 'sheets'>, tables: Table[], sa
   return res;
 }
 
-/** A links file and a separate asset list (each .xlsx, .xls or .csv). */
+/** One uploaded file as read: its details and its sheets. */
+export type FileRead = Awaited<ReturnType<typeof readFile>>;
+
+/** The Link Sheet and Asset Sheet files (each .xlsx, .xls or .csv): picks the sheet in each, then checks them together. */
+export function parsePair(links: FileRead, assets: FileRead): ParseResult {
+  const l = sheetFor(links.tables, 'links', links.file.name), a = sheetFor(assets.tables, 'assets', assets.file.name);
+  if (l.issue || a.issue) return { dataset: null, issues: [a.issue, l.issue].filter((i): i is Issue => !!i) };
+  return buildDataset(l.table, a.table, [{ ...links.file, sheets: sheetsUsed(l.table, null) }, { ...assets.file, sheets: sheetsUsed(null, a.table) }]);
+}
+
 export async function parseTwoFiles(linksFile: File, assetsFile: File): Promise<ParseResult> {
   const [l, a] = await Promise.all([readFile(linksFile), readFile(assetsFile)]);
-  const lt = findSheet(l.tables, 'links') ?? l.tables[0] ?? null;
-  const at = findSheet(a.tables, 'assets') ?? a.tables[0] ?? null;
-  return buildDataset(lt, at, [{ ...l.file, sheets: sheetsUsed(lt, null) }, { ...a.file, sheets: sheetsUsed(null, at) }]);
+  return parsePair(l, a);
 }
 
 function dataRows(t: Table): number {

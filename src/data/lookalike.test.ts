@@ -17,11 +17,11 @@ describe('made-up network with parser quirks', () => {
     expect(d.assets).toHaveLength(16);
     // Header with a line break and a bracketed alias maps to the asset importance columns.
     expect(d.links[0]).toEqual({ source: 'XD_AA', target: 'XS_Q', type: 'Type A', importance: 1, source_importance: 2, target_importance: 2 });
-    expect(r.issues.find((i) => i.title.startsWith('Links: all 6'))!.detail)
+    expect(r.issues.find((i) => i.title.startsWith('Link Sheet: all 6'))!.detail)
       .toContain('Source edge importance (Source asset importance) → Source asset importance');
     // Node table: ID, quoted name with commas, importance cross-checked against the links.
     expect(d.assets[2]).toMatchObject({ id: 'XD_AC', name: 'Invented endpoint, misc., charlie', importance: 2 });
-    expect(r.issues.map((i) => i.title)).toContain('Asset importance matches the asset list');
+    expect(r.issues.map((i) => i.title)).toContain('Asset importance matches the Asset Sheet');
     // No type column: the IDs' first segment (XD / XS / XR) splits them into the fewest groups.
     expect(d.typeSource).toBe('id-prefix');
     expect([...new Set(d.assets.map((a) => a.type))]).toEqual(['XD', 'XS', 'XR']);
@@ -63,7 +63,7 @@ describe('asset importance in the asset list', () => {
   it('warns when it differs from the links, which win', () => {
     const r = buildDataset(table('Links', [head, ['A', 'B', 'P', 1, 3, 2]]), table('Nodes', [['Node ID', 'Node importance'], ['A', 1], ['B', 2]]), files);
     expect(errors(r.issues)).toEqual([]);
-    expect(r.issues.find((i) => i.level === 'warning')!.title).toBe('1 asset: asset list importance differs from the Links sheet');
+    expect(r.issues.find((i) => i.level === 'warning')!.title).toBe('1 asset: Asset Sheet importance differs from the Link Sheet');
   });
 
   it('accepts Middle as a word for 2', () => {

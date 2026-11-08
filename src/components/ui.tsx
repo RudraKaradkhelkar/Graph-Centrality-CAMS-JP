@@ -12,7 +12,7 @@ import { css } from './css';
 
 export const LV = ['', 'L', 'M', 'H'];
 export const LV_FULL = ['', 'Low', 'Medium', 'High'];
-export const APP_TAGLINE = 'A Critical Asset Risk Management Dashboard for Enterprise Networks';
+export const APP_TAGLINE = 'Critical Asset Risk Management Dashboard for Enterprise Networks';
 
 const MINOR_WORDS = new Set(['a', 'an', 'and', 'as', 'at', 'by', 'for', 'in', 'of', 'on', 'or', 'the', 'to', 'vs', 'with']);
 
@@ -144,31 +144,33 @@ export function LevelChip({ lv, alt = false }: { lv: number | string; alt?: bool
   );
 }
 
-/** App header on every page: the name and what it stands for. */
+/** App header on the dashboard and comparison: the name, who made it (top left) and the copyright. */
 export function AppBar() {
   return (
-    <header style={css('height: 48px; padding: 0 24px; display: flex; align-items: baseline; gap: 12px; background: var(--surface); border-bottom: 1px solid var(--border); box-sizing: border-box')}>
-      <span style={css('line-height: 48px; font-size: 16px; font-weight: 600; letter-spacing: 0.04em; color: var(--text-strong)')}>CARMA</span>
-      <span style={css('font-size: 13px; color: var(--text-3)')}>{APP_TAGLINE}</span>
+    <header style={css('min-height: 56px; padding: 8px 24px; display: flex; align-items: center; gap: 16px; background: var(--surface); border-bottom: 1px solid var(--border); box-sizing: border-box')}>
+      <span style={css('font-size: 18px; font-weight: 700; letter-spacing: 0.04em; color: var(--text-strong)')}>CARMA</span>
+      <span aria-hidden="true" style={css('width: 1px; align-self: stretch; background: var(--border)')} />
+      <Credits />
       <Copyright style="margin-left: auto" />
     </header>
   );
 }
 
-/** Copyright line, top right of every page. */
-export function Copyright({ style = '' }: { style?: string }) {
-  return <span style={css(`font-size: 13px; color: var(--text-3); white-space: nowrap; ${style}`)}>Copyright © MIT</span>;
+/** Who made CARMA: top left of every page. */
+export function Credits() {
+  return (
+    <div style={css('display: flex; flex-direction: column; line-height: 18px; white-space: nowrap')}>
+      <span style={css('font-size: 14px; color: var(--text-2)')}>
+        Created by <span style={css('font-weight: 600; color: var(--text-strong)')}>Rudra Karadkhelkar</span> and <span style={css('font-weight: 600; color: var(--text-strong)')}>Ranjan Pal</span>
+      </span>
+      <span style={css('font-size: 13px; letter-spacing: 0.02em; color: var(--text-3)')}>Massachusetts Institute of Technology</span>
+    </div>
+  );
 }
 
-/** Page footer on Upload, Dashboard and Compare: who made CARMA. */
-export function Footer() {
-  return (
-    <footer style={css('margin-top: auto; padding: 24px; border-top: 1px solid var(--border); background: var(--surface); text-align: center; font-size: 20px; line-height: 28px; color: var(--text-2)')}>
-      Created by <span style={css('font-weight: 600; color: var(--text-strong)')}>Rudra Karadkhelkar</span>
-      <span aria-hidden="true" style={css('margin: 0 12px; color: var(--text-3)')}>|</span>
-      Concept: <span style={css('font-weight: 600; color: var(--text-strong)')}>Dr. Ranjan Pal</span>
-    </footer>
-  );
+/** Copyright line, top right of every page. */
+export function Copyright({ style = '' }: { style?: string }) {
+  return <span style={css(`font-size: 13px; color: var(--text-3); white-space: nowrap; ${style}`)}>Copyright © MIT Sloan School of Management</span>;
 }
 
 export function ThemeButton() {

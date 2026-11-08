@@ -5,7 +5,7 @@ import { navigate } from '../App';
 import { css } from '../components/css';
 import { DistributionChart } from '../components/DistributionChart';
 import { ExitPresent, GraphCaption, GraphLegend, IMPORTANCE_KEY, PresentButton, RingKey, RotateButton } from '../components/GraphChrome';
-import { AppBar, BandChip, Footer, GLOSSARY, Icon, InfoTip, LabelWithInfo, LevelChip, LV, LV_FULL, ParetoLink, rankingSubtitle, Segmented, ThemeButton, variantTitle } from '../components/ui';
+import { AppBar, BandChip, GLOSSARY, Icon, InfoTip, LabelWithInfo, LevelChip, LV, LV_FULL, ParetoLink, rankingSubtitle, Segmented, ThemeButton, variantTitle } from '../components/ui';
 import { shortName } from '../data/dataset';
 import { DARK, LIGHT } from '../graph/graph-theme';
 import { GraphView, type CameraInfo, type GraphControls } from '../graph/GraphView';
@@ -841,7 +841,6 @@ export function DashboardPage() {
           </section>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

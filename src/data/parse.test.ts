@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import * as XLSX from 'xlsx';
-import { buildDataset, findSheet, fromTables, matchColumns, parseLevel, readFile, rowList, tablesFromWorkbook, type Table } from './parse';
+import { buildDataset, findSheet, fromTables, matchColumns, parseLevel, parsePair, readFile, rowList, sheetFor, tablesFromWorkbook, type Table } from './parse';
 
 const HEAD = ['Source', 'Target', 'Edge type', 'Edge importance', 'Source asset importance', 'Target asset importance'];
 const table = (name: string, rows: unknown[][], firstRow = 1): Table => ({
@@ -24,13 +24,13 @@ describe('column matching', () => {
     const r = buildDataset(table('Links', [['From', 'To', 'Link type', 'Weight', 'Source importance', 'Target importance'], ['A', 'B', 'Power', 3, 2, 1]]), assets('A', 'B'), files);
     expect(titles(r, 'error')).toEqual([]);
     expect(r.dataset!.links).toEqual([{ source: 'A', target: 'B', type: 'Power', importance: 3, source_importance: 2, target_importance: 1 }]);
-    expect(r.issues.find((i) => i.title.startsWith('Links: all 6'))!.detail).toContain('From → Source');
+    expect(r.issues.find((i) => i.title.startsWith('Link Sheet: all 6'))!.detail).toContain('From → Source');
   });
 
   it('reports missing link columns as an error', () => {
     const r = buildDataset(table('Links', [['Source', 'Target', 'Edge importance'], ['A', 'B', 1]]), assets('A', 'B'), files);
     expect(r.dataset).toBeNull();
-    expect(r.issues[0]).toMatchObject({ level: 'error', title: 'Links: 3 columns not found' });
+    expect(r.issues[0]).toMatchObject({ level: 'error', title: 'Link Sheet: 3 required columns missing' });
     expect(r.issues[0].detail).toContain('Edge type, Source asset importance, Target asset importance');
   });
 });
@@ -59,9 +59,21 @@ describe('row checks', () => {
     const byTitle = Object.fromEntries(r.issues.filter((i) => i.level === 'error').map((i) => [i.title, i.detail]));
     expect(byTitle['1 edge from an asset to itself']).toContain('row 4');
     expect(byTitle['1 duplicate edge']).toContain('row 5');
-    expect(byTitle['1 Edge importance value not 1, 2 or 3']).toContain('row 6');
-    expect(byTitle['1 edge ID missing from the asset list']).toMatch(/^X is used in Links \(row 7\)/);
+    expect(byTitle['1 Edge importance value not L, M, H or 1, 2, 3']).toContain('row 6');
+    expect(byTitle['1 asset ID in the Link Sheet missing from the Asset Sheet']).toMatch(/^X is used in the Link Sheet \(row 7\)/);
     expect(byTitle['1 edge without a Source or Target']).toContain('row 8');
+  });
+
+  it('names the bad importance values, Excel errors and near-miss IDs', () => {
+    const res = buildDataset(table('Links', [
+      HEAD,
+      ['A', 'b', 'Power', 'Critical', 'h', 'm'], // row 2: bad level, and "b" is "B" in the Asset Sheet
+      ['A', 'B', 'Power', 'L', '#N/A', 'H'], // row 3: Excel error
+    ]), assets('A', 'B'), files);
+    const byTitle = Object.fromEntries(res.issues.filter((i) => i.level === 'error').map((i) => [i.title, i.detail]));
+    expect(byTitle['1 Edge importance value not L, M, H or 1, 2, 3']).toContain('Found “Critical” on row 2');
+    expect(byTitle['1 row with Excel errors in the Link Sheet']).toContain('#N/A in Source asset importance (row 3)');
+    expect(byTitle['1 asset ID in the Link Sheet missing from the Asset Sheet']).toContain('Close matches in the Asset Sheet: b → B');
   });
 
   it('rejects duplicate and missing asset IDs', () => {
@@ -99,7 +111,24 @@ describe('asset list', () => {
 
   it('requires an asset list', () => {
     const r = buildDataset(table('Links', [HEAD]), null, files);
-    expect(titles(r, 'error')).toEqual(['Asset list not found']);
+    expect(titles(r, 'error')).toEqual(['Asset Sheet not found']);
+  });
+});
+
+describe('two uploads', () => {
+  const read = (name: string, ...tables: Table[]) => ({ file: { name, size: 1, format: 'Excel workbook' as const }, tables });
+  const linkFile = read('links.xlsx', table('Links', [HEAD, ['A', 'B', 'P', 1, 1, 1]]));
+  const assetFile = read('assets.xlsx', assets('A', 'B'));
+
+  it('accepts the two files', () => {
+    expect(titles(parsePair(linkFile, assetFile), 'error')).toEqual([]);
+  });
+
+  it('spots the files swapped, an empty file, headers only and a sheet without the columns', () => {
+    expect(titles(parsePair(assetFile, linkFile), 'error')).toEqual(['links.xlsx looks like the Link Sheet', 'assets.xlsx looks like the Asset Sheet']);
+    expect(sheetFor([table('Sheet1', [])], 'assets', 'a.xlsx').issue!.title).toBe('Asset Sheet: a.xlsx is empty');
+    expect(sheetFor([table('Links', [HEAD])], 'links', 'l.xlsx').issue!.title).toBe('Link Sheet: no rows');
+    expect(sheetFor([table('Notes', [['Owner', 'Date'], ['x', 'y']])], 'links', 'l.xlsx').issue!.detail).toBe('Expected Source and Target columns. Found: Notes (Owner, Date).');
   });
 });
 
