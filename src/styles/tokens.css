@@ -100,8 +100,6 @@
   --hero-edge-c: #C9AEB4;
   --hero-outer-c: #D9C3C8;
   --hero-hot-edge: rgba(180, 18, 47, 0.55);
-  --hero-tag-bg: #FFFFFF;
-  --hero-tag-border: rgba(180, 18, 47, 0.45);
   --mark-hub: #B4122F;
   --mark-spoke: #D58E9B;
   --mark-glow: rgba(226, 50, 79, 0.22);
@@ -199,8 +197,6 @@
   --hero-edge-c: #4F3A40;
   --hero-outer-c: #5E474D;
   --hero-hot-edge: rgba(255, 58, 85, 0.6);
-  --hero-tag-bg: #17121A;
-  --hero-tag-border: rgba(255, 58, 85, 0.55);
   --mark-hub: #FF3A55;
   --mark-spoke: #8E4652;
   --mark-glow: rgba(255, 45, 74, 0.3);

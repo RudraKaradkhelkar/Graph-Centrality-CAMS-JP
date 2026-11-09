@@ -8,7 +8,7 @@ import path from 'node:path';
 
 const root = path.resolve(import.meta.dirname, '..');
 const W = 1200, H = 300;
-const BOX = { x0: 418, x1: 782, y0: 104, y1: 196 }; // wordmark + padding
+const BOX = { x0: 380, x1: 820, y0: 90, y1: 210 }; // wordmark (108 units) + padding
 const C = { x: (BOX.x0 + BOX.x1) / 2, y: (BOX.y0 + BOX.y1) / 2 };
 const hot = [[318, 86], [292, 222], [884, 64], [920, 214], [664, 268]];
 const outer = [
@@ -38,7 +38,7 @@ const parts = [];
 parts.push('<defs><radialGradient id="carma-glow"><stop offset="0" stop-color="var(--hero-glow)" style="stop-opacity: var(--hero-glow-a)"/><stop offset="0.55" stop-color="var(--hero-glow)" style="stop-opacity: var(--hero-glow-b)"/><stop offset="1" stop-color="var(--hero-glow)" stop-opacity="0"/></radialGradient></defs>');
 for (const [a, b] of outerOuter) if (!crossesBox(outer[a], outer[b])) parts.push(line(outer[a], outer[b], 'hero-edge-outer'));
 for (const [h, o] of hotOuter) if (!crossesBox(hot[h], outer[o])) parts.push(line(hot[h], outer[o], 'hero-edge'));
-parts.push(`<ellipse class="hero-glow" cx="${C.x}" cy="${C.y}" rx="250" ry="120" fill="url(#carma-glow)"/>`);
+parts.push(`<ellipse class="hero-glow" cx="${C.x}" cy="${C.y}" rx="290" ry="135" fill="url(#carma-glow)"/>`);
 hot.forEach((p, i) => {
   const s = exitBox(p);
   parts.push(line(s, p, 'hero-spoke'));
@@ -46,10 +46,7 @@ hot.forEach((p, i) => {
 });
 for (const p of outer) parts.push(`<circle class="hero-node-outer" cx="${p[0]}" cy="${p[1]}" r="5"/>`);
 hot.forEach((p, i) => parts.push(`<circle class="hero-node-ring" cx="${p[0]}" cy="${p[1]}" r="${i === 2 ? 15 : 12}"/><circle class="hero-node" cx="${p[0]}" cy="${p[1]}" r="${i === 2 ? 9 : 7}"/>`));
-// Tag on the highlighted asset at the top right (16 units, so it stays at least 12 px when the hero is shown 920 px wide).
-const T = hot[2];
-parts.push(`<g class="hero-tag"><rect x="${T[0] + 20}" y="${T[1] - 15}" width="176" height="30" rx="15"/><text x="${T[0] + 108}" y="${T[1] + 6}" text-anchor="middle">Most Critical Asset</text></g>`);
-parts.push(`<text class="hero-wordmark" x="${C.x}" y="${C.y + 29}" text-anchor="middle">CARMA</text>`);
+parts.push(`<text class="hero-wordmark" x="${C.x}" y="${C.y + 38}" text-anchor="middle">CARMA</text>`);
 const heroSvg = `<svg class="carma-hero" viewBox="0 0 ${W} ${H}" role="img" aria-label="CARMA: a network with one central hub and the assets its failure reaches">${parts.join('')}</svg>`;
 
 fs.writeFileSync(path.join(root, 'src/components/hero-svg.ts'), [

@@ -59,7 +59,7 @@ tbody tr:hover > td { background: var(--row-hover); }
 
 /* CARMA hero (src/components/hero-svg.ts): the edges fade into the page; the glow pulses and dashes travel outwards. */
 .carma-hero {
-  display: block; width: min(920px, 100%); height: auto;
+  display: block; width: min(1040px, 100%); height: auto;
   -webkit-mask-image: radial-gradient(ellipse 58% 72% at 50% 50%, #000 52%, transparent 100%);
           mask-image: radial-gradient(ellipse 58% 72% at 50% 50%, #000 52%, transparent 100%);
 }
@@ -71,9 +71,7 @@ tbody tr:hover > td { background: var(--row-hover); }
 .hero-node { fill: var(--hero-crimson); }
 .hero-node-ring { fill: var(--hero-glow); opacity: 0.18; }
 .hero-glow { transform-box: fill-box; transform-origin: center; animation: hero-pulse 4.5s ease-in-out infinite; }
-.hero-wordmark { font: 800 84px/1 'Segoe UI Variable Display', 'Segoe UI', system-ui, sans-serif; letter-spacing: 6px; fill: var(--hero-ink); }
-.hero-tag rect { fill: var(--hero-tag-bg); stroke: var(--hero-tag-border); }
-.hero-tag text { font: 600 16px 'Segoe UI', system-ui, sans-serif; fill: var(--hero-crimson); }
+.hero-wordmark { font: 800 108px/1 'Segoe UI Variable Display', 'Segoe UI', system-ui, sans-serif; letter-spacing: 8px; fill: var(--hero-ink); }
 @keyframes hero-flow { to { stroke-dashoffset: -54; } }
 @keyframes hero-pulse { 0%, 100% { opacity: 0.75; transform: scale(0.94); } 50% { opacity: 1; transform: scale(1.04); } }
 

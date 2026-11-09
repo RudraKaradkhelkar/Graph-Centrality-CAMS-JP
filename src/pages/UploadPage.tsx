@@ -171,7 +171,7 @@ export function UploadPage() {
       <main style={css('width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 32px 32px; box-sizing: border-box')}>
         <section aria-label="CARMA" style={css('padding: 0 0 20px; display: flex; flex-direction: column; align-items: center; text-align: center')}>
           <h1 style={css('margin: -8px 0 0; width: 100%; display: flex; justify-content: center')} dangerouslySetInnerHTML={{ __html: HERO_SVG }} />
-          <p style={css('margin: -4px 0 0; font-size: 16px; line-height: 24px; color: var(--text-2)')}>{APP_TAGLINE}</p>
+          <p style={css('margin: -6px 0 0; font-size: 28px; line-height: 36px; font-weight: 500; letter-spacing: 0.01em; color: var(--text-strong)')}>{APP_TAGLINE}</p>
         </section>
 
         <div style={css('display: flex; flex-wrap: wrap; align-items: stretch; gap: 24px')}>
