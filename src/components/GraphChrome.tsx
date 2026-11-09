@@ -129,7 +129,7 @@ export function GraphControlsHelp({ onClose }: { onClose(): void }) {
         <tbody>
           {CONTROLS.map(([what, mouse, pad]) => (
             <tr key={what} style={css('border-top: 1px solid var(--divider)')}>
-              <th scope="row" style={css('padding: 7px 12px 7px 0; font-weight: 600; text-align: left; vertical-align: top')}>{what}</th>
+              <th scope="row" style={css('padding: 7px 16px 7px 0; font-weight: 600; text-align: left; vertical-align: top; white-space: nowrap')}>{what}</th>
               <td style={css('padding: 7px 12px 7px 0; color: var(--text-2); vertical-align: top')}>{mouse}</td>
               <td style={css('padding: 7px 0; color: var(--text-2); vertical-align: top')}>{pad}</td>
             </tr>
