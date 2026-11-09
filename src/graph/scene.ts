@@ -315,7 +315,7 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
     if (!isSel && n.pos > tierN) return;
     if (blastOn && !inBlast(k) && focus > 0.5) return;
     if (q.x < -40 || q.x > W + 40 || q.y < -20 || q.y > VH + 20) return;
-    const nm = D.NM[k], lw = Math.max(6.6 * n.id.length, showNm ? 5.9 * nm.length : 0) + 6, lh = showNm ? 30 : 16;
+    const nm = D.NM[k], lw = Math.max(7.8 * n.id.length, showNm ? 7 * nm.length : 0) + 6, lh = showNm ? 34 : 18;
     const Rb = [q.x + q.r + 5, q.y - lh / 2, q.x + q.r + 5 + lw, q.y + lh / 2], Lb = [q.x - q.r - 5 - lw, q.y - lh / 2, q.x - q.r - 5, q.y + lh / 2];
     let left = false;
     if (clash(Rb)) { if (!clash(Lb)) left = true; else if (!isSel) return; }
@@ -324,8 +324,8 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
     names.push({
       id: n.id, nm,
       s: 'position: absolute; left: ' + pc(left ? q.x - q.r - 5 : q.x + q.r + 5, W) + '; top: ' + pc(q.y, VH) + '; transform: translate(' + (left ? '-100%' : '0') + ', -50%); white-space: nowrap; line-height: 1.25; text-align: ' + (left ? 'right' : 'left') + '; text-shadow: 0 0 2px ' + T.nameHalo + ', 0 0 4px ' + T.nameHalo + ', 0 0 8px ' + T.nameHalo,
-      is: 'display: block; font-size: ' + (lead ? '11.5px; font-weight: 600; color: ' + T.nameTop : '10.5px; font-weight: 500; color: ' + T.nameRest),
-      ns: showNm ? 'display: block; font-size: 10.5px; font-weight: 400; color: ' + T.nameRest : 'display: none',
+      is: 'display: block; font-size: ' + (lead ? '13.5px; font-weight: 600; color: ' + T.nameTop : '12.5px; font-weight: 500; color: ' + T.nameRest),
+      ns: showNm ? 'display: block; font-size: 12.5px; font-weight: 400; color: ' + T.nameRest : 'display: none',
     });
   });
 

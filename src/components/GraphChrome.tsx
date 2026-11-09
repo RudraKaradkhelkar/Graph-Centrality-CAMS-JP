@@ -13,8 +13,8 @@ const BTN = 'width: 36px; height: 32px; display: flex; align-items: center; just
 export function GraphCaption({ title, sub, big }: { title: string; sub: ReactNode; big?: boolean }) {
   return (
     <div data-ui="1" style={css(`position: absolute; left: 16px; top: 16px; max-width: 70%; ${PANEL}; padding: ${big ? '12px 16px' : '8px 12px'}; border-radius: 6px; cursor: default`)}>
-      <div style={css(`font-size: ${big ? 20 : 14}px; font-weight: 600; color: var(--text)`)}>{title}</div>
-      <div style={css(`margin-top: 2px; font-size: ${big ? 14 : 12}px; color: var(--text-3)`)}>{sub}</div>
+      <div style={css(`font-size: ${big ? 22 : 16}px; font-weight: 600; color: var(--text)`)}>{title}</div>
+      <div style={css(`margin-top: 2px; font-size: ${big ? 16 : 14}px; color: var(--text-3)`)}>{sub}</div>
     </div>
   );
 }
@@ -40,7 +40,7 @@ export const IMPORTANCE_KEY = 'Assigned Importance: H = High · M = Medium · L 
 /** Bottom-left legend in the graph's own colours. */
 export function GraphLegend({ T, from, to, levels, blast, depth = 2 }: { T: GraphTheme; from: number; to: number; levels: boolean; blast: boolean; depth?: number }) {
   return (
-    <div data-ui="1" style={css(`position: absolute; left: 16px; bottom: 16px; max-width: calc(100% - 32px); box-sizing: border-box; ${PANEL}; padding: 8px 12px; border-radius: 6px; display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: var(--text-2); cursor: default`)}>
+    <div data-ui="1" style={css(`position: absolute; left: 16px; bottom: 16px; max-width: calc(100% - 32px); box-sizing: border-box; ${PANEL}; padding: 8px 12px; border-radius: 6px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--text-2); cursor: default`)}>
       <div style={css('display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px')}>
         <span style={css('display: flex; align-items: center; gap: 8px')}><span aria-hidden="true" style={{ width: 12, height: 12, borderRadius: '50%', background: T.org[1] }} />Ranks {from}–{to}</span>
         <span style={css('display: flex; align-items: center; gap: 8px')}><span aria-hidden="true" style={{ width: 8, height: 8, borderRadius: '50%', border: `2px solid ${T.ring}` }} />Selected</span>
@@ -81,7 +81,7 @@ export function ExitPresent() {
   const app = useApp();
   return (
     <button data-ui="1" type="button" onClick={() => app.setPresent(false)} title="Esc"
-      style={css('position: fixed; right: 16px; top: 16px; z-index: 60; height: 32px; padding: 0 12px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--overlay-94); font: inherit; font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer')}>
+      style={css('position: fixed; right: 16px; top: 16px; z-index: 60; height: 32px; padding: 0 12px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--overlay-94); font: inherit; font-size: 15px; font-weight: 600; color: var(--text); cursor: pointer')}>
       <Icon name="close" size={14} width={2} />Exit Presentation
     </button>
   );
@@ -92,7 +92,7 @@ export function PresentButton() {
   const app = useApp();
   return (
     <button type="button" onClick={() => app.setPresent(true)} title="Full screen for a large display; Esc to leave"
-      style={css('height: 36px; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer')}>
+      style={css('height: 36px; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 16px; font-weight: 600; color: var(--text); cursor: pointer')}>
       <Icon name="fullscreen" size={16} />Present
     </button>
   );
@@ -113,7 +113,7 @@ const CONTROLS: [string, string, string][] = [
 export function GraphControlsHelp({ onClose }: { onClose(): void }) {
   return (
     <div data-ui="1" role="dialog" aria-labelledby="gc-h" onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}
-      style={css(`position: absolute; top: 72px; right: 20px; z-index: 5; width: min(640px, calc(100% - 40px)); box-sizing: border-box; ${PANEL}; background: var(--popover-bg); box-shadow: var(--popover-shadow); border-radius: 8px; padding: 16px 20px 18px; cursor: default`)}>
+      style={css(`position: absolute; top: 72px; right: 20px; z-index: 5; width: min(720px, calc(100% - 40px)); box-sizing: border-box; ${PANEL}; background: var(--popover-bg); box-shadow: var(--popover-shadow); border-radius: 8px; padding: 16px 20px 18px; cursor: default`)}>
       <div style={css('display: flex; align-items: center; justify-content: space-between; gap: 12px')}>
         <h2 id="gc-h" style={css('margin: 0; display: flex; align-items: center; gap: 8px; font-size: 18px; line-height: 24px; font-weight: 600; color: var(--text-strong)')}><Icon name="mouse" size={20} />Graph Controls</h2>
         <button type="button" autoFocus aria-label="Close the graph controls" onClick={onClose} style={css(`${BTN}; border-radius: 6px`)}><Icon name="close" /></button>

@@ -34,8 +34,8 @@ interface Props {
 const VB_H = 360, PL = 70, PR = 20, PT = 22, PB = 268;
 const FONT = "'Segoe UI Variable Text', 'Segoe UI', -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif";
 const BANDS: Band[] = ['Low', 'Medium', 'High'];
-const SMALL_BTN = 'height: 32px; padding: 0 12px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 12px; font-weight: 600; color: var(--text); cursor: pointer';
-const INPUT = 'height: 32px; width: 76px; padding: 0 8px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 12px; color: var(--text); font-variant-numeric: tabular-nums; box-sizing: border-box';
+const SMALL_BTN = 'height: 32px; padding: 0 12px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer';
+const INPUT = 'height: 32px; width: 76px; padding: 0 8px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 14px; color: var(--text); font-variant-numeric: tabular-nums; box-sizing: border-box';
 
 /** Theme colours as literal values, so an exported SVG/PNG keeps them. */
 function readColours() {
@@ -225,12 +225,12 @@ export function DistributionChart(p: Props) {
   return (
     <div>
       {!p.bare && <div style={css('display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 16px')}>
-        <span style={css('display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2)')}>Scale
+        <span style={css('display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-2)')}>Scale
           <Segmented label="Scale" value={dist.scale} onChange={(v) => set({ scale: v })} options={[{ id: 'linear', label: 'Linear' }, { id: 'log', label: 'Log' }]} />
-          {dist.suggest_log && dist.scale === 'linear' && <span style={css('font-size: 12px; color: var(--info-icon)')}>Log suggested</span>}
+          {dist.suggest_log && dist.scale === 'linear' && <span style={css('font-size: 14px; color: var(--info-icon)')}>Log suggested</span>}
         </span>
         {isScore && (
-          <span style={css('display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2)')}>
+          <span style={css('display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-2)')}>
             <select aria-label="Exclude assets by rule" value={ruleKind} onChange={(e) => {
               const k = e.target.value as typeof ruleKind;
               if (k === 'zero') { exclude({ rule: 'zero' }); setRuleKind(''); } else setRuleKind(k);
@@ -258,23 +258,23 @@ export function DistributionChart(p: Props) {
       {(hasRules || dist.hidden > 0) && (
         <div style={css('margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px')}>
           {dist.excluded.map((e, k) => (
-            <span key={k} style={css('display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 4px 0 12px; border-radius: 6px; background: var(--subtle); border: 1px solid var(--border); font-size: 12px; color: var(--text)')}>
+            <span key={k} style={css('display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 4px 0 12px; border-radius: 6px; background: var(--subtle); border: 1px solid var(--border); font-size: 14px; color: var(--text)')}>
               Excluded: {ruleText(e, isScore)}
               <button type="button" aria-label={`Remove exclusion: ${ruleText(e, isScore)}`} onClick={() => removeRule(k)} style={css('width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 6px; background: transparent; color: var(--text-3); cursor: pointer')}><Icon name="close" size={12} width={2.2} /></button>
             </span>
           ))}
           {options.zoom && (
-            <span style={css('display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 4px 0 12px; border-radius: 6px; background: var(--blue-soft-bg); font-size: 12px; color: var(--blue-soft-text)')}>
+            <span style={css('display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 4px 0 12px; border-radius: 6px; background: var(--blue-soft-bg); font-size: 14px; color: var(--blue-soft-text)')}>
               Zoomed to {isScore ? `${fmt(options.zoom[0])}–${fmt(options.zoom[1])}` : `fronts ${options.zoom[0]}–${options.zoom[1]}`} · {dist.outside_zoom} outside
               <button type="button" aria-label="Reset zoom" onClick={() => set({ zoom: null })} style={css('width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 6px; background: transparent; color: inherit; cursor: pointer')}><Icon name="close" size={12} width={2.2} /></button>
             </span>
           )}
-          <span style={css('font-size: 12px; color: var(--text-3)')}>Showing {dist.shown} of {dist.total} assets. Chart zones re-split the assets shown; bands in the lists stay on the full range.</span>
+          <span style={css('font-size: 14px; color: var(--text-3)')}>Showing {dist.shown} of {dist.total} assets. Chart zones re-split the assets shown; bands in the lists stay on the full range.</span>
         </div>
       )}
 
       <div ref={wrapRef} style={css('position: relative; margin-top: 12px')}>
-        {p.busy && <span style={css('position: absolute; right: 8px; top: 4px; font-size: 12px; color: var(--text-3)')}>Updating…</span>}
+        {p.busy && <span style={css('position: absolute; right: 8px; top: 4px; font-size: 14px; color: var(--text-3)')}>Updating…</span>}
         <svg ref={svgRef} xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 ${VB_W} ${VB_H}`} width={VB_W} height={VB_H} fontFamily={FONT}
           role="img" aria-label={`${X_TITLE}: ${dist.zones.map((z) => `${z.band} ${z.count}`).join(', ')}`}
           style={{ width: '100%', height: 'auto', display: 'block', touchAction: 'none' }}
@@ -287,10 +287,10 @@ export function DistributionChart(p: Props) {
           {yTicks.map((t) => (
             <g key={t}>
               <line x1={PL} x2={VB_W - PR} y1={yOf(t)} y2={yOf(t)} stroke={C.grid} strokeWidth={1} />
-              <text x={PL - 8} y={yOf(t) + 4} textAnchor="end" fontSize={12} fill={C.text3}>{t}</text>
+              <text x={PL - 8} y={yOf(t) + 4} textAnchor="end" fontSize={14} fill={C.text3}>{t}</text>
             </g>
           ))}
-          <text x={16} y={(PT + PB) / 2} textAnchor="middle" fontSize={12} fontWeight={600} fill={C.text2} transform={`rotate(-90 16 ${(PT + PB) / 2})`}>{Y_TITLE}</text>
+          <text x={16} y={(PT + PB) / 2} textAnchor="middle" fontSize={14} fontWeight={600} fill={C.text2} transform={`rotate(-90 16 ${(PT + PB) / 2})`}>{Y_TITLE}</text>
           {/* Bars */}
           {barRects.map(({ b, k, x, w, last }) => (
             <g key={k} style={{ cursor: 'pointer' }} onClick={(e) => { e.stopPropagation(); if (b.count) setPick({ x: x + w / 2, y: yOf(b.count), bar: b, kind: 'bar', last }); }}>
@@ -321,25 +321,25 @@ export function DistributionChart(p: Props) {
             if (!z) return null;
             const mid = (z[0] + z[1]) / 2, wide = z[1] - z[0] > 70;
             return (
-              <text key={b} x={mid} y={PB + 20} textAnchor="middle" fontSize={12} fontWeight={600} fill={C.zoneText[b]} pointerEvents="none">
+              <text key={b} x={mid} y={PB + 20} textAnchor="middle" fontSize={14} fontWeight={600} fill={C.zoneText[b]} pointerEvents="none">
                 {wide ? `${b} · ${zone.count}` : b[0]}
               </text>
             );
           })}
-          {zero && <text x={zeroX + ZW / 2} y={PB + 20} textAnchor="middle" fontSize={12} fill={C.text3} pointerEvents="none">{p.zeroLabel ?? 'score 0'}</text>}
+          {zero && <text x={zeroX + ZW / 2} y={PB + 20} textAnchor="middle" fontSize={14} fill={C.text3} pointerEvents="none">{p.zeroLabel ?? 'score 0'}</text>}
           {p.showNumbers && (
             <g pointerEvents="none">
               {/* With the zero bar shown, its own "0" label replaces a 0 tick on the main axis. */}
-              {dist.ticks.filter((t) => !(zero && t === 0)).map((t) => <text key={t} x={xOf(t)} y={PB + 42} textAnchor="middle" fontSize={12} fill={C.text3}>{fmt(t)}</text>)}
-              {zero && <text x={zeroX + ZW / 2} y={PB + 42} textAnchor="middle" fontSize={12} fontWeight={600} fill={C.text2}>0</text>}
+              {dist.ticks.filter((t) => !(zero && t === 0)).map((t) => <text key={t} x={xOf(t)} y={PB + 42} textAnchor="middle" fontSize={14} fill={C.text3}>{fmt(t)}</text>)}
+              {zero && <text x={zeroX + ZW / 2} y={PB + 42} textAnchor="middle" fontSize={14} fontWeight={600} fill={C.text2}>0</text>}
             </g>
           )}
           {zoomSel && <rect x={Math.min(zoomSel.x0, zoomSel.x1)} y={PT} width={Math.abs(zoomSel.x1 - zoomSel.x0)} height={PB - PT + 56} fill={C.select} opacity={0.12} pointerEvents="none" />}
-          <text x={(PL + VB_W - PR) / 2} y={VB_H - 10} textAnchor="middle" fontSize={12} fontWeight={600} fill={C.text2}>{X_TITLE}</text>
+          <text x={(PL + VB_W - PR) / 2} y={VB_H - 10} textAnchor="middle" fontSize={14} fontWeight={600} fill={C.text2}>{X_TITLE}</text>
         </svg>
         {pick && (
           <div role="dialog" aria-label="Bar actions" style={{ position: 'absolute', left: `${pick.x / VB_W * 100}%`, top: `${pick.y / VB_H * 100}%`, transform: 'translate(-50%, calc(-100% - 8px))', zIndex: 2 }}>
-            <div style={css('padding: 8px 12px; background: var(--popover-bg); border: 1px solid var(--popover-border); border-radius: 6px; box-shadow: var(--popover-shadow); white-space: nowrap; display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--text)')}>
+            <div style={css('padding: 8px 12px; background: var(--popover-bg); border: 1px solid var(--popover-border); border-radius: 6px; box-shadow: var(--popover-shadow); white-space: nowrap; display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text)')}>
               {barTitle(pick.bar, pick.kind)}
               <button type="button" style={css(SMALL_BTN + '; height: 24px')} onClick={() => exclude(
                 pick.kind === 'zero' ? { rule: 'zero' }
@@ -352,7 +352,7 @@ export function DistributionChart(p: Props) {
         )}
       </div>
 
-      {!p.bare && <details style={css('margin-top: 8px; font-size: 12px; color: var(--text-2)')}>
+      {!p.bare && <details style={css('margin-top: 8px; font-size: 14px; color: var(--text-2)')}>
         <summary style={css('cursor: pointer')}>Axis Titles</summary>
         <div style={css('margin-top: 8px; display: flex; flex-wrap: wrap; gap: 12px')}>
           <label style={css('display: flex; align-items: center; gap: 8px')}>X <input value={X_TITLE} onChange={(e) => setXTitle(e.target.value)} style={css(INPUT + '; width: 360px')} /></label>

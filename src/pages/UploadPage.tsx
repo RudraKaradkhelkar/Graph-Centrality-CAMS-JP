@@ -300,7 +300,7 @@ export function UploadPage() {
             <div style={css('display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px 20px')}>
               <div>
                 <h2 id="prev-h" style={css('margin: 0; font-size: 18px; line-height: 24px; font-weight: 600; color: var(--text-strong)')}>Preview</h2>
-                <p style={css('margin: 4px 0 0; font-size: 13px; color: var(--text-3)')}>{tab === 'links' ? `First 5 of ${d.links.length} links read` : `First 5 of ${d.assets.length} assets`}</p>
+                <p style={css('margin: 4px 0 0; font-size: 13px; color: var(--text-3)')}>{tab === 'links' ? `First ${Math.min(5, d.links.length)} of ${d.links.length} links` : `First ${Math.min(5, d.assets.length)} of ${d.assets.length} assets`}</p>
               </div>
               <div role="tablist" aria-label="Preview" style={css('display: flex; gap: 2px; padding: 2px; background: var(--seg-bg); border-radius: 6px')}>
                 {([['links', 'Link Sheet'], ['assets', 'Asset Sheet']] as const).map(([id, label]) => (

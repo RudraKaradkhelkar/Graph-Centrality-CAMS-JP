@@ -67,7 +67,7 @@ export function InfoTip({ term, text }: { term: keyof typeof GLOSSARY | string; 
         <Icon name="info" size={14} />
       </button>
       {at && (
-        <span role="tooltip" style={{ ...css('position: fixed; z-index: 100; width: 280px; box-sizing: border-box; padding: 8px 12px; background: var(--popover-bg); border: 1px solid var(--popover-border); border-radius: 6px; box-shadow: var(--popover-shadow); font-size: 12px; line-height: 18px; font-weight: 400; letter-spacing: 0; text-align: left; white-space: normal; color: var(--text)'), left: at.left, top: at.top }}>
+        <span role="tooltip" style={{ ...css('position: fixed; z-index: 100; width: 280px; box-sizing: border-box; padding: 8px 12px; background: var(--popover-bg); border: 1px solid var(--popover-border); border-radius: 6px; box-shadow: var(--popover-shadow); font-size: 14px; line-height: 18px; font-weight: 400; letter-spacing: 0; text-align: left; white-space: normal; color: var(--text)'), left: at.left, top: at.top }}>
           <span style={css('display: block; margin-bottom: 2px; font-weight: 600')}>{term}</span>{body}
         </span>
       )}
@@ -91,8 +91,8 @@ export function ParetoLink({ text = 'Pareto front' }: { text?: string }) {
   return <a href="https://en.wikipedia.org/wiki/Pareto_front" target="_blank" rel="noopener noreferrer" style={css('color: var(--link); font-weight: 600')}>{text}</a>;
 }
 
-const SEG_ON = 'height: 28px; border: 0; border-radius: 4px; background: var(--seg-on-bg); color: var(--seg-on-text); font: inherit; font-size: 13px; font-weight: 600; box-shadow: var(--seg-on-shadow); white-space: nowrap';
-const SEG_OFF = 'height: 28px; border: 0; border-radius: 4px; background: transparent; color: var(--seg-off-text); font: inherit; font-size: 13px; font-weight: 400; white-space: nowrap';
+const SEG_ON = 'height: 28px; border: 0; border-radius: 4px; background: var(--seg-on-bg); color: var(--seg-on-text); font: inherit; font-size: 15px; font-weight: 600; box-shadow: var(--seg-on-shadow); white-space: nowrap';
+const SEG_OFF = 'height: 28px; border: 0; border-radius: 4px; background: transparent; color: var(--seg-off-text); font: inherit; font-size: 15px; font-weight: 400; white-space: nowrap';
 
 export function Segmented<const T extends string | number>(props: {
   options: { id: T; label: string; disabled?: boolean }[];
@@ -129,7 +129,7 @@ export function Segmented<const T extends string | number>(props: {
 export function BandChip({ band, size = 'md' }: { band: 'Low' | 'Medium' | 'High'; size?: 'sm' | 'md' }) {
   const k = band.toLowerCase();
   return (
-    <span style={css(`display: inline-flex; align-items: center; height: ${size === 'sm' ? 20 : 24}px; padding: 0 8px; border-radius: 4px; background: var(--band-${k}-bg); color: var(--band-${k}); font-size: 12px; font-weight: 600; white-space: nowrap`)}>
+    <span style={css(`display: inline-flex; align-items: center; height: ${size === 'sm' ? 20 : 24}px; padding: 0 8px; border-radius: 4px; background: var(--band-${k}-bg); color: var(--band-${k}); font-size: 14px; font-weight: 600; white-space: nowrap`)}>
       {band}
     </span>
   );
@@ -149,7 +149,7 @@ export function LevelChip({ lv, alt = false }: { lv: number | string; alt?: bool
 export function AppBar() {
   return (
     <header style={css('min-height: 56px; padding: 8px 24px; display: flex; align-items: center; gap: 16px; background: var(--surface); border-bottom: 1px solid var(--border); box-sizing: border-box')}>
-      <span style={css('display: inline-flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 800; letter-spacing: 0.06em; color: var(--text-strong)')}><BrandMark size={26} />CARMA</span>
+      <span style={css('display: inline-flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 800; letter-spacing: 0.06em; color: var(--text-strong)')}><BrandMark size={26} />CARMA</span>
       <span aria-hidden="true" style={css('width: 1px; align-self: stretch; background: var(--border)')} />
       <Credits />
       <Copyright style="margin-left: auto" />
@@ -174,17 +174,17 @@ export function BrandMark({ size = 24 }: { size?: number }) {
 export function Credits() {
   return (
     <div style={css('display: flex; flex-direction: column; line-height: 18px; white-space: nowrap')}>
-      <span style={css('font-size: 14px; color: var(--text-2)')}>
+      <span style={css('font-size: 16px; color: var(--text-2)')}>
         Created by <span style={css('font-weight: 600; color: var(--text-strong)')}>Rudra Karadkhelkar</span> and <span style={css('font-weight: 600; color: var(--text-strong)')}>Ranjan Pal</span>
       </span>
-      <span style={css('font-size: 13px; letter-spacing: 0.02em; color: var(--text-3)')}>Massachusetts Institute of Technology</span>
+      <span style={css('font-size: 15px; letter-spacing: 0.02em; color: var(--text-3)')}>Massachusetts Institute of Technology</span>
     </div>
   );
 }
 
 /** Copyright line, top right of every page. */
 export function Copyright({ style = '' }: { style?: string }) {
-  return <span style={css(`font-size: 13px; color: var(--text-3); white-space: nowrap; ${style}`)}>Copyright © MIT Sloan School of Management</span>;
+  return <span style={css(`font-size: 15px; color: var(--text-3); white-space: nowrap; ${style}`)}>Copyright © MIT Sloan School of Management</span>;
 }
 
 export function ThemeButton() {

@@ -62,12 +62,12 @@ export function ConeView(p: Props) {
       ariaLabel={(i) => p.ariaLabel(members[i])} tip={(i) => p.tip(members[i])} onSelect={() => {}}
       overlay={(info, c) => (
         <div style={css('position: absolute; inset: 12px; pointer-events: none; display: flex; align-items: flex-end; justify-content: space-between; gap: 8px')}>
-          <div data-ui="1" style={css(`${OVERLAY}; padding: 6px 12px; border-radius: 6px; font-size: 12px; line-height: 18px; color: var(--text-2); cursor: default`)}>
+          <div data-ui="1" style={css(`${OVERLAY}; padding: 6px 12px; border-radius: 6px; font-size: 14px; line-height: 18px; color: var(--text-2); cursor: default`)}>
             Drag to turn · Ctrl + scroll or pinch to zoom
           </div>
           <div data-ui="1" style={css(`display: flex; ${OVERLAY}; border-radius: 6px; overflow: hidden`)}>
             <button type="button" aria-label="Zoom out" onClick={c.zoomOut} style={css(BTN)}><Icon name="minus" width={2} /></button>
-            <span aria-live="polite" style={css('min-width: 48px; border-left: 1px solid var(--border); border-right: 1px solid var(--border); font-size: 12px; line-height: 32px; font-weight: 600; text-align: center; color: var(--text); font-variant-numeric: tabular-nums')}>{info.zoomPct}</span>
+            <span aria-live="polite" style={css('min-width: 48px; border-left: 1px solid var(--border); border-right: 1px solid var(--border); font-size: 14px; line-height: 32px; font-weight: 600; text-align: center; color: var(--text); font-variant-numeric: tabular-nums')}>{info.zoomPct}</span>
             <button type="button" aria-label="Zoom in" onClick={c.zoomIn} style={css(BTN)}><Icon name="plus" width={2} /></button>
             <button type="button" aria-label="Reset the 3D view" title="Reset the view" onClick={() => setFresh(fresh + 1)} style={css(`${BTN}; border-left: 1px solid var(--border)`)}><Icon name="reset" /></button>
           </div>
