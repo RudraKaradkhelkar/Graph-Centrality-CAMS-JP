@@ -149,11 +149,24 @@ export function LevelChip({ lv, alt = false }: { lv: number | string; alt?: bool
 export function AppBar() {
   return (
     <header style={css('min-height: 56px; padding: 8px 24px; display: flex; align-items: center; gap: 16px; background: var(--surface); border-bottom: 1px solid var(--border); box-sizing: border-box')}>
-      <span style={css('font-size: 18px; font-weight: 700; letter-spacing: 0.04em; color: var(--text-strong)')}>CARMA</span>
+      <span style={css('display: inline-flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 800; letter-spacing: 0.06em; color: var(--text-strong)')}><BrandMark size={26} />CARMA</span>
       <span aria-hidden="true" style={css('width: 1px; align-self: stretch; background: var(--border)')} />
       <Credits />
       <Copyright style="margin-left: auto" />
     </header>
+  );
+}
+
+const MARK_SPOKES = [[16, 3.5], [27.9, 12.1], [23.3, 26.1], [8.7, 26.1], [4.1, 12.1]];
+/** CARMA's compact mark: a hub with five spokes (also public/favicon.svg, from scripts/build-hero.mjs). */
+export function BrandMark({ size = 24 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true" style={{ flex: 'none' }}>
+      {MARK_SPOKES.map(([x, y]) => <line key={`l${x}`} x1={16} y1={16} x2={x} y2={y} stroke="var(--mark-spoke)" strokeWidth={2.2} strokeLinecap="round" />)}
+      <circle cx={16} cy={16} r={9} fill="var(--mark-glow)" />
+      {MARK_SPOKES.map(([x, y]) => <circle key={`c${x}`} cx={x} cy={y} r={3.1} fill="var(--mark-hub)" />)}
+      <circle cx={16} cy={16} r={5.6} fill="var(--mark-hub)" />
+    </svg>
   );
 }
 

@@ -91,6 +91,20 @@
   --view-on-text: #242424;
   --view-off-text: #616161;
   --legend-top-glow: none;
+  /* CARMA hero and mark (landing page, app bar, favicon). */
+  --hero-ink: #231A1D;
+  --hero-crimson: #B4122F;
+  --hero-glow: #E2324F;
+  --hero-glow-a: 0.5;
+  --hero-glow-b: 0.16;
+  --hero-edge-c: #C9AEB4;
+  --hero-outer-c: #D9C3C8;
+  --hero-hot-edge: rgba(180, 18, 47, 0.55);
+  --hero-tag-bg: #FFFFFF;
+  --hero-tag-border: rgba(180, 18, 47, 0.45);
+  --mark-hub: #B4122F;
+  --mark-spoke: #D58E9B;
+  --mark-glow: rgba(226, 50, 79, 0.22);
 }
 
 :root[data-theme="dark"] {
@@ -177,4 +191,17 @@
   --view-on-text: #FFFFFF;
   --view-off-text: #ADADAD;
   --legend-top-glow: none;
+  --hero-ink: #FFFFFF;
+  --hero-crimson: #FF3A55;
+  --hero-glow: #FF2D4A;
+  --hero-glow-a: 0.85;
+  --hero-glow-b: 0.3;
+  --hero-edge-c: #4F3A40;
+  --hero-outer-c: #5E474D;
+  --hero-hot-edge: rgba(255, 58, 85, 0.6);
+  --hero-tag-bg: #17121A;
+  --hero-tag-border: rgba(255, 58, 85, 0.55);
+  --mark-hub: #FF3A55;
+  --mark-spoke: #8E4652;
+  --mark-glow: rgba(255, 45, 74, 0.3);
 }

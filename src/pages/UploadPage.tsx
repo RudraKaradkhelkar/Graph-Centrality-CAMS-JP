@@ -2,6 +2,7 @@
 import { useRef, useState } from 'react';
 import { navigate } from '../App';
 import { css } from '../components/css';
+import { HERO_SVG } from '../components/hero-svg';
 import { APP_TAGLINE, Copyright, Credits, Icon, LevelChip, LV, ThemeButton } from '../components/ui';
 import { downloadTemplate, loadSample } from '../data/dataset';
 import { hasErrors, parsePair, readFile, shortName, type FileRead, type Issue } from '../data/parse';
@@ -14,8 +15,23 @@ const TH = 'position: sticky; top: 0; background: var(--table-head); padding: 12
 const TH_SUB = 'margin-top: 2px; font-size: 12px; font-weight: 400; color: var(--text-3)';
 const TD = 'padding: 12px 16px; border-bottom: 1px solid var(--divider)';
 const SELECT = 'height: 32px; padding: 0 32px 0 12px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 13px; color: var(--text); appearance: none; -webkit-appearance: none';
-const H3 = 'margin: 20px 0 0; font-size: 16px; line-height: 24px; font-weight: 600; color: var(--text-strong)';
-const UL = 'margin: 8px 0 0; padding: 0 0 0 20px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; line-height: 22px; color: var(--text-2)';
+const H3 = 'margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; color: var(--text-strong)';
+/** README: each sheet's columns with a short explanation (the format Dr. Pal preferred). */
+const README_SHEETS: [string, [string, string][]][] = [
+  ['Asset Sheet · One Row per Asset', [
+    ['Asset ID', 'Required. Every ID used in Source and Target must be listed.'],
+    ['Asset Name', 'Optional. The legend shows up to 5 words.'],
+    ['Abbreviation', 'Optional. Labels on the graph, matching the architecture diagram.'],
+    ['Asset Type', 'Optional. Groups assets into clusters on the graph.'],
+  ]],
+  ['Link Sheet · One Row per Directed Edge', [
+    ['Source', 'Required. The asset ID the edge starts from.'],
+    ['Target', 'Required. The asset ID that depends on the source.'],
+    ['Edge Type', 'Required. Groups edges for filtering, such as Power or Control.'],
+    ['Edge Importance', 'Required. 1, 2, 3 or Low, Medium, High.'],
+    ['Source and Target Asset Importance', 'Required. 1, 2, 3 or Low, Medium, High.'],
+  ]],
+];
 
 function formatSize(bytes: number) {
   return bytes >= 1e6 ? `${(bytes / 1e6).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1e3))} KB`;
@@ -153,9 +169,9 @@ export function UploadPage() {
         <div style={css('display: flex; align-items: center; gap: 12px')}><Copyright /><ThemeButton /></div>
       </header>
       <main style={css('width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 32px 32px; box-sizing: border-box')}>
-        <section aria-label="CARMA" style={css('padding: 4px 0 24px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center')}>
-          <h1 style={css('margin: 0; font-size: 64px; line-height: 72px; font-weight: 700; letter-spacing: 0.04em; color: var(--text-strong)')}>CARMA</h1>
-          <p style={css('margin: 0; font-size: 16px; line-height: 24px; color: var(--text-2)')}>{APP_TAGLINE}</p>
+        <section aria-label="CARMA" style={css('padding: 0 0 20px; display: flex; flex-direction: column; align-items: center; text-align: center')}>
+          <h1 style={css('margin: -8px 0 0; width: 100%; display: flex; justify-content: center')} dangerouslySetInnerHTML={{ __html: HERO_SVG }} />
+          <p style={css('margin: -4px 0 0; font-size: 16px; line-height: 24px; color: var(--text-2)')}>{APP_TAGLINE}</p>
         </section>
 
         <div style={css('display: flex; flex-wrap: wrap; align-items: stretch; gap: 24px')}>
@@ -167,22 +183,25 @@ export function UploadPage() {
             <p style={css('margin: 8px 0 0; font-size: 16px; line-height: 24px; color: var(--text)')}>
               Upload <span style={css('font-weight: 600')}>2 files</span>: an Asset Sheet and a Link Sheet, each .xlsx, .xls or .csv.
             </p>
-            <h3 style={css(H3)}>Asset Sheet · one row per asset</h3>
-            <ul style={css(UL)}>
-              <li><b>Asset ID</b> (required): a unique ID for each asset</li>
-              <li><b>Asset Name</b>, <b>Asset Type</b>, <b>Abbreviation</b> (optional)</li>
-            </ul>
-            <h3 style={css(H3)}>Link Sheet · one row per link, Source → Target</h3>
-            <ul style={css(UL)}>
-              <li><b>Source</b>, <b>Target</b> (required): asset IDs from the Asset Sheet</li>
-              <li><b>Edge Type</b> (required): for example Power, Control or Network</li>
-              <li><b>Edge Importance</b> (required): L, M, H or 1, 2, 3</li>
-              <li><b>Source</b> and <b>Target Asset Importance</b> (required): L, M, H or 1, 2, 3</li>
-            </ul>
-            <p style={css('margin: 16px 0 0; display: flex; align-items: center; gap: 8px; font-size: 14px; line-height: 20px; color: var(--text-3)')}>
+            <div style={css('margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 20px 40px')}>
+              {README_SHEETS.map(([title, fields]) => (
+                <div key={title}>
+                  <h3 style={css(H3)}>{title}</h3>
+                  <dl style={css('margin: 12px 0 0; display: flex; flex-direction: column; gap: 12px')}>
+                    {fields.map(([t, dd]) => (
+                      <div key={t}>
+                        <dt style={css('font-size: 15px; line-height: 22px; font-weight: 600; color: var(--text)')}>{t}</dt>
+                        <dd style={css('margin: 0; font-size: 14px; line-height: 20px; color: var(--text-2)')}>{dd}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              ))}
+            </div>
+            <div style={css('margin-top: 20px; display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 6px; background: var(--subtle); font-size: 14px; line-height: 20px; color: var(--text-2)')}>
               <span style={css('display: flex; gap: 4px')} aria-hidden="true">{[1, 2, 3].map((v) => <LevelChip key={v} lv={v} alt />)}</span>
-              L, M, H = Low, Medium, High (any case). The target depends on the source.
-            </p>
+              Assigned importance 1, 2, 3 appears as Low, Medium, High.
+            </div>
           </section>
 
           <section aria-labelledby="upload-h" style={css(`${CARD}; flex: 2 1 400px; min-width: 0; display: flex; flex-direction: column; gap: 14px`)}>

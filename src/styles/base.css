@@ -54,6 +54,27 @@ tbody tr:hover > td { background: var(--row-hover); }
 .graph-tip-title { font-size: 13px; font-weight: 600; color: var(--text); }
 .graph-tip-line { margin-top: 2px; font-size: 12px; color: var(--text-3); }
 
+/* CARMA hero (src/components/hero-svg.ts): the edges fade into the page; the glow pulses and dashes travel outwards. */
+.carma-hero {
+  display: block; width: min(920px, 100%); height: auto;
+  -webkit-mask-image: radial-gradient(ellipse 58% 72% at 50% 50%, #000 52%, transparent 100%);
+          mask-image: radial-gradient(ellipse 58% 72% at 50% 50%, #000 52%, transparent 100%);
+}
+.hero-edge-outer { stroke: var(--hero-outer-c); stroke-width: 1.2; }
+.hero-edge { stroke: var(--hero-edge-c); stroke-width: 1.5; }
+.hero-spoke { stroke: var(--hero-hot-edge); stroke-width: 2.6; stroke-linecap: round; }
+.hero-flow { stroke: var(--hero-crimson); stroke-width: 2.6; stroke-linecap: round; stroke-dasharray: 5 22; animation: hero-flow 2.4s linear infinite; }
+.hero-node-outer { fill: var(--hero-outer-c); }
+.hero-node { fill: var(--hero-crimson); }
+.hero-node-ring { fill: var(--hero-glow); opacity: 0.18; }
+.hero-glow { transform-box: fill-box; transform-origin: center; animation: hero-pulse 4.5s ease-in-out infinite; }
+.hero-wordmark { font: 800 84px/1 'Segoe UI Variable Display', 'Segoe UI', system-ui, sans-serif; letter-spacing: 6px; fill: var(--hero-ink); }
+.hero-tag rect { fill: var(--hero-tag-bg); stroke: var(--hero-tag-border); }
+.hero-tag text { font: 600 16px 'Segoe UI', system-ui, sans-serif; fill: var(--hero-crimson); }
+@keyframes hero-flow { to { stroke-dashoffset: -54; } }
+@keyframes hero-pulse { 0%, 100% { opacity: 0.75; transform: scale(0.94); } 50% { opacity: 1; transform: scale(1.04); } }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+  .hero-flow { display: none; }
 }
