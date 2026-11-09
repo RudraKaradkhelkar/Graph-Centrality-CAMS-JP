@@ -5,10 +5,10 @@
 :root,
 :root[data-theme="light"] {
   color-scheme: light;
-  /* Very light pink page (Dr. Pal, 2026-11-06); cards and the graph stay white. */
+  /* Very light pink page (Dr. Pal, 2026-11-06); cards stay white and the graph is a light grey (2026-11-09). */
   --page: #FCF3F4;
   --surface: #FFFFFF;
-  --graph-bg: #FFFFFF;
+  --graph-bg: #F0F1F4;
   --text: #242424;
   --text-strong: #242424;
   --text-2: #424242;

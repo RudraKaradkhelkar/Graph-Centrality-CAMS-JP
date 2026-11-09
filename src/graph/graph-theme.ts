@@ -1,4 +1,5 @@
-// 3D graph palettes, copied verbatim from the V3 reference (light and dark). Do not restyle.
+// 3D graph palettes, copied from the V3 reference (light and dark). Only change: the light background is a light
+// grey instead of white (2026-11-09), so the gap ring and name halo follow it.
 
 export interface GraphTheme {
   bg: string;
@@ -29,15 +30,15 @@ export interface GraphTheme {
 }
 
 export const LIGHT: GraphTheme = {
-  bg: '#FFFFFF', grid: '100, 116, 139, 0.16',
+  bg: '#F0F1F4', grid: '100, 116, 139, 0.18',
   sph: [['#EEF5FE', '#86B6EF', '#4F7FBF', '#0B1F3A'], ['#E3EEFD', '#5598E7', '#2E62A8', '#0B1F3A'], ['#D6E6FB', '#2A78D6', '#174A8C', '#FFFFFF'], ['#C9DDF8', '#1C5CAB', '#0D3366', '#FFFFFF']],
   org: ['#FFE3D1', '#EB6834', '#9E3A12', '#2A1205'], glow: '', shadow: '0 2px 4px rgba(16, 24, 40, 0.22)',
-  ring: '#16181D', ringGap: '#FFFFFF', halo: 'rgba(15, 98, 214, 0.14)',
+  ring: '#16181D', ringGap: '#F0F1F4', halo: 'rgba(15, 98, 214, 0.14)',
   e0: ['#E1E6EC', '#A7B1BF', '#717C8C'], e1: ['#B9D5FB', '#2A78D6', '#164A8F'], e2: ['#D6E6FB', '#7FAEEA', '#4F7FBF'],
   cone: '235, 104, 52', coneA: [0.30, 0.16, 0.06, 0.10, 0.05],
   lblBg: '#FFFFFF', lblBorder: '#C3C9D2', lblText: '#2B3340', lblHop: '#2A78D6', badgeBg: '#16181D', badgeText: '#FFFFFF',
   gx: ['194, 65, 12', '21, 128, 61', '29, 78, 216'], gizmoText: '78, 85, 98',
-  nameTop: '#16181D', nameRest: '#4E5562', nameHalo: '#FFFFFF',
+  nameTop: '#16181D', nameRest: '#4E5562', nameHalo: '#F0F1F4',
 };
 
 export const DARK: GraphTheme = {

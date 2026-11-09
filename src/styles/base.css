@@ -32,6 +32,9 @@ tbody tr:hover > td { background: var(--row-hover); }
 .graph-viewport {
   position: relative; width: 100%; aspect-ratio: 1400 / 1200; background: var(--graph-bg);
   border-bottom: 1px solid var(--border); overflow: hidden; user-select: none; -webkit-user-select: none;
+  /* Dragging on the graph (mouse, pen or touch) moves the graph, never the page; clip (not hidden) so focusing a
+     sphere can't scroll the drawing inside its frame. */
+  touch-action: none; overflow: clip;
 }
 .graph-viewport:fullscreen { aspect-ratio: auto; }
 /* Overlays adapt to the graph's own width (it narrows beside the affected-assets panel). */

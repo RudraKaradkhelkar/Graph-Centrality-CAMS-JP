@@ -36,6 +36,12 @@ export interface SceneData {
   FLOOR: number;
   GX: [number, number];
   GZ: [number, number];
+  /** Standalone cone (Blast Radius in 3D): the cone's direction on the floor plane, instead of away from the centre. */
+  coneDir?: [number, number];
+  /** Standalone cone: how far the cone tilts upwards, in degrees (default 35). */
+  coneTilt?: number;
+  /** Standalone cone: rotate and zoom around the middle of the first cone instead of the network's origin. */
+  pivotOnCone?: boolean;
 }
 
 export interface SceneState {
@@ -104,7 +110,10 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
   const flat = st.view === 'flat', zoom = st.z, weighted = st.weighted && st.showLevels, sel = st.sel;
   const yaw = st.yaw * Math.PI / 180, pit = (flat ? -90 : st.pitch) * Math.PI / 180;
   const cyw = Math.cos(yaw), syw = Math.sin(yaw), cp = Math.cos(pit), sp = Math.sin(pit);
-  const proj = (x: number, y: number, z: number): P2 => {
+  // The point the camera turns around (the origin, or the middle of a standalone cone: set below).
+  let O: [number, number, number] = [0, 0, 0];
+  const proj = (x0: number, y0: number, z0: number): P2 => {
+    const x = x0 - O[0], y = y0 - O[1], z = z0 - O[2];
     const x1 = x * cyw - z * syw, z1 = x * syw + z * cyw;
     const y1 = y * cp - z1 * sp, z2 = y * sp + z1 * cp;
     const sc = flat ? 1 : DIST / (DIST + z2);
@@ -123,6 +132,7 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
   // cone CONE_TILT upwards.
   const coneDirs = (targets: number[]): Map<number, [number, number]> => {
     const dirs = targets.map((x): [number, number] => {
+      if (D.coneDir) return D.coneDir;
       const hx = N[x].x, hz = N[x].z, l = Math.hypot(hx, hz);
       return l > 1e-6 ? [hx / l, hz / l] : [0.57, 0.82];
     });
@@ -155,7 +165,8 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
     const Lfar = Math.max(2.2, Math.min(4.1, 2 + 0.09 * nLast)) * (nr > 2 ? 1 + 0.35 * (nr - 2) : 1);
     const L = nr >= 2 ? counts.map((_, h) => Lfar * (0.46 + 0.54 * h / (nr - 1))) : [0.46 * Lfar];
     const Lend = nr >= 2 ? Lfar + 0.7 : L[0] + 0.55;
-    const dx = hd[0] * Math.cos(CONE_TILT), dy = Math.sin(CONE_TILT), dz = hd[1] * Math.cos(CONE_TILT);
+    const tilt = D.coneTilt != null ? D.coneTilt * Math.PI / 180 : CONE_TILT;
+    const dx = hd[0] * Math.cos(tilt), dy = Math.sin(tilt), dz = hd[1] * Math.cos(tilt);
     let vx = -dy * dx, vy = 1 - dy * dy, vz = -dy * dz;
     const vl = Math.sqrt(vx * vx + vy * vy + vz * vz);
     vx /= vl; vy /= vl; vz /= vl;
@@ -200,6 +211,8 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
   const mt = st.mt, e = mt < 0.5 ? 4 * mt * mt * mt : 1 - Math.pow(-2 * mt + 2, 3) / 2;
   const gathersOf = (targets: number[]) => { const dirs = coneDirs(targets); return new Map(targets.map((x) => [x, gather(x, dirs.get(x)!)])); };
   const fromG = gathersOf(st.gFrom), toG = gathersOf(st.gTo);
+  const G1 = D.pivotOnCone ? [...toG.values()][0] : undefined;
+  if (G1) O = [0, 1, 2].map((a) => G1.S[a] + G1.d[a] * G1.Lend / 2) as [number, number, number];
   const focus = toG.size ? (fromG.size ? 1 : e) : (fromG.size ? 1 - e : 0);
   // Highlighting follows the cones being shown (or, while they fade out, the previous ones).
   const targets = st.gTo.length ? st.gTo : st.gFrom, BLs = [...(st.gTo.length ? toG : fromG).values()], blastOn = BLs.length > 0;

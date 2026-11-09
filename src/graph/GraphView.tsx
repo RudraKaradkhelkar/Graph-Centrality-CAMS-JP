@@ -1,7 +1,7 @@
 // 3D network view. The ported scene maths (scene.ts) produces style strings; this component writes them to
 // pooled DOM elements in requestAnimationFrame, so dragging and tweening never re-render React.
 // Overlays (legend, selected asset bar, view controls) are rendered by the caller through `overlay`.
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import type { GraphTheme } from './graph-theme';
 import { DEFAULT_PITCH, DEFAULT_YAW } from './layout';
 import { buildScene, H, W, type GatherCache, type Scene, type SceneData } from './scene';
@@ -57,6 +57,8 @@ interface Props {
   /** Shared camera: views with the same link rotate, zoom and pan together (Compare 1D vs 2D). */
   link?: CameraLink;
   view: '3d' | 'flat';
+  /** false: the drawing stays where it is (no panning); dragging only turns it and zoom centres on its pivot. */
+  pannable?: boolean;
   labelStyle: 'inside' | 'badge';
   ariaLabel: (k: number) => string;
   tip: (k: number) => TipContent;
@@ -128,7 +130,15 @@ export function GraphView(props: Props) {
   const frame = useRef(0);
   const frameKey = useRef('');
   const pendingFrame = useRef(false);
-  const cache = useMemo<GatherCache>(() => new Map(), [props.data]);
+  // Cone layouts, per data set. Looked up when drawing (not captured at render time): a frame scheduled before the
+  // data changed must not reuse the previous data's cones.
+  const caches = useRef<{ data: SceneData; map: GatherCache } | null>(null);
+  const cacheFor = (data: SceneData) => {
+    if (caches.current?.data !== data) caches.current = { data, map: new Map() };
+    return caches.current.map;
+  };
+  // Ends a drag in progress (window listeners): kept so unmounting mid-drag cleans up.
+  const endDrag = useRef<(() => void) | null>(null);
   const [info, setInfo] = useState<CameraInfo>({ zoomPct: '100%', gizmo: [], nameTier: 10, auto: false });
   const [dragging, setDragging] = useState(false);
 
@@ -161,7 +171,7 @@ export function GraphView(props: Props) {
       view: p.view, z: c.z, px: c.px, py: c.py, yaw: c.yaw, pitch: c.pitch, weighted: p.weighted, showLevels: p.showLevels,
       sizeByScore: p.sizeByScore, gatherCone: p.gatherCone, sel: p.sel, from: p.from, to: p.to, labelStyle: p.labelStyle,
       hover: drag.current ? null : hover.current, gFrom: m.from, gTo: m.to, mt, vh: vh.current,
-    }, p.theme, cache);
+    }, p.theme, cacheFor(p.data));
     apply(sc, p);
     if (pendingFrame.current && mt >= 1 && sc.focus) {
       // Fit the blast cones in view (leaving room for the overlays), keeping the current rotation.
@@ -242,6 +252,8 @@ export function GraphView(props: Props) {
       if (!r.width) return;
       vh.current = W * r.height / r.width;
       if (autoFit.current && !props.link) { const z = fitAt(); Object.assign(cam.current, { z, py: fitPy(z) }); }
+      // A drawing that can't be panned (Blast Radius in 3D) is framed again whenever its box changes size.
+      if (propsRef.current.pannable === false && frameKey.current) pendingFrame.current = true;
       schedule();
     };
     measure();
@@ -265,6 +277,10 @@ export function GraphView(props: Props) {
     const v = cam.current, t = Math.max(0.2, Math.min(12, nz)), CX = propsRef.current.data.CX, CY = propsRef.current.data.CY + (vh.current - H) / 2;
     return { z: t, px: x - CX - (x - CX - v.px) * t / v.z, py: y - CY - (y - CY - v.py) * t / v.z };
   };
+  // Where zooming centres: the given point, or (no panning) the pivot, so the drawing never moves sideways.
+  const anchor = (x: number, y: number) => propsRef.current.pannable === false
+    ? { x: propsRef.current.data.CX + cam.current.px, y: propsRef.current.data.CY + (vh.current - H) / 2 + cam.current.py }
+    : { x, y };
   const startTween = (to: Partial<Cam>, dur = 300) => { tween.current = { from: { ...cam.current }, to, t0: performance.now(), dur }; schedule(); };
   const stopAuto = () => { auto.current = null; autoFit.current = false; schedule(); };
   const isUI = (e: { target: EventTarget | null }) => !!(e.target as HTMLElement)?.closest?.('[data-ui]');
@@ -272,21 +288,23 @@ export function GraphView(props: Props) {
   useEffect(() => {
     const vp = vpRef.current!;
     const onWheel = (e: WheelEvent) => {
+      // While dragging, scrolling must not move the page under the graph.
+      if (drag.current) { e.preventDefault(); return; }
       if (!(e.ctrlKey || e.metaKey)) return;
       e.preventDefault();
-      const p = pt(e);
+      const p = pt(e), a = anchor(p.x, p.y);
       tween.current = null;
       autoFit.current = false;
-      Object.assign(cam.current, zoomTarget(p.x, p.y, cam.current.z * Math.exp(-e.deltaY * 0.0022)));
+      Object.assign(cam.current, zoomTarget(a.x, a.y, cam.current.z * Math.exp(-e.deltaY * 0.0022)));
       schedule();
     };
     vp.addEventListener('wheel', onWheel, { passive: false });
-    return () => vp.removeEventListener('wheel', onWheel);
+    return () => { vp.removeEventListener('wheel', onWheel); endDrag.current?.(); };
   }, []);
 
   const controls: GraphControls = {
-    zoomIn: () => { autoFit.current = false; startTween(zoomTarget(W / 2, vh.current / 2, cam.current.z * 1.5)); },
-    zoomOut: () => { autoFit.current = false; startTween(zoomTarget(W / 2, vh.current / 2, cam.current.z / 1.5)); },
+    zoomIn: () => { const a = anchor(W / 2, vh.current / 2); autoFit.current = false; startTween(zoomTarget(a.x, a.y, cam.current.z * 1.5)); },
+    zoomOut: () => { const a = anchor(W / 2, vh.current / 2); autoFit.current = false; startTween(zoomTarget(a.x, a.y, cam.current.z / 1.5)); },
     resetView: () => {
       const s = propsRef.current.startZoom;
       auto.current = null;
@@ -313,29 +331,47 @@ export function GraphView(props: Props) {
     <section
       ref={vpRef}
       className="graph-viewport"
-      aria-label="3D network view. Hover a sphere for its name, click to select, drag to rotate, Shift and drag to pan, Ctrl and scroll to zoom."
+      aria-label={props.pannable === false ? '3D view. Hover a sphere for its name, drag to rotate, Ctrl and scroll to zoom.' : '3D network view. Hover a sphere for its name, click to select, drag to rotate, Shift and drag to pan, Ctrl and scroll to zoom.'}
       style={{ cursor: dragging ? 'grabbing' : 'grab', ...(props.height ? { height: props.height, aspectRatio: 'auto' } : null) }}
-      onMouseDown={(e) => {
+      onPointerDown={(e) => {
         moved.current = false;
-        if ((e.button !== 0 && e.button !== 2) || isUI(e)) return;
+        if (isUI(e) || (e.pointerType === 'mouse' && e.button > 2) || drag.current) return;
         stopAuto();
         tween.current = null;
-        drag.current = { mode: e.shiftKey || e.button === 2 ? 'pan' : 'rot', x: e.clientX, y: e.clientY, k: pt(e).k, ...cam.current };
+        const pan = props.pannable !== false && (e.shiftKey || e.button === 1 || e.button === 2);
+        drag.current = { mode: pan ? 'pan' : 'rot', x: e.clientX, y: e.clientY, k: pt(e).k, ...cam.current };
         hover.current = null;
         setDragging(true);
+        // Follow the pointer on the whole window: the drag carries on past the graph's edges (the cursor is never
+        // locked) and ends wherever the button is released.
+        const id = e.pointerId;
+        const move = (ev: PointerEvent) => {
+          const d = drag.current;
+          if (!d || ev.pointerId !== id) return;
+          const dx = ev.clientX - d.x, dy = ev.clientY - d.y;
+          if (Math.abs(dx) + Math.abs(dy) > 4) moved.current = true;
+          if (d.mode === 'pan') Object.assign(cam.current, { px: d.px + dx * d.k, py: d.py + dy * d.k });
+          else Object.assign(cam.current, { yaw: d.yaw + dx * 0.35, pitch: Math.max(-89, Math.min(15, d.pitch - dy * 0.3)) });
+          schedule();
+        };
+        const up = (ev: PointerEvent) => { if (ev.pointerId === id) finish(); };
+        const finish = () => {
+          window.removeEventListener('pointermove', move);
+          window.removeEventListener('pointerup', up);
+          window.removeEventListener('pointercancel', up);
+          endDrag.current = null;
+          drag.current = null;
+          setDragging(false);
+        };
+        window.addEventListener('pointermove', move);
+        window.addEventListener('pointerup', up);
+        window.addEventListener('pointercancel', up);
+        endDrag.current = finish;
       }}
-      onMouseMove={(e) => {
-        const d = drag.current;
-        if (!d) return;
-        const dx = e.clientX - d.x, dy = e.clientY - d.y;
-        if (Math.abs(dx) + Math.abs(dy) > 4) moved.current = true;
-        if (d.mode === 'pan') Object.assign(cam.current, { px: d.px + dx * d.k, py: d.py + dy * d.k });
-        else Object.assign(cam.current, { yaw: d.yaw + dx * 0.35, pitch: Math.max(-89, Math.min(15, d.pitch - dy * 0.3)) });
-        schedule();
-      }}
-      onMouseUp={() => { if (drag.current) { drag.current = null; setDragging(false); } }}
-      onMouseLeave={() => { if (drag.current) { drag.current = null; setDragging(false); } }}
-      onDoubleClick={(e) => { if (isUI(e)) return; const p = pt(e); autoFit.current = false; startTween(zoomTarget(p.x, p.y, cam.current.z * 1.8)); }}
+      // Middle button: pans like the right button, instead of starting the browser's autoscroll (which moves the page).
+      onMouseDown={(e) => { if (e.button === 1 && !isUI(e)) e.preventDefault(); }}
+      onAuxClick={(e) => { if (e.button === 1 && !isUI(e)) e.preventDefault(); }}
+      onDoubleClick={(e) => { if (isUI(e)) return; const p = pt(e), a = anchor(p.x, p.y); autoFit.current = false; startTween(zoomTarget(a.x, a.y, cam.current.z * 1.8)); }}
       onContextMenu={(e) => { if (!isUI(e)) e.preventDefault(); }}
     >
       <div ref={L.grid} aria-hidden="true" className="graph-layer" />
