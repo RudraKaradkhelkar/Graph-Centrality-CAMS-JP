@@ -4,7 +4,7 @@ import type { ChartOptions, Dimension, Distribution, ReadyVariant, Scope, Varian
 import { navigate } from '../App';
 import { css } from '../components/css';
 import { DistributionChart } from '../components/DistributionChart';
-import { ExitPresent, GraphCaption, GraphLegend, IMPORTANCE_KEY, PresentButton, RingKey, RotateButton } from '../components/GraphChrome';
+import { ExitPresent, GraphCaption, GraphControlsHelp, GraphLegend, IMPORTANCE_KEY, PresentButton, RingKey, RotateButton } from '../components/GraphChrome';
 import { AppBar, BandChip, GLOSSARY, Icon, InfoTip, LabelWithInfo, LevelChip, LV, LV_FULL, ParetoLink, rankingSubtitle, Segmented, ThemeButton, variantTitle } from '../components/ui';
 import { shortName } from '../data/dataset';
 import { DARK, LIGHT } from '../graph/graph-theme';
@@ -26,6 +26,8 @@ const GRAPH_MIN = 400;
 const GRAPH_H_KEY = 'carma-graph-height';
 // "How to Read This Dashboard": open until closed once in this browser.
 const GUIDE_KEY = 'carma-guide-closed';
+// Graph Controls pop-up: opens by itself the first time in this browser, then from its button.
+const CONTROLS_KEY = 'carma-controls-seen';
 const GUIDE = [
   'The graph is your network. Each sphere is an asset and each arrow an edge, pointing to the asset that depends on it. Orange spheres are the highlighted ranks; bigger spheres score higher.',
   'Click a sphere, or a row in the list below the graph, to select an asset. Selected Asset shows its edges, its importance and how many assets depend on it.',
@@ -70,6 +72,11 @@ export function DashboardPage() {
   const showGuide = (on: boolean) => {
     setGuideOpen(on);
     try { if (on) localStorage.removeItem(GUIDE_KEY); else localStorage.setItem(GUIDE_KEY, '1'); } catch { /* storage unavailable */ }
+  };
+  const [controlsOpen, setControlsOpen] = useState(() => { try { return localStorage.getItem(CONTROLS_KEY) !== '1'; } catch { return true; } });
+  const closeControls = () => {
+    setControlsOpen(false);
+    try { localStorage.setItem(CONTROLS_KEY, '1'); } catch { /* storage unavailable */ }
   };
   const [q, setQ] = useState('');
   const [sizeByScore, setSizeByScore] = useState(true);
@@ -399,6 +406,10 @@ export function DashboardPage() {
         </div>
 
         <div data-ui="1" className="gv-tools" style={css('justify-self: end; display: flex; gap: 8px; pointer-events: auto; cursor: default')}>
+          <button type="button" aria-expanded={controlsOpen} onClick={() => (controlsOpen ? closeControls() : setControlsOpen(true))}
+            style={css(`height: 38px; padding: 0 14px; display: flex; align-items: center; gap: 8px; ${OVERLAY}; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer; ${controlsOpen ? 'background: var(--view-on-bg)' : ''}`)}>
+            <Icon name="mouse" />Graph Controls
+          </button>
           <div role="group" aria-label="View mode" style={css(`display: flex; gap: 2px; padding: 4px; ${OVERLAY}; border-radius: 6px`)}>
             {(['3d', 'flat'] as const).map((v) => (
               <button key={v} type="button" aria-pressed={view === v} onClick={() => setView(v)}
@@ -451,7 +462,7 @@ export function DashboardPage() {
         </div>
 
         <div data-ui="1" className="gv-narrow-hide" style={css(`justify-self: center; min-width: 0; max-width: 100%; box-sizing: border-box; overflow: hidden; text-overflow: ellipsis; ${OVERLAY}; padding: 8px 16px; border-radius: 6px; font-size: 14px; white-space: nowrap; color: var(--text-2); cursor: default`)}>
-          {info.nameTier ? `Top ${info.nameTier} named, zoom in for more` : 'All assets named'} · Click to select · Drag to rotate · Ctrl + scroll to zoom
+          {info.nameTier ? `Top ${info.nameTier} named, zoom in for more` : 'All assets named'} · Drag to turn · Shift + drag to move · Ctrl + scroll or pinch to zoom
         </div>
 
         <div data-ui="1" style={css('justify-self: end; pointer-events: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; cursor: default')}>
@@ -477,6 +488,7 @@ export function DashboardPage() {
           </div>
         </div>
       </div>
+      {controlsOpen && <GraphControlsHelp onClose={closeControls} />}
     </>
   );
 

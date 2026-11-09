@@ -2,7 +2,7 @@
 import {
   Add20Regular, ArrowClockwise20Regular, ArrowCounterclockwise20Regular, ArrowDownload20Regular, ArrowRight20Regular,
   ArrowUpload20Regular, Checkmark20Regular, CheckmarkCircle20Regular, ChevronDown20Regular, ChevronLeft20Regular,
-  ChevronRight20Regular, Dismiss20Regular, DocumentTable20Regular, ErrorCircle20Regular, FullScreenMaximize20Regular,
+  ChevronRight20Regular, CursorClick20Regular, Dismiss20Regular, DocumentTable20Regular, ErrorCircle20Regular, FullScreenMaximize20Regular,
   Info20Regular, Pause20Regular, Pin20Regular, Play20Regular, Subtract20Regular, Warning20Regular, WeatherMoon20Regular,
   WeatherSunny20Regular, ZoomFit20Regular, type FluentIcon,
 } from '@fluentui/react-icons';
@@ -224,6 +224,7 @@ const ICONS = {
   play: Play20Regular,
   pause: Pause20Regular,
   pin: Pin20Regular,
+  mouse: CursorClick20Regular,
 } satisfies Record<string, FluentIcon>;
 
 export function Icon({ name, size = 16, stroke, style }: {

@@ -63,7 +63,7 @@ export function ConeView(p: Props) {
       overlay={(info, c) => (
         <div style={css('position: absolute; inset: 12px; pointer-events: none; display: flex; align-items: flex-end; justify-content: space-between; gap: 8px')}>
           <div data-ui="1" style={css(`${OVERLAY}; padding: 6px 12px; border-radius: 6px; font-size: 12px; line-height: 18px; color: var(--text-2); cursor: default`)}>
-            Drag to turn · Ctrl + scroll to zoom
+            Drag to turn · Ctrl + scroll or pinch to zoom
           </div>
           <div data-ui="1" style={css(`display: flex; ${OVERLAY}; border-radius: 6px; overflow: hidden`)}>
             <button type="button" aria-label="Zoom out" onClick={c.zoomOut} style={css(BTN)}><Icon name="minus" width={2} /></button>

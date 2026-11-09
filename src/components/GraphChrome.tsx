@@ -1,4 +1,4 @@
-// Small overlays for graph views outside the main dashboard: the 1D vs 2D comparison and Present mode.
+// Small overlays for graph views: Present mode, ring and level keys, and the Graph Controls pop-up.
 import type { ReactNode } from 'react';
 import type { GraphTheme } from '../graph/graph-theme';
 import type { CameraInfo, GraphControls } from '../graph/GraphView';
@@ -95,5 +95,50 @@ export function PresentButton() {
       style={css('height: 36px; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--control-bg); font: inherit; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer')}>
       <Icon name="fullscreen" size={16} />Present
     </button>
+  );
+}
+
+/** Every way to move the graph, for a mouse and for a laptop touchpad (no middle button needed). */
+const CONTROLS: [string, string, string][] = [
+  ['Turn the graph', 'Drag', 'Click and hold, then slide'],
+  ['Move it sideways', 'Shift + drag, or right-click and drag', 'Shift + click and hold, then slide'],
+  ['Zoom in or out', 'Ctrl + scroll wheel, or double-click', 'Pinch with two fingers, or double-tap'],
+  ["See an asset's name", 'Point at a sphere', 'Point at a sphere'],
+  ['Select an asset', 'Click a sphere', 'Tap a sphere'],
+  ['Add a second blast radius', 'Shift + click a sphere', 'Shift + tap a sphere'],
+  ['Scroll the page', 'Scroll wheel', 'Two-finger swipe'],
+];
+
+/** "Graph Controls" pop-up: opens over the graph, closes with its button or Escape. */
+export function GraphControlsHelp({ onClose }: { onClose(): void }) {
+  return (
+    <div data-ui="1" role="dialog" aria-labelledby="gc-h" onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}
+      style={css(`position: absolute; top: 72px; right: 20px; z-index: 5; width: min(640px, calc(100% - 40px)); box-sizing: border-box; ${PANEL}; background: var(--popover-bg); box-shadow: var(--popover-shadow); border-radius: 8px; padding: 16px 20px 18px; cursor: default`)}>
+      <div style={css('display: flex; align-items: center; justify-content: space-between; gap: 12px')}>
+        <h2 id="gc-h" style={css('margin: 0; display: flex; align-items: center; gap: 8px; font-size: 18px; line-height: 24px; font-weight: 600; color: var(--text-strong)')}><Icon name="mouse" size={20} />Graph Controls</h2>
+        <button type="button" autoFocus aria-label="Close the graph controls" onClick={onClose} style={css(`${BTN}; border-radius: 6px`)}><Icon name="close" /></button>
+      </div>
+      <table style={css('margin-top: 12px; width: 100%; border-collapse: collapse; font-size: 15px; line-height: 22px; color: var(--text)')}>
+        <thead>
+          <tr style={css('font-size: 14px; color: var(--text-3); text-align: left')}>
+            <th scope="col" style={css('padding: 0 12px 6px 0; font-weight: 600')}>To</th>
+            <th scope="col" style={css('padding: 0 12px 6px 0; font-weight: 600')}>Mouse</th>
+            <th scope="col" style={css('padding: 0 0 6px 0; font-weight: 600')}>Laptop Touchpad</th>
+          </tr>
+        </thead>
+        <tbody>
+          {CONTROLS.map(([what, mouse, pad]) => (
+            <tr key={what} style={css('border-top: 1px solid var(--divider)')}>
+              <th scope="row" style={css('padding: 7px 12px 7px 0; font-weight: 600; text-align: left; vertical-align: top')}>{what}</th>
+              <td style={css('padding: 7px 12px 7px 0; color: var(--text-2); vertical-align: top')}>{mouse}</td>
+              <td style={css('padding: 7px 0; color: var(--text-2); vertical-align: top')}>{pad}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p style={css('margin: 12px 0 0; font-size: 14px; line-height: 20px; color: var(--text-3)')}>
+        Buttons on the graph: rotate and auto-rotate, + and − to zoom, reset view, fit to screen, full screen, and 3D or Top-Down.
+      </p>
+    </div>
   );
 }
