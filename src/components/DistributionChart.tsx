@@ -1,7 +1,7 @@
 // Distribution chart: how many assets are highly, moderately, and weakly critical (and, reused, blast radius totals).
 // It only draws. Every bar, zone count, tick and exclusion count comes from distribution() in carma_metrics.py.
 // Zone cut-offs are calculated (equal thirds of the assets shown), never set by hand.
-import { useLayoutEffect, useMemo, useRef, useState, type PointerEvent as RPointerEvent } from 'react';
+import { useId, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as RPointerEvent } from 'react';
 import type { Band, ChartOptions, DistBar, Distribution, ExclusionRule } from '../analysis-types';
 import { css } from './css';
 import { Icon, Segmented } from './ui';
@@ -50,6 +50,15 @@ function readColours() {
 }
 
 const fmt = (v: number) => (v === 0 ? '0' : Math.abs(v) < 0.001 ? v.toExponential(1) : String(+v.toFixed(4)));
+
+/** A hex colour lightened (f > 1, towards white) or darkened (f < 1), for the 3D bars' lit and shaded faces. */
+function tone(hex: string, f: number): string {
+  const h = hex.replace('#', '');
+  const n = h.length === 3 ? h.split('').map((c) => c + c).join('') : h.slice(0, 6);
+  const rgb = [0, 2, 4].map((i) => parseInt(n.slice(i, i + 2), 16));
+  if (rgb.some((v) => Number.isNaN(v))) return hex;
+  return `rgb(${rgb.map((v) => Math.round(f >= 1 ? v + (255 - v) * (f - 1) : v * f)).join(',')})`;
+}
 
 function countTicks(max: number): number[] {
   const m = Math.max(1, max);
@@ -209,13 +218,26 @@ export function DistributionChart(p: Props) {
     const where = kind === 'zero' ? 'Score 0' : isScore ? `${fmt(b.lo)}–${fmt(b.hi)}` : b.hi > b.lo ? `Fronts ${b.lo}–${b.hi}` : `Front ${b.lo}`;
     return `${where}: ${b.count} ${b.count === 1 ? 'asset' : 'assets'}${b.top_count ? ` (${b.top_count} in ranks ${p.kFrom}–${p.kTo})` : ''}`;
   };
+  // 3D bars: each bar is a block with a shaded front, a darker right side and a lit top, set back by (DX, DY).
+  // One depth for every bar (from the narrowest), so the blocks share one perspective.
+  const uid = useId().replace(/[^a-zA-Z0-9_-]/g, '');
+  const narrowest = Math.min(...barRects.filter((r) => !r.b.excluded).map((r) => r.w), zero ? ZW - 4 : Infinity);
+  const DX = Number.isFinite(narrowest) ? Math.max(2, Math.min(10, narrowest * 0.38)) : 0, DY = DX * 0.75;
+  const face = (c: string) => `url(#${uid}-${c === C.top ? 'top' : 'other'})`;
+  const block = (x: number, y: number, w: number, h: number, c: string, lid: boolean) => h > 0 && (
+    <>
+      <rect x={x} y={y} width={w} height={h} fill={face(c)} />
+      <polygon points={`${x + w},${y} ${x + w + DX},${y - DY} ${x + w + DX},${y + h - DY} ${x + w},${y + h}`} fill={tone(c, 0.62)} />
+      {lid && <polygon points={`${x},${y} ${x + DX},${y - DY} ${x + w + DX},${y - DY} ${x + w},${y}`} fill={tone(c, 1.45)} />}
+    </>
+  );
   const stack = (x: number, w: number, b: DistBar) => {
     const total = yOf(b.count), topH = b.count ? (PB - total) * b.top_count / b.count : 0;
     return (
-      <>
-        <rect x={x} y={total + topH} width={w} height={PB - total - topH} fill={C.other} />
-        {b.top_count > 0 && <rect x={x} y={total} width={w} height={topH} fill={C.top} />}
-      </>
+      <g filter={`url(#${uid}-shadow)`}>
+        {block(x, total + topH, w, PB - total - topH, C.other, b.top_count === 0)}
+        {b.top_count > 0 && block(x, total, w, topH, C.top, true)}
+      </g>
     );
   };
 
@@ -291,8 +313,20 @@ export function DistributionChart(p: Props) {
             </g>
           ))}
           <text x={16} y={(PT + PB) / 2} textAnchor="middle" fontSize={14} fontWeight={600} fill={C.text2} transform={`rotate(-90 16 ${(PT + PB) / 2})`}>{Y_TITLE}</text>
-          {/* Bars */}
-          {barRects.map(({ b, k, x, w, last }) => (
+          {/* Bars, in 3D: shading, a soft shadow, and the floor they stand on */}
+          <defs>
+            {([['top', C.top], ['other', C.other]] as const).map(([id, c]) => (
+              <linearGradient key={id} id={`${uid}-${id}`} x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stopColor={tone(c, 1.35)} /><stop offset="0.45" stopColor={c} /><stop offset="1" stopColor={tone(c, 0.82)} />
+              </linearGradient>
+            ))}
+            <filter id={`${uid}-shadow`} x="-30%" y="-10%" width="160%" height="130%">
+              <feDropShadow dx="3" dy="3" stdDeviation="2.5" floodColor="#000" floodOpacity={p.theme === 'dark' ? 0.5 : 0.22} />
+            </filter>
+          </defs>
+          {DX > 0 && <polygon points={`${PL},${PB} ${PL + DX},${PB - DY} ${VB_W - PR + DX},${PB - DY} ${VB_W - PR},${PB}`} fill={C.text} opacity={0.07} pointerEvents="none" />}
+          {/* Left to right, so each bar's front covers the side of the bar before it */}
+          {[...barRects].sort((a, b) => a.x - b.x).map(({ b, k, x, w, last }) => (
             <g key={k} style={{ cursor: 'pointer' }} onClick={(e) => { e.stopPropagation(); if (b.count) setPick({ x: x + w / 2, y: yOf(b.count), bar: b, kind: 'bar', last }); }}>
               <title>{barTitle(b, 'bar')}</title>
               <rect x={x} y={PT} width={w} height={PB - PT} fill="transparent" />

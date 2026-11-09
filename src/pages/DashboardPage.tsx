@@ -432,7 +432,7 @@ export function DashboardPage() {
             <span style={css('display: flex; align-items: center; gap: 8px')}>
               <span aria-hidden="true" style={{ width: 10, height: 10, borderRadius: '50%', background: T.sph[1][1] }} />
               <span aria-hidden="true" style={{ width: 18, height: 18, borderRadius: '50%', background: T.sph[1][1] }} />
-              Size = Score
+              Size = Criticality
             </span>
             <span style={css('display: flex; align-items: center; gap: 8px')}>
               <span aria-hidden="true" style={{ width: 14, height: 14, borderRadius: '50%', background: T.org[1] }} />
@@ -493,25 +493,35 @@ export function DashboardPage() {
   );
 
   // Summary tiles under each statistics chart (pushed to the card's bottom so both cards line up).
-  const statTiles = (tiles: [string, string][]) => (
+  // Each tile: label, value, and one line on what the value means.
+  const statTiles = (tiles: [string, string, string][]) => (
     <dl style={css('margin: auto 0 0; padding-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 12px')}>
-      {tiles.map(([dt, dd]) => (
-        <div key={dt} style={css('padding: 12px 16px; border-radius: 6px; background: var(--subtle)')}><dt style={css('font-size: 14px; color: var(--text-3)')}>{dt}</dt><dd style={css('margin: 4px 0 0; font-size: 22px; font-weight: 600; color: var(--text-strong); font-variant-numeric: tabular-nums')}>{dd}</dd></div>
+      {tiles.map(([dt, dd, what]) => (
+        <div key={dt} style={css('padding: 12px 16px; border-radius: 6px; background: var(--subtle)')}>
+          <dt style={css('font-size: 14px; color: var(--text-2)')}>{dt}</dt>
+          <dd style={css('margin: 4px 0 0; font-size: 22px; font-weight: 600; color: var(--text-strong); font-variant-numeric: tabular-nums')}>{dd}</dd>
+          <dd style={css('margin: 6px 0 0; font-size: 14px; line-height: 18px; color: var(--text-3)')}>{what}</dd>
+        </div>
       ))}
     </dl>
   );
-  const critTiles: [string, string][] = [
-    ...(V.summary.top_share == null ? [] : [[`Ranks ${from}–${to} Share of Total Score`, `${(V.summary.top_share * 100).toFixed(1)}%`] as [string, string]]),
+  const critTiles: [string, string, string][] = [
+    ...(V.summary.top_share == null ? [] : [[`Ranks ${from}–${to} Share of Total Score`, `${(V.summary.top_share * 100).toFixed(1)}%`,
+      'The highlighted ranks’ scores as a share of all scores added together.'] as [string, string, string]]),
     !showValues
-      ? ['Criticality in Selection', (['High', 'Medium', 'Low'] as const).filter((b) => range.some((i) => band[i] === b)).join(' to ').replace(/ to .* to /, ' to ')]
-      : [V.kind === 'scalar' ? 'Score Range in Selection' : 'Fronts in Selection', V.kind === 'scalar' ? `${V.summary.range[0].toFixed(3)}–${V.summary.range[1].toFixed(3)}` : `${V.summary.range[0]}–${V.summary.range[1]}`],
-    ['Assets with No Edges', String(noLinks)],
+      ? ['Criticality in Selection', (['High', 'Medium', 'Low'] as const).filter((b) => range.some((i) => band[i] === b)).join(' to ').replace(/ to .* to /, ' to '),
+          'The criticality levels the highlighted ranks fall in.']
+      : V.kind === 'scalar'
+        ? ['Score Range in Selection', `${V.summary.range[0].toFixed(3)}–${V.summary.range[1].toFixed(3)}`, 'Lowest to highest score in the highlighted ranks.']
+        : ['Fronts in Selection', `${V.summary.range[0]}–${V.summary.range[1]}`, 'First to last front in the highlighted ranks (front 1 is the most critical).'],
+    ['Assets with No Edges', String(noLinks), 'No edges in or out: a failure can neither reach them nor spread from them.'],
   ];
   const reachMax = reachValues.reduce((m, v, i) => (v > reachValues[m] ? i : m), 0);
-  const reachTiles: [string, string][] = [
-    [`Ranks ${from}–${to} Average Total`, range.length ? String(Math.round(range.reduce((t, i) => t + reachValues[i], 0) / range.length)) : '–'],
-    ['Assets That Reach No Other Asset', String(reachValues.filter((v) => v === 0).length)],
-    ['Largest Total', `${reachValues[reachMax]} (${labels[reachMax]})`],
+  const reachTiles: [string, string, string][] = [
+    [`Ranks ${from}–${to} Average Total`, range.length ? String(Math.round(range.reduce((t, i) => t + reachValues[i], 0) / range.length)) : '–',
+      'The average total of the highlighted ranks (orange in the chart).'],
+    ['Assets That Reach No Other Asset', String(reachValues.filter((v) => v === 0).length), 'A total of 0: their failure spreads to no other asset (the “reaches none” bar).'],
+    ['Largest Total', `${reachValues[reachMax]} (${labels[reachMax]})`, 'The asset whose failure reaches the most, and its total.'],
   ];
 
   const presets = [10, 25, 50].map((nn) => ({ id: nn, label: `Top ${nn}` }));
@@ -699,7 +709,7 @@ export function DashboardPage() {
 
           <section aria-labelledby="display-h" style={css('display: flex; flex-direction: column; gap: 12px')}>
             <h3 id="display-h" style={css('margin: 0; font-size: 14px; font-weight: 600; color: var(--text-3)')}>Display</h3>
-            {([['Importance Value', showValues, app.setShowValues], ['Size Spheres by Score', sizeByScore, setSizeByScore], ['Show L / M / H When Weighted', showLevels, setShowLevels], ['Gather Affected Assets into the Blast Cone', gatherCone, setGatherCone]] as const).map(([label, val, set]) => (
+            {([['Importance Value', showValues, app.setShowValues], ['Size Spheres by Criticality', sizeByScore, setSizeByScore], ['Show L / M / H When Weighted', showLevels, setShowLevels], ['Gather Affected Assets into the Blast Cone', gatherCone, setGatherCone]] as const).map(([label, val, set]) => (
               <label key={label} style={css('display: flex; align-items: center; gap: 12px; font-size: 15px; color: var(--text); cursor: pointer')}>
                 <input type="checkbox" checked={val} onChange={(e) => set(e.target.checked)} style={css(CHECK)} />{label}
               </label>
@@ -862,7 +872,7 @@ export function DashboardPage() {
           <section aria-label="Asset Blast Radius" style={css(`min-width: 0; ${CARD}; padding: 20px 24px 24px; display: flex; flex-direction: column`)}>
             <h3 style={css(TOWER_H)}>Asset Blast Radius</h3>
             <p style={css(TOWER_SUB)}>
-              {V.dimension === '2d' ? 'Importance of every asset and link' : 'Importance of every asset'} each asset's failure reaches, all hops ({V.weighted ? 'L 1, M 2, H 3' : 'each counts 1'}).
+              Each asset’s total adds up the importance of every {V.dimension === '2d' ? 'asset and link' : 'asset'} its failure reaches, all hops ({V.weighted ? 'L 1, M 2, H 3' : 'each counts 1'}).
             </p>
             {reachDist
               ? <DistributionChart key={`reach-${V.key}`} dist={reachDist} options={reachOpt} onOptions={setReachOpt}

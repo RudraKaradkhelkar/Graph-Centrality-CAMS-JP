@@ -8,8 +8,9 @@ import { GraphView, type TipContent } from './GraphView';
 import { DEFAULT_YAW } from './layout';
 import { H, W, type SceneData } from './scene';
 
-/** The cone opens to the right and a little towards the viewer in the default camera, almost level (tilt 10). */
-const DIR_DEG = -DEFAULT_YAW - 25;
+/** The cone opens to the right and towards the viewer in the default camera, almost level (tilt 10), so its rings
+ *  show as open ellipses rather than edge-on. */
+const DIR_DEG = -DEFAULT_YAW - 32;
 const CONE_DIR: [number, number] = [Math.cos(DIR_DEG * Math.PI / 180), Math.sin(DIR_DEG * Math.PI / 180)];
 const BTN = 'width: 36px; height: 32px; display: flex; align-items: center; justify-content: center; border: 0; background: transparent; color: var(--text-2); cursor: pointer';
 const OVERLAY = 'pointer-events: auto; background: var(--overlay-94); box-shadow: var(--overlay-shadow); border: 1px solid var(--border)';

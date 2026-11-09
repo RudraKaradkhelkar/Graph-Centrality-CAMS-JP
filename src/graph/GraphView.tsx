@@ -174,10 +174,12 @@ export function GraphView(props: Props) {
     }, p.theme, cacheFor(p.data));
     apply(sc, p);
     if (pendingFrame.current && mt >= 1 && sc.focus) {
-      // Fit the blast cones in view (leaving room for the overlays), keeping the current rotation.
+      // Fit the blast cones in view (leaving room for the overlays), keeping the current rotation. A fixed view (the
+      // standalone cone) has only a thin bar at the bottom, so its cone can fill more of the box.
       pendingFrame.current = false;
       const [x0, y0, x1, y1] = sc.focus, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
-      const f = Math.min(W * 0.8 / Math.max(1, x1 - x0), vh.current * 0.66 / Math.max(1, y1 - y0));
+      const [fw, fh] = p.pannable === false ? [0.9, 0.8] : [0.8, 0.66];
+      const f = Math.min(W * fw / Math.max(1, x1 - x0), vh.current * fh / Math.max(1, y1 - y0));
       const zt = zoomTarget(cx, cy, c.z * f);
       autoFit.current = false;
       startTween({ z: zt.z, px: zt.px! + (W / 2 - cx), py: zt.py! + (vh.current / 2 + 20 - cy) }, 500);

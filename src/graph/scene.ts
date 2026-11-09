@@ -162,9 +162,25 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
     const sx = N[x].x, sy = N[x].y, sz = N[x].z;
     const nr = rings.length, counts = rings.map((r) => r.length);
     const nLast = nr >= 2 ? counts[nr - 1] : 0;
-    const Lfar = Math.max(2.2, Math.min(4.1, 2 + 0.09 * nLast)) * (nr > 2 ? 1 + 0.35 * (nr - 2) : 1);
+    const Lfar = Math.max(2.2, Math.min(4.6, 2 + 0.09 * nLast)) * (nr > 2 ? 1 + 0.35 * (nr - 2) : 1);
     const L = nr >= 2 ? counts.map((_, h) => Lfar * (0.46 + 0.54 * h / (nr - 1))) : [0.46 * Lfar];
-    const Lend = nr >= 2 ? Lfar + 0.7 : L[0] + 0.55;
+    // Crowding: the disc radius each ring needs so its assets sit `space` apart (a small ring on a circle, a large one
+    // spread over the disc). More assets in a ring means more edges and labels between them, so each gets more room.
+    // The cone opens as wide as its most crowded ring needs, up to MAX_TH (34 degrees, so two cones still can't meet;
+    // 24 for the standalone cone, whose box is wide and short, so it grows along its length instead).
+    const MAX_TH = (D.pivotOnCone ? 24 : 34) * Math.PI / 180;
+    const need = counts.map((n, h) => {
+      const space = Math.min(1, 0.45 + 0.012 * n), circle = h === 0 ? n <= 10 : n <= 7;
+      return n <= 1 ? 0.25 : circle ? n * space / (2 * Math.PI * 0.78) : space * Math.sqrt(n) / ((h === 0 ? 0.84 : 0.86) * Math.sqrt(Math.PI));
+    });
+    let th = 11 * Math.PI / 180;
+    for (let h = 0; h < nr; h++) th = Math.max(th, Math.atan(need[h] / L[h]));
+    th = Math.min(MAX_TH, th);
+    const tn = Math.tan(th);
+    // A ring that still needs more room than that angle gives moves further out along the cone (and the rings after
+    // it keep their distance), so only the crowded part of the cone gets longer.
+    for (let h = 0; h < nr; h++) L[h] = Math.max(L[h], Math.min(2.5 * L[h], need[h] / tn), h ? L[h - 1] + 0.6 : 0);
+    const Lend = nr >= 2 ? L[nr - 1] + 0.7 : L[0] + 0.55;
     const tilt = D.coneTilt != null ? D.coneTilt * Math.PI / 180 : CONE_TILT;
     const dx = hd[0] * Math.cos(tilt), dy = Math.sin(tilt), dz = hd[1] * Math.cos(tilt);
     let vx = -dy * dx, vy = 1 - dy * dy, vz = -dy * dz;
@@ -172,11 +188,6 @@ export function buildScene(D: SceneData, st: SceneState, T: GraphTheme, cache: G
     vx /= vl; vy /= vl; vz /= vl;
     const ux = dy * vz - dz * vy, uy = dz * vx - dx * vz, uz = dx * vy - dy * vx;
     const n1 = counts[0] || 0;
-    let th = Math.atan(Math.max(0.22, n1 * 0.4 / (2 * Math.PI)) / 0.8 / L[0]);
-    for (let h = 1; h < nr; h++) th = Math.max(th, Math.atan((0.2 * Math.sqrt(counts[h]) + 0.25) / 0.8 / L[h]));
-    if (nr < 2) th = Math.max(th, Math.atan(0.25 / 0.8 / Lfar));
-    th = Math.max(11 * Math.PI / 180, Math.min(24 * Math.PI / 180, th));
-    const tn = Math.tan(th);
     const at = (t: number, r: number, ph: number): [number, number, number] => {
       const cs = Math.cos(ph) * r, sn = Math.sin(ph) * r;
       return [sx + dx * t + ux * cs + vx * sn, sy + dy * t + uy * cs + vy * sn, sz + dz * t + uz * cs + vz * sn];
