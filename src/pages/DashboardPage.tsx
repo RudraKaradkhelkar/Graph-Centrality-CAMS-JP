@@ -8,6 +8,7 @@ import { ExitPresent, GraphCaption, GraphLegend, IMPORTANCE_KEY, PresentButton, 
 import { AppBar, BandChip, GLOSSARY, Icon, InfoTip, LabelWithInfo, LevelChip, LV, LV_FULL, ParetoLink, rankingSubtitle, Segmented, ThemeButton, variantTitle } from '../components/ui';
 import { shortName } from '../data/dataset';
 import { DARK, LIGHT } from '../graph/graph-theme';
+import { ConeView } from '../graph/ConeView';
 import { GraphView, type CameraInfo, type GraphControls } from '../graph/GraphView';
 import { useNetworkView, useOrderPositions, useScene } from '../graph/useNetworkView';
 import { distribution } from '../metrics-client';
@@ -479,6 +480,28 @@ export function DashboardPage() {
     </>
   );
 
+  // Summary tiles under each statistics chart (pushed to the card's bottom so both cards line up).
+  const statTiles = (tiles: [string, string][]) => (
+    <dl style={css('margin: auto 0 0; padding-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 12px')}>
+      {tiles.map(([dt, dd]) => (
+        <div key={dt} style={css('padding: 12px 16px; border-radius: 6px; background: var(--subtle)')}><dt style={css('font-size: 12px; color: var(--text-3)')}>{dt}</dt><dd style={css('margin: 4px 0 0; font-size: 20px; font-weight: 600; color: var(--text-strong); font-variant-numeric: tabular-nums')}>{dd}</dd></div>
+      ))}
+    </dl>
+  );
+  const critTiles: [string, string][] = [
+    ...(V.summary.top_share == null ? [] : [[`Ranks ${from}–${to} Share of Total Score`, `${(V.summary.top_share * 100).toFixed(1)}%`] as [string, string]]),
+    !showValues
+      ? ['Criticality in Selection', (['High', 'Medium', 'Low'] as const).filter((b) => range.some((i) => band[i] === b)).join(' to ').replace(/ to .* to /, ' to ')]
+      : [V.kind === 'scalar' ? 'Score Range in Selection' : 'Fronts in Selection', V.kind === 'scalar' ? `${V.summary.range[0].toFixed(3)}–${V.summary.range[1].toFixed(3)}` : `${V.summary.range[0]}–${V.summary.range[1]}`],
+    ['Assets with No Edges', String(noLinks)],
+  ];
+  const reachMax = reachValues.reduce((m, v, i) => (v > reachValues[m] ? i : m), 0);
+  const reachTiles: [string, string][] = [
+    [`Ranks ${from}–${to} Average Total`, range.length ? String(Math.round(range.reduce((t, i) => t + reachValues[i], 0) / range.length)) : '–'],
+    ['Assets That Reach No Other Asset', String(reachValues.filter((v) => v === 0).length)],
+    ['Largest Total', `${reachValues[reachMax]} (${labels[reachMax]})`],
+  ];
+
   const presets = [10, 25, 50].map((nn) => ({ id: nn, label: `Top ${nn}` }));
   const preset = from === 1 && [10, 25, 50].includes(to) ? to : null;
   const ringPct = (c: number) => (down ? Math.round(c / down * 100) : 0);
@@ -593,7 +616,9 @@ export function DashboardPage() {
       )}
       </div>
 
-      <div style={css('padding: 24px; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px')}>
+      <div style={css('padding: 24px; display: flex; flex-direction: column; gap: 24px')}>
+      {/* Controls, list and selected asset share one row, all as tall as the controls; the statistics run full width below. */}
+      <div style={css('display: flex; flex-wrap: wrap; align-items: stretch; gap: 24px')}>
         <aside aria-label="Controls" style={css(`flex: 1 1 340px; min-width: 0; ${CARD}; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px`)}>
           {(app.error || app.busy) && (
             <p role="status" aria-live="polite" style={css(`margin: 0; font-size: 12px; color: ${app.error ? 'var(--warn)' : 'var(--text-3)'}`)}>
@@ -697,8 +722,8 @@ export function DashboardPage() {
         </aside>
 
         {/* At most two columns (list and selected asset), each half the width; one column below 2 x 340px. */}
-        <div aria-label="Outputs" style={css('flex: 999 1 640px; min-width: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(max(340px, calc((100% - 24px) / 2)), 100%), 1fr)); gap: 24px; align-items: start')}>
-          <section aria-labelledby="rank-list-h" style={css(`min-width: 0; ${CARD}; overflow: hidden`)}>
+        <div aria-label="Outputs" style={css('flex: 999 1 640px; min-width: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(max(340px, calc((100% - 24px) / 2)), 100%), 1fr)); gap: 24px; align-items: stretch')}>
+          <section aria-labelledby="rank-list-h" style={css(`min-width: 0; ${CARD}; overflow: hidden; display: flex; flex-direction: column`)}>
             <div style={css('padding: 16px 20px 16px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--divider)')}>
               <div style={css('min-width: 0')}>
                 <h2 id="rank-list-h" style={css('margin: 0; font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text-strong)')}>List of Most Important Critical Assets</h2>
@@ -711,7 +736,9 @@ export function DashboardPage() {
               <span style={css('text-align: right')}>#</span><span>Asset</span>
               <span style={css('justify-self: end; text-align: right')}>{showValues ? 'Score' : <>Criticality <InfoTip term="Criticality" /></>}</span>
             </div>
-            <ol style={css(`list-style: none; margin: 0; padding: 4px 8px; max-height: 452px; overflow-y: ${range.length > 10 ? 'scroll' : 'auto'}; scrollbar-width: thin; scrollbar-color: var(--control-border) transparent`)}>
+            {/* The list fills the card (as tall as the controls, at least 10 rows) and scrolls beyond that. */}
+            <div style={css('position: relative; flex: 1 1 auto; min-height: 452px')}>
+            <ol style={css('position: absolute; inset: 0; list-style: none; margin: 0; padding: 4px 8px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--control-border) transparent')}>
               {range.map((i, j) => (
                 <li key={i}>
                   <button type="button" aria-pressed={i === s} onClick={(e) => select(i, e.shiftKey)} style={css(`width: 100%; height: 44px; display: grid; grid-template-columns: 30px minmax(0, 1fr) 96px; align-items: center; gap: 12px; padding: 0 12px; border: 0; border-radius: 6px; font: inherit; text-align: left; color: var(--text); cursor: pointer; background: ${i === s ? 'var(--row-selected)' : 'transparent'}`)}>
@@ -732,6 +759,7 @@ export function DashboardPage() {
                 </li>
               ))}
             </ol>
+            </div>
           </section>
 
           <section aria-labelledby="sel-h" style={css(`min-width: 0; ${CARD}; padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 16px`)}>
@@ -775,52 +803,64 @@ export function DashboardPage() {
                 {down > 0 && ` (${hopBreakdown})`} · {result.blast[s].high} with High Assigned Importance
               </div>
             </div>
-          </section>
-
-          <section aria-labelledby="dist-h" style={css(`grid-column: 1 / -1; min-width: 0; ${CARD}; padding: 20px 24px 24px; box-sizing: border-box`)}>
-            <div style={css('display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px')}>
-              <div>
-                <h2 id="dist-h" style={css('margin: 0; font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text-strong)')}>Importance Statistics for Network Assets</h2>
-                <p style={css('margin: 2px 0 0; font-size: 12px; color: var(--text-3)')}>How many assets are highly, moderately, and weakly critical, and how far each one's failure reaches · {vLabel}</p>
+            {/* The same cone as on the graph, on its own: turn and zoom it, but it stays in place. */}
+            <div style={css('flex: 1 1 auto; min-height: 320px; display: flex; flex-direction: column; gap: 8px')}>
+              <div style={css('display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px')}>
+                <h3 style={css(TOWER_H)}>Blast Radius in 3D</h3>
+                <span style={css('font-size: 12px; color: var(--text-3)')}>{labels[s]} · {depth} {depth === 1 ? 'Hop' : 'Hops'} {Way}</span>
               </div>
-              <div style={css('display: flex; gap: 16px; font-size: 12px; color: var(--text-2)')}>
-                <span style={css('display: flex; align-items: center; gap: 8px')}><span style={css('width: 12px; height: 12px; border-radius: 2px; background: var(--orange)')} />Ranks {from}–{to}</span>
-                <span style={css('display: flex; align-items: center; gap: 8px')}><span style={css('width: 12px; height: 12px; border-radius: 2px; background: var(--hist-other)')} />Other Assets</span>
-              </div>
-            </div>
-            <div style={css('margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(460px, 100%), 1fr)); gap: 16px 40px')}>
-              <div style={css('min-width: 0')}>
-                <h3 style={css(TOWER_H)}>Asset Criticality</h3>
-                <p style={css(TOWER_SUB)}>Assets by criticality, most critical on the left.</p>
-                <DistributionChart key={V.key} dist={dist} options={chartOpt} onOptions={(o) => setChartOpts({ ...chartOpts, [V.key]: o })}
-                  criticalLeft showNumbers={showValues} variantLabel={vLabel}
-                  kFrom={from} kTo={to} busy={chartBusy} theme={app.theme} />
-              </div>
-              <div style={css('min-width: 0')}>
-                <h3 style={css(TOWER_H)}>Asset Blast Radius</h3>
-                <p style={css(TOWER_SUB)}>
-                  {V.dimension === '2d' ? 'Importance of every asset and link' : 'Importance of every asset'} each asset's failure reaches, all hops ({V.weighted ? 'L 1, M 2, H 3' : 'each counts 1'}).
+              {down > 0 ? (
+                <div style={css('position: relative; flex: 1 1 auto; min-height: 280px; border: 1px solid var(--border); border-radius: 6px; overflow: hidden')}>
+                  <div style={css('position: absolute; inset: 0')}>
+                    <ConeView data={sceneData} x={s} theme={T} from={from} to={to} weighted={weighted} showLevels={showLevels} sizeByScore={sizeByScore} height="100%"
+                      ariaLabel={(i) => `${labels[i]}, ${names[i]}, ${rankText(i).toLowerCase()}`}
+                      tip={(i) => ({ title: `${labels[i]} · ${names[i]}`, line: `${rankText(i)} · ${showValues ? `Score ${scoreText(i)}` : `Criticality ${band[i]}`} · Assigned Importance ${LV_FULL[result.importance[i]]}` })} />
+                  </div>
+                </div>
+              ) : (
+                <p style={css('margin: 0; padding: 16px; border-radius: 6px; background: var(--subtle); font-size: 13px; line-height: 20px; color: var(--text-2)')}>
+                  No assets {Way.toLowerCase()} of {labels[s]} within {depth} {depth === 1 ? 'hop' : 'hops'}, so there is no cone to show.
                 </p>
-                {reachDist
-                  ? <DistributionChart key={`reach-${V.key}`} dist={reachDist} options={reachOpt} onOptions={setReachOpt}
-                      criticalLeft showNumbers variantLabel={vLabel} kFrom={from} kTo={to} busy={false} theme={app.theme}
-                      xTitle={`Blast Radius Total (All Hops), ${vLabel}`} zeroLabel="reaches none" exportName="carma-blast-radius-distribution" />
-                  : <p style={css('margin: 16px 0 0; font-size: 13px; color: var(--text-3)')}>Counting…</p>}
-              </div>
+              )}
             </div>
-            <dl style={css('margin: 20px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 12px')}>
-              {([
-                [`Ranks ${from}–${to} Share of Total Score`, V.summary.top_share == null ? 'Not defined for 2D' : `${(V.summary.top_share * 100).toFixed(1)}%`],
-                !showValues
-                  ? ['Criticality in Selection', (['High', 'Medium', 'Low'] as const).filter((b) => range.some((i) => band[i] === b)).join(' to ').replace(/ to .* to /, ' to ')]
-                  : [V.kind === 'scalar' ? 'Score Range in Selection' : 'Fronts in Selection', V.kind === 'scalar' ? `${V.summary.range[0].toFixed(3)}–${V.summary.range[1].toFixed(3)}` : `${V.summary.range[0]}–${V.summary.range[1]}`],
-                ['Assets with No Edges', String(noLinks)],
-              ] as const).map(([dt, dd]) => (
-                <div key={dt} style={css('padding: 12px 16px; border-radius: 6px; background: var(--subtle)')}><dt style={css('font-size: 12px; color: var(--text-3)')}>{dt}</dt><dd style={css('margin: 4px 0 0; font-size: 20px; font-weight: 600; color: var(--text-strong); font-variant-numeric: tabular-nums')}>{dd}</dd></div>
-              ))}
-            </dl>
           </section>
         </div>
+      </div>
+
+      <section aria-labelledby="dist-h" style={css('min-width: 0')}>
+        <div style={css('display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px')}>
+          <div>
+            <h2 id="dist-h" style={css('margin: 0; font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text-strong)')}>Importance Statistics for Network Assets</h2>
+            <p style={css('margin: 2px 0 0; font-size: 12px; color: var(--text-3)')}>How many assets are highly, moderately, and weakly critical, and how far each one's failure reaches · {vLabel}</p>
+          </div>
+          <div style={css('display: flex; gap: 16px; font-size: 12px; color: var(--text-2)')}>
+            <span style={css('display: flex; align-items: center; gap: 8px')}><span style={css('width: 12px; height: 12px; border-radius: 2px; background: var(--orange)')} />Ranks {from}–{to}</span>
+            <span style={css('display: flex; align-items: center; gap: 8px')}><span style={css('width: 12px; height: 12px; border-radius: 2px; background: var(--hist-other)')} />Other Assets</span>
+          </div>
+        </div>
+        <div style={css('margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(560px, 100%), 1fr)); gap: 24px; align-items: stretch')}>
+          <section aria-label="Asset Criticality" style={css(`min-width: 0; ${CARD}; padding: 20px 24px 24px; display: flex; flex-direction: column`)}>
+            <h3 style={css(TOWER_H)}>Asset Criticality</h3>
+            <p style={css(TOWER_SUB)}>Assets by criticality, most critical on the left.</p>
+            <DistributionChart key={V.key} dist={dist} options={chartOpt} onOptions={(o) => setChartOpts({ ...chartOpts, [V.key]: o })}
+              criticalLeft showNumbers={showValues} variantLabel={vLabel}
+              kFrom={from} kTo={to} busy={chartBusy} theme={app.theme} />
+            {statTiles(critTiles)}
+          </section>
+          <section aria-label="Asset Blast Radius" style={css(`min-width: 0; ${CARD}; padding: 20px 24px 24px; display: flex; flex-direction: column`)}>
+            <h3 style={css(TOWER_H)}>Asset Blast Radius</h3>
+            <p style={css(TOWER_SUB)}>
+              {V.dimension === '2d' ? 'Importance of every asset and link' : 'Importance of every asset'} each asset's failure reaches, all hops ({V.weighted ? 'L 1, M 2, H 3' : 'each counts 1'}).
+            </p>
+            {reachDist
+              ? <DistributionChart key={`reach-${V.key}`} dist={reachDist} options={reachOpt} onOptions={setReachOpt}
+                  criticalLeft showNumbers variantLabel={vLabel} kFrom={from} kTo={to} busy={false} theme={app.theme}
+                  xTitle={`Blast Radius Total (All Hops), ${vLabel}`} zeroLabel="reaches none" exportName="carma-blast-radius-distribution" />
+              : <p style={css('margin: 16px 0 0; font-size: 13px; color: var(--text-3)')}>Counting…</p>}
+            {statTiles(reachTiles)}
+          </section>
+        </div>
+      </section>
       </div>
     </div>
   );
